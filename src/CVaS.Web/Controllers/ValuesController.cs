@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CVaS.Web.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class ValuesController : Controller
     {
         // GET api/values
@@ -39,6 +41,31 @@ namespace CVaS.Web.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        [HttpGet("test/{program}")]
+        public IActionResult Test(string program)
+        {
+            Process process = new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = program,
+                    Arguments = "",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            process.Start();
+            var buffer = new StringBuilder();
+            while (!process.StandardOutput.EndOfStream)
+            {
+                buffer.AppendLine(process.StandardOutput.ReadLine());
+            }
+
+            return Ok(buffer.ToString());
         }
     }
 }
