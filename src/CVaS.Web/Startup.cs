@@ -3,19 +3,24 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CVaS.BL.Installers;
 using CVaS.BL.Repositories;
+using CVaS.BL.Services.Process;
 using CVaS.DAL;
+using CVaS.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
 namespace CVaS.Web
 {
     public class Startup
     {
+        private IHostingEnvironment hostingEnvironment;
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -24,6 +29,8 @@ namespace CVaS.Web
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+
+            hostingEnvironment = env;
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -37,10 +44,17 @@ namespace CVaS.Web
             // Add framework services.
             services.AddMvc();
 
-            // Add application services.
+            // Register Autofac and BL module
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule<BusinessLayerModule>();
 
+            // Add application services.
+            var physicalProvider = hostingEnvironment.ContentRootFileProvider;
+            containerBuilder.RegisterInstance<IFileProvider>(physicalProvider);
+            containerBuilder.RegisterType<BaseProcessService>()
+                .As<IProcessService>();
+
+            // Populate asp.net core services to autofac
             containerBuilder.Populate(services);
             var container = containerBuilder.Build();
             return new AutofacServiceProvider(container);

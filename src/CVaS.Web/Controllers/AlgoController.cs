@@ -1,64 +1,90 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using CVaS.BL.Repositories;
+using CVaS.BL.Services.Process;
 using CVaS.DAL.Model;
-using Microsoft.AspNetCore.Hosting;
+using CVaS.Web.Models;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
 namespace CVaS.Web.Controllers
 {
     [Route("[controller]")]
-    public class AlgoController : Controller
+    public class AlgoController : ApiController
     {
-        private readonly IHostingEnvironment hostingEnvironment;
         private readonly ILogger<AlgoController> logger;
         private readonly AlgorithmRepository repository;
+        private readonly IFileProvider fileProvider;
+        private readonly IProcessService processService;
 
-        public AlgoController(IHostingEnvironment hostingEnvironment, ILogger<AlgoController> logger, AlgorithmRepository repository)
+        public AlgoController(ILogger<AlgoController> logger, AlgorithmRepository repository, IFileProvider fileProvider, IProcessService processService)
         {
-            this.hostingEnvironment = hostingEnvironment;
             this.logger = logger;
             this.repository = repository;
+            this.fileProvider = fileProvider;
+            this.processService = processService;
         }
 
-        [HttpGet("")]
-        public IActionResult GetTest()
+        [HttpPost("{codeName}")]
+        public async Task<IActionResult> Process(string codeName, [FromBody] AlgorithmOptions options)
         {
-            repository.Insert(new Algorithm { Title = "Mega Giga Super"});
+            var algorithm = await repository.GetByCodeName(codeName);
 
-            return Ok("test");
-        }
-
-        [HttpGet("{program}/{arguments}")]
-        public IActionResult Get(string program, string arguments)
-        {
-            var algFolderPath = hostingEnvironment.ContentRootPath + "\\Algorithms\\" ;
-            Process process = new Process()
+            if (algorithm == null)
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = algFolderPath + program,
-                    Arguments = arguments,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true
-                }
-            };
-
-            logger.LogInformation("Starting Program");
-            process.Start();
-            var buffer = new StringBuilder();
-            while (!process.StandardOutput.EndOfStream)
-            {
-                buffer.AppendLine(process.StandardOutput.ReadLine());
+                return NotFound("Given algorithm codeName doesn't exists");
             }
-            logger.LogInformation("Ending Program");
 
+            var algoDir = fileProvider.GetDirectoryContents("Algorithms");
+            var file = algoDir.FirstOrDefault(f => f.Name == algorithm.FilePath);
 
-            return Ok(buffer.ToString());
+            if (file == null)
+            {
+                return NotFound("Given algorithm execution file doesn't exists");
+            }
+
+            var result = processService.Run(file.PhysicalPath, options.Arguments);
+
+            return Ok(new AlgorithmResult
+            {
+                Title = algorithm.Title,
+                Arguments = options.Arguments,
+                Result = result
+            });
         }
+
+        //[HttpGet("{program}/{arguments}")]
+        //public IActionResult Get(string program, string arguments)
+        //{
+            
+
+        //    Process process = new Process()
+        //    {
+        //        StartInfo = new ProcessStartInfo
+        //        {
+        //            FileName = fileName.PhysicalPath,
+        //            Arguments = arguments,
+        //            UseShellExecute = false,
+        //            RedirectStandardOutput = true,
+        //            CreateNoWindow = true
+        //        }
+        //    };
+
+        //    logger.LogInformation("Starting Program");
+        //    process.Start();
+        //    var buffer = new StringBuilder();
+        //    while (!process.StandardOutput.EndOfStream)
+        //    {
+        //        buffer.AppendLine(process.StandardOutput.ReadLine());
+        //    }
+        //    logger.LogInformation("Ending Program");
+
+
+        //    return Ok(buffer.ToString());
+        //}
         
 
     }

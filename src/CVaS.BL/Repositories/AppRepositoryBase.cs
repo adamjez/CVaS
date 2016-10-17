@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CVaS.DAL;
 using CVaS.DAL.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace CVaS.BL.Repositories
 {
@@ -14,24 +16,24 @@ namespace CVaS.BL.Repositories
             Context = context;
         }
 
-        public TEntity GetById(TKey id)
+        public async Task<TEntity> GetById(TKey id)
         {
-            return GetByIds(new TKey[] { id }).FirstOrDefault();
+            return (await GetByIds(new TKey[] { id })).FirstOrDefault();
 
         }
 
-        public virtual IList<TEntity> GetByIds(IEnumerable<TKey> ids)
+        public virtual async Task<IList<TEntity>> GetByIds(IEnumerable<TKey> ids)
         {
             IQueryable<TEntity> source = this.Context.Set<TEntity>();
 
-            return source.Where(i => ids.Contains(i.Id)).ToList();
+            return await source.Where(i => ids.Contains(i.Id)).ToListAsync();
         }
 
 
-        public virtual void Insert(TEntity entity)
+        public virtual async Task Insert(TEntity entity)
         {
             Context.Set<TEntity>().Add(entity);
-            Context.SaveChanges();
+            await Context.SaveChangesAsync();
         }
     }
 }

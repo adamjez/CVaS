@@ -1,4 +1,5 @@
-﻿using CVaS.DAL.Common;
+﻿using System.ComponentModel.DataAnnotations;
+using CVaS.DAL.Common;
 
 namespace CVaS.DAL.Model
 {
@@ -7,5 +8,13 @@ namespace CVaS.DAL.Model
         public int Id { get; set; }
 
         public string Title { get; set; }
+
+        [Required]
+        [MaxLength(64)]
+        public string CodeName { get; set; }
+
+        [Required]
+        [MaxLength(256)]
+        public string FilePath { get; set; }
     }
 }
