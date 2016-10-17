@@ -49,7 +49,7 @@ namespace CVaS.Web.Controllers
 
             if (file == null)
             {
-                return NotFound("Given algorithm execution file doesn't exists (2)");
+                return NotFound($"Given algorithm execution file doesn't exists ({algorithm.FilePath})");
             }
 
 
