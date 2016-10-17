@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,13 +39,19 @@ namespace CVaS.Web.Controllers
                 return NotFound("Given algorithm codeName doesn't exists");
             }
 
-            var algoDir = fileProvider.GetDirectoryContents("Algorithms");
+            var algoDir = fileProvider.GetDirectoryContents("Algorithms" + Path.PathSeparator + codeName);
+            if (algoDir == null)
+            {
+                return NotFound("Given algorithm execution file doesn't exists (1)");
+            }
+
             var file = algoDir.FirstOrDefault(f => f.Name == algorithm.FilePath);
 
             if (file == null)
             {
-                return NotFound("Given algorithm execution file doesn't exists");
+                return NotFound("Given algorithm execution file doesn't exists (2)");
             }
+
 
             var result = processService.Run(file.PhysicalPath, options.Arguments);
 
@@ -55,37 +62,5 @@ namespace CVaS.Web.Controllers
                 Result = result
             });
         }
-
-        //[HttpGet("{program}/{arguments}")]
-        //public IActionResult Get(string program, string arguments)
-        //{
-            
-
-        //    Process process = new Process()
-        //    {
-        //        StartInfo = new ProcessStartInfo
-        //        {
-        //            FileName = fileName.PhysicalPath,
-        //            Arguments = arguments,
-        //            UseShellExecute = false,
-        //            RedirectStandardOutput = true,
-        //            CreateNoWindow = true
-        //        }
-        //    };
-
-        //    logger.LogInformation("Starting Program");
-        //    process.Start();
-        //    var buffer = new StringBuilder();
-        //    while (!process.StandardOutput.EndOfStream)
-        //    {
-        //        buffer.AppendLine(process.StandardOutput.ReadLine());
-        //    }
-        //    logger.LogInformation("Ending Program");
-
-
-        //    return Ok(buffer.ToString());
-        //}
-        
-
     }
 }
