@@ -4,6 +4,8 @@
     {
         public string Title { get; set; }
         public string Arguments { get; set; }
-        public string Result { get; set; }
+        public string StdOut { get; set; }
+        public string StdError { get; set; }
+
     }
 }

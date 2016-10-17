@@ -2,6 +2,12 @@
 {
     public interface IProcessService
     {
-        string Run(string filePath, string arguments);
+        ProcessResult Run(string filePath, string arguments);
+    }
+
+    public class ProcessResult
+    {
+        public string StdOut { get; set; }
+        public string StdError { get; set; }
     }
 }

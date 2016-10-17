@@ -39,7 +39,7 @@ namespace CVaS.Web.Controllers
                 return NotFound("Given algorithm codeName doesn't exists");
             }
 
-            var algoDir = fileProvider.GetDirectoryContents("Algorithms" + Path.PathSeparator + codeName);
+            var algoDir = fileProvider.GetDirectoryContents("Algorithms" + Path.DirectorySeparatorChar + codeName);
             if (algoDir == null)
             {
                 return NotFound("Given algorithm execution file doesn't exists (1)");
@@ -49,7 +49,7 @@ namespace CVaS.Web.Controllers
 
             if (file == null)
             {
-                return NotFound($"Given algorithm execution file doesn't exists ({algorithm.FilePath})");
+                return NotFound($"Given algorithm execution file doesn't exists (2)");
             }
 
 
@@ -59,7 +59,8 @@ namespace CVaS.Web.Controllers
             {
                 Title = algorithm.Title,
                 Arguments = options.Arguments,
-                Result = result
+                StdOut = result.StdOut,
+                StdError = result.StdError
             });
         }
     }
