@@ -38,8 +38,8 @@ namespace CVaS.Web.Controllers
             {
                 return NotFound("Given algorithm codeName doesn't exists");
             }
-
-            var algoDir = fileProvider.GetDirectoryContents("Algorithms" + Path.DirectorySeparatorChar + codeName);
+            
+            var algoDir = fileProvider.GetDirectoryContents(Path.Combine("Algorithms", codeName));
             if (algoDir == null)
             {
                 return NotFound("Given algorithm execution file doesn't exists (1)");
