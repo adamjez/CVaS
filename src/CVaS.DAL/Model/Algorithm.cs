@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using CVaS.DAL.Common;
 
 namespace CVaS.DAL.Model

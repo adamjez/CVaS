@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CVaS.BL.Repositories;
 using CVaS.BL.Services.Process;
-using CVaS.DAL.Model;
 using CVaS.Web.Models;
+using CVaS.Web.Services;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 
@@ -18,10 +16,11 @@ namespace CVaS.Web.Controllers
     {
         private readonly ILogger<AlgoController> logger;
         private readonly AlgorithmRepository repository;
-        private readonly IFileProvider fileProvider;
+        private readonly AlgorithmFileProvider fileProvider;
         private readonly IProcessService processService;
 
-        public AlgoController(ILogger<AlgoController> logger, AlgorithmRepository repository, IFileProvider fileProvider, IProcessService processService)
+        public AlgoController(ILogger<AlgoController> logger, AlgorithmRepository repository,
+            AlgorithmFileProvider fileProvider, IProcessService processService)
         {
             this.logger = logger;
             this.repository = repository;
@@ -39,7 +38,7 @@ namespace CVaS.Web.Controllers
                 return NotFound("Given algorithm codeName doesn't exists");
             }
             
-            var algoDir = fileProvider.GetDirectoryContents(Path.Combine("Algorithms", codeName));
+            var algoDir = fileProvider.GetAlgorithmDirectoryContents(codeName);
             if (algoDir == null)
             {
                 return NotFound("Given algorithm execution file doesn't exists (1)");

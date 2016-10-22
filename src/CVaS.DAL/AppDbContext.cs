@@ -1,9 +1,11 @@
 ﻿using CVaS.DAL.Model;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CVaS.DAL
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<AppUser, AppRole, int, AppUserClaim, 
+        AppUserRole, AppUserLogin, AppRoleClaim, AppUserToken>
     {
         public DbSet<Algorithm> Algorithms { get; set; }
 
@@ -16,6 +18,5 @@ namespace CVaS.DAL
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
         }
-        
     }
 }
