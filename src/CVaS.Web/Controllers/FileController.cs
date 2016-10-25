@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CVaS.BL.Providers;
+using CVaS.BL.Repositories;
 using CVaS.Web.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,12 +16,17 @@ namespace CVaS.Web.Controllers
     public class FileController : ApiController
     {
         private readonly ILogger<FileController> _logger;
-        private readonly TempFileProvider fileProvider;
+        private readonly TempFileProvider _fileProvider;
+        private readonly FileRepository _fileRepository;
+        private readonly ICurrentUserProvider _currentUserProvider;
 
-        public FileController(ILogger<FileController> logger, TempFileProvider fileProvider)
+        public FileController(ILogger<FileController> logger, TempFileProvider fileProvider, FileRepository fileRepository, 
+            ICurrentUserProvider currentUserProvider)
         {
             _logger = logger;
-            this.fileProvider = fileProvider;
+            this._fileProvider = fileProvider;
+            this._fileRepository = fileRepository;
+            _currentUserProvider = currentUserProvider;
         }
 
         [HttpPost("")]
@@ -33,7 +39,7 @@ namespace CVaS.Web.Controllers
 
             //foreach (var file in files)
             {
-                await fileProvider.CreateTempFile(image);
+                await _fileProvider.CreateTempFile(image);
             }
 
             return Ok(new FileResult
@@ -65,10 +71,10 @@ namespace CVaS.Web.Controllers
                 const int chunkSize = 1024;
                 var buffer = new byte[chunkSize];
 
-                var filename = fileProvider.CreateFileName();
-                using (var stream = fileProvider.CreateTempFile1(filename))
+                var filename = _fileProvider.CreateFileName();
+                using (var stream = _fileProvider.CreateTempFile1(filename))
                 {
-                    var bytesRead = 0;
+                    int bytesRead;
                     do
                     {
                         bytesRead = await section.Body.ReadAsync(buffer, 0, buffer.Length);
@@ -79,6 +85,15 @@ namespace CVaS.Web.Controllers
 
                 fileNames.Add(filename);
                 section = await reader.ReadNextSectionAsync();
+            }
+
+            foreach (var file in fileNames)
+            {
+                await _fileRepository.Insert(new DAL.Model.File()
+                {
+                    Path = file,
+                    UserId = _currentUserProvider.Id
+                });
             }
 
             return Ok(fileNames);

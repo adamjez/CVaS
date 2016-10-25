@@ -2,7 +2,7 @@
 
 namespace CVaS.DAL.Model
 {
-    public class AppRole : IdentityRole<int, AppUserRole, AppRoleClaim>
+    public class AppRole : IdentityRole<int>
     {
     }
 }

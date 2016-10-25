@@ -35,20 +35,20 @@ namespace CVaS.Web.Controllers
 
             if (algorithm == null)
             {
-                return NotFound("Given algorithm codeName doesn't exists");
+                return NotFound(Json("Given algorithm codeName doesn't exists"));
             }
             
             var algoDir = fileProvider.GetAlgorithmDirectoryContents(codeName);
             if (algoDir == null)
             {
-                return NotFound("Given algorithm execution file doesn't exists (1)");
+                return NotFound(Json("Given algorithm execution file doesn't exists (1)"));
             }
 
             var file = algoDir.FirstOrDefault(f => f.Name == algorithm.FilePath);
 
             if (file == null)
             {
-                return NotFound($"Given algorithm execution file doesn't exists (2)");
+                return NotFound(Json("Given algorithm execution file doesn't exists (2)"));
             }
 
 

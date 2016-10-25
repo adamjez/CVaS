@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CVaS.DAL
 {
-    public class AppDbContext : IdentityDbContext<AppUser, AppRole, int, AppUserClaim, 
-        AppUserRole, AppUserLogin, AppRoleClaim, AppUserToken>
+    public class AppDbContext : IdentityDbContext<AppUser, AppRole, int>
     {
         public DbSet<Algorithm> Algorithms { get; set; }
 
@@ -17,6 +16,15 @@ namespace CVaS.DAL
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<File>()
+                .HasAlternateKey(c => c.Path);
+
         }
     }
 }

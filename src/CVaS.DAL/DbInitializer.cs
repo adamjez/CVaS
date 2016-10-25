@@ -1,15 +1,25 @@
 ﻿using System.Linq;
 using CVaS.DAL.Model;
+using Microsoft.AspNetCore.Identity;
 
 namespace CVaS.DAL
 {
-    public static class DbInitializer
+    public class DbInitializer
     {
-        public static void Initialize(AppDbContext context)
-        {
-            context.Database.EnsureCreated();
+        private readonly UserManager<AppUser> _userManager;
+        private readonly AppDbContext _context;
 
-            if (!context.Algorithms.Any())
+        public DbInitializer(UserManager<AppUser> userManager, AppDbContext context)
+        {
+            _userManager = userManager;
+            _context = context;
+        }
+
+        public void Initialize()
+        {
+            _context.Database.EnsureCreated();
+
+            if (!_context.Algorithms.Any())
             {
                 var algorithm = new Algorithm()
                 {
@@ -17,9 +27,34 @@ namespace CVaS.DAL
                     FilePath = "Project1",
                     Title = "Mega Giga Super Algo"
                 };
-                context.Algorithms.Add(algorithm);
+                _context.Algorithms.Add(algorithm);
+
+                _context.SaveChanges();
             }
-            context.SaveChanges();
+
+            if (!_context.Roles.Any())
+            {
+                var role = new AppRole()
+                {
+                    Name = Roles.Admin
+                };
+                _context.Roles.Add(role);
+
+                _context.SaveChanges();
+            }
+
+            if (!_context.Users.Any())
+            {
+                var user = new AppUser()
+                {
+                    UserName = "username",
+                    Email = "spiritakcz@gmail.com"
+                };
+
+                _userManager.CreateAsync(user, "Password1!").Wait();
+
+                _userManager.AddToRoleAsync(user, Roles.Admin).Wait();
+            }
         }
     }
 }
