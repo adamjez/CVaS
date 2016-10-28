@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CVaS.BL.Exceptions;
 using CVaS.BL.Providers;
 using CVaS.BL.Repositories;
 using CVaS.Web.Services;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using FileResult = CVaS.Web.Models.FileResult;
 
 namespace CVaS.Web.Controllers
 {
@@ -67,20 +69,10 @@ namespace CVaS.Web.Controllers
             var fileNames = new List<string>();
             while (section != null)
             {
-                // process each image
-                const int chunkSize = 1024;
-                var buffer = new byte[chunkSize];
-
                 var filename = _fileProvider.CreateFileName();
                 using (var stream = _fileProvider.CreateTempFile1(filename))
                 {
-                    int bytesRead;
-                    do
-                    {
-                        bytesRead = await section.Body.ReadAsync(buffer, 0, buffer.Length);
-                        stream.Write(buffer, 0, bytesRead);
-
-                    } while (bytesRead > 0);
+                    await section.Body.CopyToAsync(stream);
                 }
 
                 fileNames.Add(filename);
@@ -119,16 +111,5 @@ namespace CVaS.Web.Controllers
             }
             return boundary;
         }
-
-        public class FileResult
-        {
-            public IEnumerable<string> FileNames { get; set; }
-            public string Description { get; set; }
-            public DateTime CreatedTimestamp { get; set; }
-            public DateTime UpdatedTimestamp { get; set; }
-            public string DownloadLink { get; set; }
-            public IEnumerable<string> ContentTypes { get; set; }
-        }
-
     }
 }
