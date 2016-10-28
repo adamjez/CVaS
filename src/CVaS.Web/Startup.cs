@@ -39,7 +39,7 @@ namespace CVaS.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            if (hostingEnvironment.IsProduction())
+            if (hostingEnvironment.IsStaging())
             {
                 services.AddDbContext<AppDbContext>(options =>
                     options.UseMySQL(Configuration.GetConnectionString("DefaultConnection")));
@@ -49,7 +49,7 @@ namespace CVaS.Web
                 services.AddDbContext<AppDbContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             }
-
+                
             services.AddIdentity<AppUser, AppRole>(options =>
                 {
                     // Password settings

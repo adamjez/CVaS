@@ -36,7 +36,8 @@ namespace CVaS.DAL
             {
                 var role = new AppRole()
                 {
-                    Name = Roles.Admin
+                    Name = Roles.Admin,
+                    NormalizedName = Roles.Admin
                 };
                 _context.Roles.Add(role);
 

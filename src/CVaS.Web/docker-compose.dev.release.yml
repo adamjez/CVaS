@@ -6,4 +6,6 @@ services:
       - "com.microsoft.visualstudio.targetoperatingsystem=linux"
     volumes:
       - ~/clrdbg:/clrdbg:ro
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
     entrypoint: tail -f /dev/null

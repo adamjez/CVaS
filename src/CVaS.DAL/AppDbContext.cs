@@ -7,6 +7,7 @@ namespace CVaS.DAL
     public class AppDbContext : IdentityDbContext<AppUser, AppRole, int>
     {
         public DbSet<Algorithm> Algorithms { get; set; }
+        public DbSet<File> Files { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
