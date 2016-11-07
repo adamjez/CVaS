@@ -16,9 +16,9 @@ namespace CVaS.Web.Services
             this.configuration = configuration;
         }
 
-        public string GetAlgorithmFilePath(string codename, string algFile)
+        public string GetAlgorithmFilePath(string codeName, string algFile)
         {
-            var pathToFolder = Path.Combine(configuration["DirectoryPaths:Algorithm"], algFile);
+            var pathToFolder = Path.Combine(configuration["DirectoryPaths:Algorithm"], codeName);
             var pathToFile = Path.Combine(pathToFolder, algFile);
             return pathToFile;
         }

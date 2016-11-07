@@ -50,16 +50,20 @@ namespace CVaS.Web.Controllers
                         
             if (!_fileProvider.Exists(filePath))
             {
-                return NotFound(Json("Given algorithm execution file doesn't exists"));
+                return NotFound(Json("Given algorithm execution file doesn't exists" + filePath));
             }
 
 
             List<string> paths = new List<string>();
-            foreach (var arg in options.Arguments)
+            if (options.Arguments != null)
             {
-                var argEntity = await _fileRepository.GetById(int.Parse(arg.Content));
-                paths.Add(argEntity.Path);
+                foreach (var arg in options.Arguments)
+                {
+                    var argEntity = await _fileRepository.GetById(int.Parse(arg.Content));
+                    paths.Add(argEntity.Path);
+                }
             }
+
 
             var runFolder = _fileSystemProvider.CreateTempFolder();
 
@@ -74,7 +78,8 @@ namespace CVaS.Web.Controllers
                 //Arguments = options.Arguments,
                 StdOut = result.StdOut,
                 StdError = result.StdError,
-                Zip = zipPath
+                Zip = zipPath,
+                RunFolder = runFolder
             });
         }
 

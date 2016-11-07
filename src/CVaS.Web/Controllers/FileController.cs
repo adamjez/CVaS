@@ -104,7 +104,7 @@ namespace CVaS.Web.Controllers
         {
             const string zipMime = "application/zip";
             HttpContext.Response.ContentType = zipMime;
-            var path = Path.Combine(@"D:\Downloads", zipName);
+            var path = zipName;
 
             var service = HttpContext.Features.Get<IHttpSendFileFeature>();
             IFileInfo f = new PhysicalFileInfo(new FileInfo(path));
