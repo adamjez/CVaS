@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -82,7 +83,6 @@ namespace CVaS.Web
             containerBuilder.RegisterInstance(physicalProvider);
             containerBuilder.RegisterInstance(Configuration);
             containerBuilder.RegisterType<DbInitializer>();
-            containerBuilder.RegisterType<FileProvider>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 

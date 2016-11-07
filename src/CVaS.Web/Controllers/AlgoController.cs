@@ -10,6 +10,8 @@ using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Web.Models;
 using CVaS.Web.Services;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +32,8 @@ namespace CVaS.Web.Controllers
 
         public AlgoController(ILogger<AlgoController> logger, AlgorithmRepository repository, FileProvider fileProvider,
             AlgorithmFileProvider algFileProvider, IProcessService processService, FileRepository fileRepository, 
-            TemporaryFileProvider fileSystemProvider, AppDbContext context, IUrlHelper urlHelper)
+            TemporaryFileProvider fileSystemProvider, AppDbContext context, IUrlHelperFactory urlHelperFactory, 
+            IActionContextAccessor actionContextAccessor)
         {
             this.logger = logger;
             this.repository = repository;
@@ -40,7 +43,7 @@ namespace CVaS.Web.Controllers
             _fileRepository = fileRepository;
             _fileSystemProvider = fileSystemProvider;
             _context = context;
-            _urlHelper = urlHelper;
+            _urlHelper = urlHelperFactory.GetUrlHelper(actionContextAccessor.ActionContext);
         }
 
         [HttpPost("{codeName}")]
