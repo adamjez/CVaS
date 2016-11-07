@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 
@@ -29,6 +30,16 @@ namespace CVaS.Web.Services
         public bool Exists(string path)
         {
             return File.Exists(path);
+        }
+
+        public bool IsEmpty(string directory)
+        {
+            return !Directory.EnumerateFiles(directory).Any();
+        }
+
+        public string GetDirectoryFromFile(string filePath)
+        {
+            return Directory.GetParent(filePath).FullName;
         }
     }
 }

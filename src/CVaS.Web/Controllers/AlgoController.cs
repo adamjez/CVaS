@@ -69,8 +69,12 @@ namespace CVaS.Web.Controllers
 
             var result = processService.Run(filePath, runFolder, args);
 
-            var zipPath = Guid.NewGuid() + ".zip";
-            ZipFile.CreateFromDirectory(runFolder, zipPath, CompressionLevel.Fastest, false);
+            var zipPath = "<output empty>";
+            if (!_fileProvider.IsEmpty(runFolder))
+            {
+                zipPath = Guid.NewGuid() + ".zip";
+                ZipFile.CreateFromDirectory(runFolder, zipPath, CompressionLevel.Fastest, false);
+            }
 
             return Ok(new AlgorithmResult
             {
