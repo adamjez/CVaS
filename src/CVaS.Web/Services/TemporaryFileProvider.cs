@@ -40,7 +40,7 @@ namespace CVaS.Web.Services
 
         public string CreateTemporaryFileName()
         {
-            return ResolveTemporaryFilePath(Path.GetTempFileName());
+            return Path.GetTempFileName();
         }
 
         public string ResolveTemporaryFilePath(string file)
