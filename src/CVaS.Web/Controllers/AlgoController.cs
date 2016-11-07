@@ -59,8 +59,17 @@ namespace CVaS.Web.Controllers
             {
                 foreach (var arg in options.Arguments)
                 {
-                    var argEntity = await _fileRepository.GetById(int.Parse(arg.Content));
-                    args.Add(argEntity.Path);
+                    if (arg.Type == ArgumentType.File)
+                    {
+                        // Check for user
+                        var argEntity = await _fileRepository.GetById(int.Parse(arg.Content));
+                        args.Add(argEntity.Path);
+                    }
+                    else if (arg.Type == ArgumentType.Number)
+                    {
+                        // Validate?
+                        args.Add(arg.Content);
+                    }
                 }
             }
 
