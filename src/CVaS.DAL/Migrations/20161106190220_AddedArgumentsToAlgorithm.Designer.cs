@@ -8,9 +8,10 @@ using CVaS.DAL;
 namespace CVaS.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20161106190220_AddedArgumentsToAlgorithm")]
+    partial class AddedArgumentsToAlgorithm
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.1")
@@ -24,8 +25,6 @@ namespace CVaS.DAL.Migrations
                     b.Property<string>("CodeName")
                         .IsRequired()
                         .HasAnnotation("MaxLength", 64);
-
-                    b.Property<string>("Description");
 
                     b.Property<string>("FilePath")
                         .IsRequired()

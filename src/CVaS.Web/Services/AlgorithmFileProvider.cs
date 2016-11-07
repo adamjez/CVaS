@@ -20,5 +20,10 @@ namespace CVaS.Web.Services
             var path = Path.Combine(configuration["DirectoryPaths:Algorithm"], subpath);
             return fileProvider.GetDirectoryContents(path);
         }
+
+        public IDirectoryContents GetDirectoryContent(string path)
+        {
+            return fileProvider.GetDirectoryContents(path);
+        }
     }
 }

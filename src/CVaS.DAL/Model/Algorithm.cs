@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using CVaS.DAL.Common;
 
@@ -17,5 +19,10 @@ namespace CVaS.DAL.Model
         [Required]
         [MaxLength(256)]
         public string FilePath { get; set; }
+
+        public ICollection<Argument> Arguments { get; private set; } 
+            = new List<Argument>();
+
+        public string Description { get; set; }
     }
 }

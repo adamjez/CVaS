@@ -2,7 +2,7 @@
 {
     public interface IProcessService
     {
-        ProcessResult Run(string filePath, string arguments);
+        ProcessResult Run(string filePath, string arguments, string workingDirectory);
     }
 
     public class ProcessResult

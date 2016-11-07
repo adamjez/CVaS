@@ -6,7 +6,7 @@ namespace CVaS.Web.Services
 {
     public class BaseProcessService : IProcessService
     {
-        public ProcessResult Run(string filePath, string arguments)
+        public ProcessResult Run(string filePath, string arguments, string workingDirectory)
         {
             var result = new ProcessResult {StdError = "", StdOut = ""};
             Process process = new Process()
@@ -18,7 +18,8 @@ namespace CVaS.Web.Services
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    CreateNoWindow = true
+                    CreateNoWindow = true,
+                    WorkingDirectory = workingDirectory
                 }
             };
 

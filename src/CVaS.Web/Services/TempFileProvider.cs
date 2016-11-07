@@ -28,6 +28,14 @@ namespace CVaS.Web.Services
             return path;
         }
 
+        public string CreateTempFolder()
+        {
+            var folderName = Path.GetRandomFileName();
+            var directory = Directory.CreateDirectory(folderName);
+          
+            return directory.FullName;
+        }
+
         public FileStream CreateTempFile1(string fileName)
         {
             return File.Create(fileName);

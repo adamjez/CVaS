@@ -7,5 +7,7 @@
         public string StdOut { get; set; }
         public string StdError { get; set; }
 
+        public string Zip { get; set; }
+
     }
 }
