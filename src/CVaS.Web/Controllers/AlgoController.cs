@@ -86,7 +86,7 @@ namespace CVaS.Web.Controllers
             string zipPath = null;
             if (!_fileProvider.IsEmpty(runFolder))
             {
-                zipPath = Guid.NewGuid() + ".zip";
+                zipPath = _fileSystemProvider.CreateTemporaryFileName() + ".zip";
                 ZipFile.CreateFromDirectory(runFolder, zipPath, CompressionLevel.Fastest, false);
             }
 

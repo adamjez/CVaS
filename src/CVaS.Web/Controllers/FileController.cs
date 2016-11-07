@@ -28,15 +28,17 @@ namespace CVaS.Web.Controllers
         private readonly FileRepository _fileRepository;
         private readonly ICurrentUserProvider _currentUserProvider;
         private readonly AppDbContext _context;
+        private readonly TemporaryFileProvider _temporaryFileProvider;
 
         public FileController(ILogger<FileController> logger, TemporaryFileProvider fileProvider, FileRepository fileRepository, 
-            ICurrentUserProvider currentUserProvider, AppDbContext context)
+            ICurrentUserProvider currentUserProvider, AppDbContext context, TemporaryFileProvider temporaryFileProvider)
         {
             _logger = logger;
             this._fileProvider = fileProvider;
             this._fileRepository = fileRepository;
             _currentUserProvider = currentUserProvider;
             _context = context;
+            _temporaryFileProvider = temporaryFileProvider;
         }
 
         [HttpPost("")]
@@ -78,7 +80,7 @@ namespace CVaS.Web.Controllers
             MultipartSection section;
             while ((section = await reader.ReadNextSectionAsync()) != null)
             {
-                var filename = _fileProvider.CreateFileName();
+                var filename = _fileProvider.CreateTemporaryFileName();
                 using (var stream = _fileProvider.CreateTemporaryFile(filename))
                 {
                     await section.Body.CopyToAsync(stream);
@@ -104,18 +106,19 @@ namespace CVaS.Web.Controllers
         {
             const string zipMime = "application/zip";
             HttpContext.Response.ContentType = zipMime;
-            var path = zipName;
 
             var service = HttpContext.Features.Get<IHttpSendFileFeature>();
-            IFileInfo f = new PhysicalFileInfo(new FileInfo(path));
+
+            var pathToFile = _temporaryFileProvider.ResolveTemporaryFilePath(zipName);
+            IFileInfo fileInfo = new PhysicalFileInfo(new FileInfo(pathToFile));
 
             if (service != null)
             {
-                await service.SendFileAsync(path, 0, f.Length, CancellationToken.None);
+                await service.SendFileAsync(pathToFile, 0, fileInfo.Length, CancellationToken.None);
             }
             else
             {
-                await HttpContext.Response.SendFileAsync(f);
+                await HttpContext.Response.SendFileAsync(fileInfo);
 
             }
         }

@@ -38,9 +38,14 @@ namespace CVaS.Web.Services
             return File.Create(fileName);
         }
 
-        public string CreateFileName()
+        public string CreateTemporaryFileName()
         {
-            return Path.Combine(temporaryDirectory, Path.GetTempFileName());
+            return ResolveTemporaryFilePath(Path.GetTempFileName());
+        }
+
+        public string ResolveTemporaryFilePath(string file)
+        {
+            return Path.Combine(temporaryDirectory, file);
         }
     }
 }
