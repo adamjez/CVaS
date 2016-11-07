@@ -8,7 +8,7 @@ namespace CVaS.Web
         public static void Main(string[] args)
         {
             var host = new WebHostBuilder()
-                .UseWebListener()
+                .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>()

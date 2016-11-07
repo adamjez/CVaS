@@ -1,5 +1,4 @@
 ﻿using CVaS.DAL.Common;
-using CVaS.Web.Models;
 
 namespace CVaS.DAL.Model
 {
@@ -8,5 +7,9 @@ namespace CVaS.DAL.Model
         public int Id { get; set; }
 
         public ArgumentType Type { get; set; }
+
+        public string Name { get; set; }
+
+        public string Description { get; set; }
     }
 }

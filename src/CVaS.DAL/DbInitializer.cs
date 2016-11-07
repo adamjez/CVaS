@@ -21,13 +21,49 @@ namespace CVaS.DAL
 
             if (!_context.Algorithms.Any())
             {
-                var algorithm = new Algorithm()
+                var algorithm1 = new Algorithm()
                 {
                     CodeName = "hello-world",
-                    FilePath = "Project1",
-                    Title = "Mega Giga Super Algo"
+                    FilePath = "hello-world.py",
+                    Title = "Hello World ",
+                    Description = "Hello world Example App - Just print to standard output Hello World!"
                 };
-                _context.Algorithms.Add(algorithm);
+
+                _context.Algorithms.Add(algorithm1);
+
+                var algorithm2 = new Algorithm()
+                {
+                    CodeName = "face-detection",
+                    FilePath = "facedetect.py",
+                    Title = "Face Detection",
+                    Description = "Detect Faces number on given Image - Print out to standard output number of faces on image!"
+                };
+
+                algorithm2.Arguments.Add(new Argument()
+                {
+                    Type = ArgumentType.File,
+                    Description = "Image which where will be detected faces",
+                    Name = "Image"
+                });
+
+                _context.Algorithms.Add(algorithm2);
+
+                var algorithm3 = new Algorithm()
+                {
+                    CodeName = "to-grayscale",
+                    FilePath = "grayscale.py",
+                    Title = "Conversion to grayscale",
+                    Description = "Converts given image to grayscale!"
+                };
+
+                algorithm3.Arguments.Add(new Argument()
+                {
+                    Type = ArgumentType.File,
+                    Description = "Image which where will be converted to grayscale",
+                    Name = "Image"
+                });
+
+                _context.Algorithms.Add(algorithm3);
 
                 _context.SaveChanges();
             }

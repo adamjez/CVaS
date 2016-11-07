@@ -98,40 +98,9 @@ namespace CVaS.Web.Controllers
             return Ok(files);
         }
 
-
-        [HttpGet("1/{zipName}")]
-        public async Task GetResultZip(string zipName)
-        {
-            const string zipMime = "application/zip";
-            HttpContext.Response.ContentType = zipMime;
-            var path = Path.Combine(@"D:\Downloads", zipName);
-
-            var service = HttpContext.Features.Get<IHttpSendFileFeature>();
-            IFileInfo f = new PhysicalFileInfo(new FileInfo(path));
-
-            if (service != null)
-            {
-                //await service.SendFileAsync(path, 0, f.Length, CancellationToken.None);
-                //return StatusCode(200);
-            }
-            await HttpContext.Response.SendFileAsync(f);
-
-            //return PhysicalFile(path, zipMime);
-        }
-
-        [HttpGet("2/{zipName}")]
-        public IActionResult GetResultZip1(string zipName)
-        {
-            const string zipMime = "application/zip";
-            HttpContext.Response.ContentType = zipMime;
-            var path = Path.Combine(@"D:\Downloads", zipName);     
-
-            return PhysicalFile(path, zipMime);
-        }
-
         // Nejlepsi verze !!!!!!!!!
-        [HttpGet("3/{zipName}")]
-        public async Task GetResultZip2(string zipName)
+        [HttpGet("{zipName}")]
+        public async Task GetResultZip(string zipName)
         {
             const string zipMime = "application/zip";
             HttpContext.Response.ContentType = zipMime;
@@ -149,23 +118,6 @@ namespace CVaS.Web.Controllers
                 await HttpContext.Response.SendFileAsync(f);
 
             }
-        }
-
-
-        [HttpGet("4/{zipName}")]
-        public Microsoft.AspNetCore.Mvc.FileResult GetResultZip3(string zipName)
-        {
-            const string zipMime = "application/zip";
-            HttpContext.Response.ContentType = zipMime;
-            var path = Path.Combine(@"D:\Downloads", zipName);
-
-            HttpContext.Response.ContentType = zipMime;
-            FileContentResult result = new FileContentResult(System.IO.File.ReadAllBytes(path), zipMime)
-            {
-                FileDownloadName = zipName
-            };
-
-            return result;
         }
 
         private static bool IsMultipartContentType(string contentType)
