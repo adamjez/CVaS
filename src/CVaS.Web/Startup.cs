@@ -84,8 +84,6 @@ namespace CVaS.Web
             containerBuilder.RegisterInstance(Configuration);
             containerBuilder.RegisterType<DbInitializer>();
 
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
             // Register Modules
             containerBuilder.RegisterModule<BusinessLayerModule>();
             containerBuilder.RegisterModule<WebApiModule>();

@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO.Compression;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using System.Threading.Tasks;
 using CVaS.BL.Repositories;
 using CVaS.BL.Services.Process;
@@ -10,15 +10,13 @@ using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Web.Models;
 using CVaS.Web.Services;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 
 namespace CVaS.Web.Controllers
 {
     [Route("[controller]")]
-    public class AlgoController : ApiController
+    public class AlgoController : Controller
     {
         private readonly ILogger<AlgoController> logger;
         private readonly AlgorithmRepository repository;
@@ -28,12 +26,10 @@ namespace CVaS.Web.Controllers
         private readonly FileRepository _fileRepository;
         private readonly TemporaryFileProvider _fileSystemProvider;
         private readonly AppDbContext _context;
-        private readonly IUrlHelper _urlHelper;
 
         public AlgoController(ILogger<AlgoController> logger, AlgorithmRepository repository, FileProvider fileProvider,
             AlgorithmFileProvider algFileProvider, IProcessService processService, FileRepository fileRepository, 
-            TemporaryFileProvider fileSystemProvider, AppDbContext context, IUrlHelperFactory urlHelperFactory, 
-            IActionContextAccessor actionContextAccessor)
+            TemporaryFileProvider fileSystemProvider, AppDbContext context)
         {
             this.logger = logger;
             this.repository = repository;
@@ -43,7 +39,6 @@ namespace CVaS.Web.Controllers
             _fileRepository = fileRepository;
             _fileSystemProvider = fileSystemProvider;
             _context = context;
-            _urlHelper = urlHelperFactory.GetUrlHelper(actionContextAccessor.ActionContext);
         }
 
         [HttpPost("{codeName}")]
@@ -96,14 +91,12 @@ namespace CVaS.Web.Controllers
             }
 
 
-            var controllerName = nameof(FileController);
             return Ok(new AlgorithmResult
             {
                 Title = algorithm.Title,
                 StdOut = result.StdOut,
                 StdError = result.StdError,
-                Zip = zipPath != null ?_urlHelper.Action(nameof(FileController.GetResultZip), controllerName, new {zipName = zipPath})
-                        :   "<no-output>"
+                Zip = zipPath != null ? Url.Link(nameof(FileController.GetResultZip), new { zipName = zipPath }) : "<no-output>"
             });
         }
 
@@ -115,7 +108,7 @@ namespace CVaS.Web.Controllers
             return Ok(algorithms);
         }
 
-        [HttpGet("{codeName}")]
+        [HttpGet, Route("{codeName}")]
         public async Task<IActionResult> RetrieveHelp(string codeName)
         {
             var algorithm = await repository.GetByCodeNameWithArgs(codeName);

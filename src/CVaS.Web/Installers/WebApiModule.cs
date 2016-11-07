@@ -3,10 +3,6 @@ using CVaS.BL.Providers;
 using CVaS.BL.Services.Process;
 using CVaS.Web.Providers;
 using CVaS.Web.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace CVaS.Web.Installers
 {
@@ -22,16 +18,16 @@ namespace CVaS.Web.Installers
             builder.RegisterType<CurrentUserProvider>()
                 .As<ICurrentUserProvider>();
 
-            builder.RegisterType<HttpContextAccessor>()
-                .As<IHttpContextAccessor>()
-                .SingleInstance();
+            //builder.RegisterType<HttpContextAccessor>()
+            //    .As<IHttpContextAccessor>()
+            //    .SingleInstance();
 
-            builder.RegisterType<ActionContextAccessor>()
-                .As<IActionContextAccessor>()
-                .SingleInstance();
+            //builder.RegisterType<ActionContextAccessor>()
+            //    .As<IActionContextAccessor>()
+            //    .SingleInstance();
             
-            builder.RegisterType<UrlHelperFactory>()
-                .As<IUrlHelperFactory>();
+            //builder.RegisterType<UrlHelperFactory>()
+            //    .As<IUrlHelperFactory>();
         }
     }
 }

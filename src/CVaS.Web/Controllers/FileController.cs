@@ -99,7 +99,7 @@ namespace CVaS.Web.Controllers
             return Ok(files);
         }
 
-        [HttpGet("{zipName}")]
+        [HttpGet, Route("{zipName}", Name = nameof(GetResultZip))]
         public async Task GetResultZip(string zipName)
         {
             const string zipMime = "application/zip";
