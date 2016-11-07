@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 
@@ -6,24 +7,28 @@ namespace CVaS.Web.Services
 {
     public class AlgorithmFileProvider
     {
-        private readonly IFileProvider fileProvider;
+        private readonly FileProvider fileProvider;
         private readonly IConfigurationRoot configuration;
 
-        public AlgorithmFileProvider(IFileProvider fileProvider, IConfigurationRoot configuration)
+        public AlgorithmFileProvider(FileProvider fileProvider, IConfigurationRoot configuration)
         {
             this.fileProvider = fileProvider;
             this.configuration = configuration;
         }
 
-        public IDirectoryContents GetAlgorithmDirectoryContents(string subpath = "")
+        public string GetAlgorithmFilePath(string codename, string algFile)
         {
-            var path = Path.Combine(configuration["DirectoryPaths:Algorithm"], subpath);
-            return fileProvider.GetDirectoryContents(path);
+            var pathToFolder = Path.Combine(configuration["DirectoryPaths:Algorithm"], algFile);
+            var pathToFile = Path.Combine(pathToFolder, algFile);
+            return pathToFile;
         }
+    }
 
-        public IDirectoryContents GetDirectoryContent(string path)
+    public class FileProvider
+    {
+        public bool Exists(string path)
         {
-            return fileProvider.GetDirectoryContents(path);
+            return File.Exists(path);
         }
     }
 }

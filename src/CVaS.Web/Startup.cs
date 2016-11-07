@@ -7,6 +7,7 @@ using CVaS.DAL.Model;
 using CVaS.Web.Authentication;
 using CVaS.Web.Filters;
 using CVaS.Web.Installers;
+using CVaS.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
@@ -32,7 +33,7 @@ namespace CVaS.Web
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
-
+            
             hostingEnvironment = env;
         }
 
@@ -81,6 +82,8 @@ namespace CVaS.Web
             containerBuilder.RegisterInstance(physicalProvider);
             containerBuilder.RegisterInstance(Configuration);
             containerBuilder.RegisterType<DbInitializer>();
+            containerBuilder.RegisterType<FileProvider>();
+
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Register Modules
@@ -93,6 +96,7 @@ namespace CVaS.Web
 
             return new AutofacServiceProvider(container);
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DbInitializer initializer)

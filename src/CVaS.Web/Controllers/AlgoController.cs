@@ -18,17 +18,19 @@ namespace CVaS.Web.Controllers
     {
         private readonly ILogger<AlgoController> logger;
         private readonly AlgorithmRepository repository;
-        private readonly AlgorithmFileProvider fileProvider;
+        private readonly FileProvider _fileProvider;
+        private readonly AlgorithmFileProvider algFileProvider;
         private readonly IProcessService processService;
         private readonly FileRepository _fileRepository;
         private readonly TempFileProvider _fileSystemProvider;
 
-        public AlgoController(ILogger<AlgoController> logger, AlgorithmRepository repository,
-            AlgorithmFileProvider fileProvider, IProcessService processService, FileRepository fileRepository, TempFileProvider fileSystemProvider)
+        public AlgoController(ILogger<AlgoController> logger, AlgorithmRepository repository, FileProvider fileProvider,
+            AlgorithmFileProvider algFileProvider, IProcessService processService, FileRepository fileRepository, TempFileProvider fileSystemProvider)
         {
             this.logger = logger;
             this.repository = repository;
-            this.fileProvider = fileProvider;
+            _fileProvider = fileProvider;
+            this.algFileProvider = algFileProvider;
             this.processService = processService;
             _fileRepository = fileRepository;
             _fileSystemProvider = fileSystemProvider;
@@ -44,17 +46,11 @@ namespace CVaS.Web.Controllers
                 return NotFound(Json("Given algorithm codeName doesn't exists"));
             }
             
-            var algoDir = fileProvider.GetAlgorithmDirectoryContents(codeName);
-            if (algoDir == null)
+            var filePath = algFileProvider.GetAlgorithmFilePath(codeName, algorithm.FilePath);
+                        
+            if (!_fileProvider.Exists(filePath))
             {
-                return NotFound(Json("Given algorithm execution file doesn't exists (1)"));
-            }
-
-            var file = algoDir.FirstOrDefault(f => f.Name == algorithm.FilePath);
-
-            if (file == null)
-            {
-                return NotFound(Json("Given algorithm execution file doesn't exists (2)"));
+                return NotFound(Json("Given algorithm execution file doesn't exists"));
             }
 
 
@@ -67,7 +63,7 @@ namespace CVaS.Web.Controllers
 
             var runFolder = _fileSystemProvider.CreateTempFolder();
 
-            var result = processService.Run(file.PhysicalPath, string.Join(" ", paths), runFolder);
+            var result = processService.Run(filePath, string.Join(" ", paths), runFolder);
 
             var zipPath = Guid.NewGuid() + ".zip";
             ZipFile.CreateFromDirectory(runFolder, zipPath, CompressionLevel.Fastest, false);
