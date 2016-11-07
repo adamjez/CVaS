@@ -24,12 +24,12 @@ namespace CVaS.Web.Controllers
     public class FileController : ApiController
     {
         private readonly ILogger<FileController> _logger;
-        private readonly TempFileProvider _fileProvider;
+        private readonly TemporaryFileProvider _fileProvider;
         private readonly FileRepository _fileRepository;
         private readonly ICurrentUserProvider _currentUserProvider;
         private readonly AppDbContext _context;
 
-        public FileController(ILogger<FileController> logger, TempFileProvider fileProvider, FileRepository fileRepository, 
+        public FileController(ILogger<FileController> logger, TemporaryFileProvider fileProvider, FileRepository fileRepository, 
             ICurrentUserProvider currentUserProvider, AppDbContext context)
         {
             _logger = logger;
@@ -79,7 +79,7 @@ namespace CVaS.Web.Controllers
             while ((section = await reader.ReadNextSectionAsync()) != null)
             {
                 var filename = _fileProvider.CreateFileName();
-                using (var stream = _fileProvider.CreateTempFile1(filename))
+                using (var stream = _fileProvider.CreateTemporaryFile(filename))
                 {
                     await section.Body.CopyToAsync(stream);
                 }

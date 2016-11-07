@@ -24,12 +24,13 @@ namespace CVaS.Web.Controllers
         private readonly AlgorithmFileProvider algFileProvider;
         private readonly IProcessService processService;
         private readonly FileRepository _fileRepository;
-        private readonly TempFileProvider _fileSystemProvider;
+        private readonly TemporaryFileProvider _fileSystemProvider;
         private readonly AppDbContext _context;
+        private readonly IUrlHelper _urlHelper;
 
         public AlgoController(ILogger<AlgoController> logger, AlgorithmRepository repository, FileProvider fileProvider,
             AlgorithmFileProvider algFileProvider, IProcessService processService, FileRepository fileRepository, 
-            TempFileProvider fileSystemProvider, AppDbContext context)
+            TemporaryFileProvider fileSystemProvider, AppDbContext context, IUrlHelper urlHelper)
         {
             this.logger = logger;
             this.repository = repository;
@@ -39,6 +40,7 @@ namespace CVaS.Web.Controllers
             _fileRepository = fileRepository;
             _fileSystemProvider = fileSystemProvider;
             _context = context;
+            _urlHelper = urlHelper;
         }
 
         [HttpPost("{codeName}")]
@@ -79,24 +81,26 @@ namespace CVaS.Web.Controllers
             }
 
 
-            var runFolder = _fileSystemProvider.CreateTempFolder();
+            var runFolder = _fileSystemProvider.CreateTemporaryFolder();
 
             var result = processService.Run(filePath, runFolder, args);
 
-            var zipPath = "<output empty>";
+            string zipPath = null;
             if (!_fileProvider.IsEmpty(runFolder))
             {
                 zipPath = Guid.NewGuid() + ".zip";
                 ZipFile.CreateFromDirectory(runFolder, zipPath, CompressionLevel.Fastest, false);
             }
 
+
+            var controllerName = nameof(FileController);
             return Ok(new AlgorithmResult
             {
                 Title = algorithm.Title,
                 StdOut = result.StdOut,
                 StdError = result.StdError,
-                Zip = zipPath,
-                RunFolder = runFolder
+                Zip = zipPath != null ?_urlHelper.Action(nameof(FileController.GetResultZip), controllerName, new {zipName = zipPath})
+                        :   "<no-output>"
             });
         }
 

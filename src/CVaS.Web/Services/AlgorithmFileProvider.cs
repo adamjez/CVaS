@@ -1,19 +1,15 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
 
 namespace CVaS.Web.Services
 {
     public class AlgorithmFileProvider
     {
-        private readonly FileProvider fileProvider;
         private readonly IConfigurationRoot configuration;
 
-        public AlgorithmFileProvider(FileProvider fileProvider, IConfigurationRoot configuration)
+        public AlgorithmFileProvider(IConfigurationRoot configuration)
         {
-            this.fileProvider = fileProvider;
             this.configuration = configuration;
         }
 

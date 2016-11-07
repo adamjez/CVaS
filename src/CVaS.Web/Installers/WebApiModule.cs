@@ -13,7 +13,7 @@ namespace CVaS.Web.Installers
             builder.RegisterType<BaseProcessService>()
                 .As<IProcessService>();
             builder.RegisterType<AlgorithmFileProvider>();
-            builder.RegisterType<TempFileProvider>();
+            builder.RegisterType<TemporaryFileProvider>();
             builder.RegisterType<CurrentUserProvider>()
                 .As<ICurrentUserProvider>();
         }
