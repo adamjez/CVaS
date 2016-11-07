@@ -6,10 +6,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using CVaS.BL.Repositories;
 using CVaS.BL.Services.Process;
+using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Web.Models;
 using CVaS.Web.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace CVaS.Web.Controllers
 {
@@ -23,9 +25,11 @@ namespace CVaS.Web.Controllers
         private readonly IProcessService processService;
         private readonly FileRepository _fileRepository;
         private readonly TempFileProvider _fileSystemProvider;
+        private readonly AppDbContext _context;
 
         public AlgoController(ILogger<AlgoController> logger, AlgorithmRepository repository, FileProvider fileProvider,
-            AlgorithmFileProvider algFileProvider, IProcessService processService, FileRepository fileRepository, TempFileProvider fileSystemProvider)
+            AlgorithmFileProvider algFileProvider, IProcessService processService, FileRepository fileRepository, 
+            TempFileProvider fileSystemProvider, AppDbContext context)
         {
             this.logger = logger;
             this.repository = repository;
@@ -34,12 +38,13 @@ namespace CVaS.Web.Controllers
             this.processService = processService;
             _fileRepository = fileRepository;
             _fileSystemProvider = fileSystemProvider;
+            _context = context;
         }
 
         [HttpPost("{codeName}")]
         public async Task<IActionResult> Process(string codeName, [FromBody] AlgorithmOptions options)
         {
-            var algorithm = await repository.GetByCodeName(codeName);
+            var algorithm = await repository.GetByCodeNameWithArgs(codeName);
 
             if (algorithm == null)
             {
@@ -95,25 +100,25 @@ namespace CVaS.Web.Controllers
             });
         }
 
+        [HttpGet("")]
+        public IActionResult GetAll()
+        {
+            var algorithms = _context.Algorithms.Include(x => x.Arguments).ToList();
+
+            return Ok(algorithms);
+        }
+
         [HttpGet("{codeName}")]
         public async Task<IActionResult> RetrieveHelp(string codeName)
         {
-            var algorithm = await repository.GetByCodeName(codeName);
+            var algorithm = await repository.GetByCodeNameWithArgs(codeName);
 
             if (algorithm == null)
             {
                 return NotFound(Json("Given algorithm codeName doesn't exists"));
             }
 
-            return Ok(FormatHelp(algorithm));
-        }
-
-        public string FormatHelp(Algorithm algo)
-        {
-            return $"{algo.Title}\n" +
-                   $"Description: {algo.Description}" +
-                   $"CodeName: {algo.CodeName}" +
-                   $"Arguments: {algo.Arguments.Select(x => x.Type)}";
+            return Ok(algorithm);
         }
     }
 }

@@ -11,9 +11,11 @@ namespace CVaS.BL.Repositories
         {
         }
 
-        public async Task<Algorithm> GetByCodeName(string codeName)
+        public async Task<Algorithm> GetByCodeNameWithArgs(string codeName)
         {
-            return await Context.Algorithms.FirstOrDefaultAsync(a => a.CodeName == codeName);
+            return await Context.Algorithms
+                .Include(a => a.Arguments)
+                .FirstOrDefaultAsync(a => a.CodeName == codeName);
         }
     }
 }
