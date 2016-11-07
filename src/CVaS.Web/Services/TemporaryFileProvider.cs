@@ -11,7 +11,7 @@ namespace CVaS.Web.Services
 
         public TemporaryFileProvider(IConfigurationRoot configuration)
         {
-            this.temporaryDirectory = configuration["DirectoryPaths:Temporary"];
+            this.temporaryDirectory = Path.GetTempPath();//
         }
 
         public async Task<string> CreateTempFile(IFormFile formFile)
@@ -40,7 +40,7 @@ namespace CVaS.Web.Services
 
         public string CreateTemporaryFileName()
         {
-            return Path.GetTempFileName();
+            return Path.GetRandomFileName();
         }
 
         public string ResolveTemporaryFilePath(string file)

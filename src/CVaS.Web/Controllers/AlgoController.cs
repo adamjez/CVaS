@@ -16,7 +16,7 @@ using Microsoft.EntityFrameworkCore;
 namespace CVaS.Web.Controllers
 {
     [Route("[controller]")]
-    public class AlgoController : Controller
+    public class AlgoController : ApiController
     {
         private readonly ILogger<AlgoController> logger;
         private readonly AlgorithmRepository repository;
