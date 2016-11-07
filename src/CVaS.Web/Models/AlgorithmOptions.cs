@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CVaS.DAL.Model;
 
 namespace CVaS.Web.Models
 {
     public class AlgorithmOptions
     {
-        //public string Arguments { get; set; }
         public IList<AlgorithmArgument> Arguments { get; set; }
     }
 

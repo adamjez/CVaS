@@ -54,20 +54,20 @@ namespace CVaS.Web.Controllers
             }
 
 
-            List<string> paths = new List<string>();
+            List<string> args = new List<string>();
             if (options.Arguments != null)
             {
                 foreach (var arg in options.Arguments)
                 {
                     var argEntity = await _fileRepository.GetById(int.Parse(arg.Content));
-                    paths.Add(argEntity.Path);
+                    args.Add(argEntity.Path);
                 }
             }
 
 
             var runFolder = _fileSystemProvider.CreateTempFolder();
 
-            var result = processService.Run(filePath, string.Join(" ", paths), runFolder);
+            var result = processService.Run(filePath, runFolder, args);
 
             var zipPath = Guid.NewGuid() + ".zip";
             ZipFile.CreateFromDirectory(runFolder, zipPath, CompressionLevel.Fastest, false);
@@ -75,7 +75,6 @@ namespace CVaS.Web.Controllers
             return Ok(new AlgorithmResult
             {
                 Title = algorithm.Title,
-                //Arguments = options.Arguments,
                 StdOut = result.StdOut,
                 StdError = result.StdError,
                 Zip = zipPath,

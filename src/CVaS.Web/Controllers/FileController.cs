@@ -72,10 +72,11 @@ namespace CVaS.Web.Controllers
 
             var boundary = GetBoundary(HttpContext.Request.ContentType);
             var reader = new MultipartReader(boundary, HttpContext.Request.Body);
-            var section = await reader.ReadNextSectionAsync();
+
 
             var files = new List<DAL.Model.File>();
-            while (section != null)
+            MultipartSection section;
+            while ((section = await reader.ReadNextSectionAsync()) != null)
             {
                 var filename = _fileProvider.CreateFileName();
                 using (var stream = _fileProvider.CreateTempFile1(filename))
@@ -89,7 +90,7 @@ namespace CVaS.Web.Controllers
                     UserId = _currentUserProvider.Id
                 });
 
-                section = await reader.ReadNextSectionAsync();
+                
             }
 
             _context.Files.AddRange(files);
@@ -98,7 +99,6 @@ namespace CVaS.Web.Controllers
             return Ok(files);
         }
 
-        // Nejlepsi verze !!!!!!!!!
         [HttpGet("{zipName}")]
         public async Task GetResultZip(string zipName)
         {

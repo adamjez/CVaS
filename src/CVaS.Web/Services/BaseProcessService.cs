@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using CVaS.BL.Services.Process;
 
@@ -6,7 +8,7 @@ namespace CVaS.Web.Services
 {
     public class BaseProcessService : IProcessService
     {
-        public ProcessResult Run(string filePath, string arguments, string workingDirectory)
+        public ProcessResult Run(string filePath, string workingDirectory, IList<string> arguments)
         {
             var result = new ProcessResult {StdError = "", StdOut = ""};
             Process process = new Process()
@@ -14,12 +16,11 @@ namespace CVaS.Web.Services
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = filePath,
-                    Arguments = arguments,
+                    Arguments = workingDirectory + ' ' + String.Join(" ", arguments),
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    WorkingDirectory = workingDirectory
                 }
             };
 
