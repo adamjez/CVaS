@@ -28,7 +28,7 @@ namespace CVaS.Web.Services
         public string CreateTemporaryFolder()
         {
             var folderName = Path.GetRandomFileName();
-            var directory = Directory.CreateDirectory(ResolveTemporaryFilePath(folderName);
+            var directory = Directory.CreateDirectory(ResolveTemporaryFilePath(folderName));
           
             return directory.FullName;
         }

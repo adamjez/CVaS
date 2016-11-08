@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CVaS.BL.Installers;
@@ -19,6 +20,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MySQL.Data.EntityFrameworkCore.Extensions;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace CVaS.Web
 {
@@ -71,9 +74,13 @@ namespace CVaS.Web
 
             // Add framework services.
             services.AddMvc(options =>
-            {
-                options.Filters.Add(typeof(HttpExceptionFilterAttribute));
-            });
+                {
+                    options.Filters.Add(typeof(HttpExceptionFilterAttribute));
+                })
+                    .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter(true));
+                });
 
             // Register Autofac
             var containerBuilder = new ContainerBuilder();

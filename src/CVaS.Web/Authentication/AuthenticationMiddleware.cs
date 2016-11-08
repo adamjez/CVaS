@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using CVaS.DAL.Model;
@@ -29,10 +27,14 @@ namespace CVaS.Web.Authentication
             {
                 //Extract credentials
                 string encodedUsernamePassword = authHeader.Substring(Scheme.Length).Trim();
-                //string usernamePassword = Encoding.UTF8.GetString(Convert.FromBase64String(encodedUsernamePassword)); 
-                string usernamePassword = encodedUsernamePassword;
+                string usernamePassword = Encoding.UTF8.GetString(Convert.FromBase64String(encodedUsernamePassword)); 
 
                 int seperatorIndex = usernamePassword.IndexOf(':');
+
+                if (seperatorIndex == -1)
+                {
+                    return AuthenticateResult.Fail("Bad format of basic authentication");
+                }
 
                 var username = usernamePassword.Substring(0, seperatorIndex);
                 var password = usernamePassword.Substring(seperatorIndex + 1);
