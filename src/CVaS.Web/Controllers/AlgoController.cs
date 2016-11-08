@@ -86,7 +86,7 @@ namespace CVaS.Web.Controllers
             BasicFileInfo zipFile = null;
             if (!_fileProvider.IsEmpty(runFolder))
             {
-                zipFile = _fileSystemProvider.CreateTemporaryFile();
+                zipFile = _fileSystemProvider.GetTemporaryFile();
                 ZipFile.CreateFromDirectory(runFolder, zipFile.FullPath, CompressionLevel.Fastest, false);
             }
 
@@ -94,8 +94,8 @@ namespace CVaS.Web.Controllers
             return Ok(new AlgorithmResult
             {
                 Title = algorithm.Title,
-                //StdOut = result.StdOut,
-                //StdError = result.StdError,
+                StdOut = result.StdOut,
+                StdError = result.StdError,
                 Zip = zipFile != null ? Url.Link(nameof(FileController.GetResultZip), new { zipName = zipFile.FileName }) : "<no-output>"
             });
         }
