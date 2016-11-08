@@ -80,15 +80,15 @@ namespace CVaS.Web.Controllers
             MultipartSection section;
             while ((section = await reader.ReadNextSectionAsync()) != null)
             {
-                var filename = _fileProvider.CreateTemporaryFileName();
-                using (var stream = _fileProvider.CreateTemporaryFile(filename))
+                string filePath;
+                using (var stream = _fileProvider.CreateTemporaryFile(out filePath))
                 {
                     await section.Body.CopyToAsync(stream);
                 }
 
                 files.Add(new DAL.Model.File()
                 {
-                    Path = filename,
+                    Path = filePath,
                     UserId = _currentUserProvider.Id
                 });
 

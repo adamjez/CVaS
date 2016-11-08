@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 
 namespace CVaS.Web.Services
 {
@@ -9,9 +8,9 @@ namespace CVaS.Web.Services
     {
         private readonly string temporaryDirectory;
 
-        public TemporaryFileProvider(IConfigurationRoot configuration)
+        public TemporaryFileProvider()
         {
-            this.temporaryDirectory = Path.GetTempPath();//
+            this.temporaryDirectory = Path.GetTempPath();
         }
 
         public async Task<string> CreateTempFile(IFormFile formFile)
@@ -33,19 +32,33 @@ namespace CVaS.Web.Services
             return directory.FullName;
         }
 
-        public FileStream CreateTemporaryFile(string fileName)
+        public FileStream CreateTemporaryFile(out string filePath)
         {
-            return File.Create(fileName);
+            var info = CreateTemporaryFile();
+            filePath = info.FullPath;
+
+            return File.Create(filePath);
         }
 
-        public string CreateTemporaryFileName()
+        public BasicFileInfo CreateTemporaryFile()
         {
-            return Path.GetRandomFileName();
+            var filePath = Path.GetTempFileName();
+            return new BasicFileInfo
+            {
+                FullPath = filePath,
+                FileName = Path.GetFileName(filePath)
+            };
         }
 
         public string ResolveTemporaryFilePath(string file)
         {
             return Path.Combine(temporaryDirectory, file);
         }
+    }
+
+    public class BasicFileInfo
+    {
+        public string FileName { get; set; }
+        public string FullPath { get; set; }
     }
 }

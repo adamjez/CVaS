@@ -50,9 +50,9 @@ namespace CVaS.Web.Controllers
             {
                 return NotFound(Json("Given algorithm codeName doesn't exists"));
             }
-            
+
             var filePath = algFileProvider.GetAlgorithmFilePath(codeName, algorithm.FilePath);
-                        
+
             if (!_fileProvider.Exists(filePath))
             {
                 return NotFound(Json("Given algorithm execution file doesn't exists" + filePath));
@@ -83,21 +83,20 @@ namespace CVaS.Web.Controllers
 
             var result = processService.Run(filePath, runFolder, args);
 
-            string zipFileName = null;
+            BasicFileInfo zipFile = null;
             if (!_fileProvider.IsEmpty(runFolder))
             {
-                zipFileName = _fileSystemProvider.CreateTemporaryFileName() + ".zip";
-                var zipPath = _fileSystemProvider.ResolveTemporaryFilePath(zipFileName);
-                ZipFile.CreateFromDirectory(runFolder, zipPath, CompressionLevel.Fastest, false);
+                zipFile = _fileSystemProvider.CreateTemporaryFile();
+                ZipFile.CreateFromDirectory(runFolder, zipFile.FullPath, CompressionLevel.Fastest, false);
             }
 
 
             return Ok(new AlgorithmResult
             {
                 Title = algorithm.Title,
-                StdOut = result.StdOut,
-                StdError = result.StdError,
-                Zip = zipFileName != null ? Url.Link(nameof(FileController.GetResultZip), new { zipName = zipFileName }) : "<no-output>"
+                //StdOut = result.StdOut,
+                //StdError = result.StdError,
+                Zip = zipFile != null ? Url.Link(nameof(FileController.GetResultZip), new { zipName = zipFile.FileName }) : "<no-output>"
             });
         }
 
