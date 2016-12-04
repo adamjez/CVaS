@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
-namespace CVaS.Web.Services
+namespace CVaS.BL.Services.File
 {
     public class TemporaryFileProvider
     {
@@ -17,7 +17,7 @@ namespace CVaS.Web.Services
         public async Task<string> CreateTempFile(IFormFile formFile)
         {
             var path = Path.GetTempFileName();
-            using (var tmpFile = File.Create(path))
+            using (var tmpFile = System.IO.File.Create(path))
             {
                 await formFile.CopyToAsync(tmpFile);
             }
@@ -38,7 +38,7 @@ namespace CVaS.Web.Services
             var info = GetTemporaryFile();
             filePath = info.FullPath;
 
-            return File.Create(filePath);
+            return System.IO.File.Create(filePath);
         }
 
         public BasicFileInfo GetTemporaryFile()

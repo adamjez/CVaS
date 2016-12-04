@@ -1,0 +1,31 @@
+﻿@using System.Threading.Tasks
+@using CVaS.DAL.Model
+
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+<h2>@ViewData["Title"]</h2>
+<div class="row">
+    <div class="col-md-12">
+        <section>
+            <p>@((await UserManager.GetUserAsync(User)).ApiKey)</p>
+
+            <form asp-controller="Account" asp-action="RevokeApiKey" method="post" class="form-horizontal">
+                <h4>Revoke Api Key </h4>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <button type="submit" class="btn btn-default">Revoke</button>
+                    </div>
+                </div>
+            </form>
+            <form asp-controller="Account" asp-action="CreateApiKey" method="post" class="form-horizontal">
+                <h4>Create Api Key </h4>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <button type="submit" class="btn btn-default">Create</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>

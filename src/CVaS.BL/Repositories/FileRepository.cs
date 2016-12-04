@@ -1,13 +1,13 @@
-﻿using CVaS.DAL;
+﻿using CVaS.BL.Core.Provider;
+using CVaS.DAL;
 using CVaS.DAL.Model;
 
 namespace CVaS.BL.Repositories
 {
-    public class FileRepository : AppRepositoryBase<File, int>
+    public class FileRepository : EntityFrameworkRepository<File, int>
     {
-        public FileRepository(AppDbContext context) : base(context)
+        public FileRepository(IUnitOfWorkProvider provider) : base(provider)
         {
         }
-
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace CVaS.Web.Services
+﻿namespace CVaS.BL.Services.File
 {
     public class BasicFileInfo
     {

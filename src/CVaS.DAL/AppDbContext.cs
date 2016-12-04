@@ -25,7 +25,6 @@ namespace CVaS.DAL
 
             modelBuilder.Entity<File>()
                 .HasAlternateKey(c => c.Path);
-
         }
     }
 }

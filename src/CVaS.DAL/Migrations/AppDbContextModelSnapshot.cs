@@ -67,6 +67,8 @@ namespace CVaS.DAL.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
+                    b.Property<Guid?>("ApiKey");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
@@ -110,26 +112,6 @@ namespace CVaS.DAL.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("CVaS.DAL.Model.Argument", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int?>("AlgorithmId");
-
-                    b.Property<string>("Description");
-
-                    b.Property<string>("Name");
-
-                    b.Property<int>("Type");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AlgorithmId");
-
-                    b.ToTable("Argument");
-                });
-
             modelBuilder.Entity("CVaS.DAL.Model.File", b =>
                 {
                     b.Property<int>("Id")
@@ -152,6 +134,33 @@ namespace CVaS.DAL.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Files");
+                });
+
+            modelBuilder.Entity("CVaS.DAL.Model.Run", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("AlgorithmId");
+
+                    b.Property<DateTime>("CreatedAt");
+
+                    b.Property<string>("Path")
+                        .HasAnnotation("MaxLength", 256);
+
+                    b.Property<string>("StdErr");
+
+                    b.Property<string>("StdOut");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlgorithmId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Run");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<int>", b =>
@@ -237,17 +246,23 @@ namespace CVaS.DAL.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("CVaS.DAL.Model.Argument", b =>
-                {
-                    b.HasOne("CVaS.DAL.Model.Algorithm")
-                        .WithMany("Arguments")
-                        .HasForeignKey("AlgorithmId");
-                });
-
             modelBuilder.Entity("CVaS.DAL.Model.File", b =>
                 {
                     b.HasOne("CVaS.DAL.Model.AppUser", "User")
                         .WithMany("Files")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("CVaS.DAL.Model.Run", b =>
+                {
+                    b.HasOne("CVaS.DAL.Model.Algorithm", "Algorithm")
+                        .WithMany()
+                        .HasForeignKey("AlgorithmId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("CVaS.DAL.Model.AppUser", "User")
+                        .WithMany("Runs")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

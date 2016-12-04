@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Identity;
 
 namespace CVaS.Web.Authentication
 {
-    public class CustomAuthenticationHandler : AuthenticationHandler<BasicAuthenticationOptions>
+    public class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticationOptions>
     {
         private const string Scheme = "Basic";
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
 
-        public CustomAuthenticationHandler(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager)
+        public BasicAuthenticationHandler(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager)
         {
             _signInManager = signInManager;
             _userManager = userManager;

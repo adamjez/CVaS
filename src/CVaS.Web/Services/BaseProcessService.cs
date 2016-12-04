@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using CVaS.BL.Services.File;
 using CVaS.BL.Services.Process;
 
 namespace CVaS.Web.Services
@@ -23,12 +24,12 @@ namespace CVaS.Web.Services
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = filePath,
-                    Arguments = $"\"{workingDirectory}\"" + ' ' + escapedArguments,
+                    Arguments = escapedArguments,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    WorkingDirectory = _fileProvider.GetDirectoryFromFile(filePath)
+                    WorkingDirectory = workingDirectory
                 }
             };
 
@@ -40,6 +41,4 @@ namespace CVaS.Web.Services
             return result;
         }
     }
-
-
 }

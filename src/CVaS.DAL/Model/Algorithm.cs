@@ -20,9 +20,6 @@ namespace CVaS.DAL.Model
         [MaxLength(256)]
         public string FilePath { get; set; }
 
-        public ICollection<Argument> Arguments { get; private set; } 
-            = new List<Argument>();
-
         public string Description { get; set; }
     }
 }

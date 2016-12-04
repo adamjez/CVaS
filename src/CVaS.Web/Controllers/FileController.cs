@@ -5,10 +5,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CVaS.BL.Exceptions;
+using CVaS.BL.Facades;
 using CVaS.BL.Providers;
 using CVaS.BL.Repositories;
+using CVaS.BL.Services.File;
 using CVaS.DAL;
-using CVaS.Web.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,6 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Logging;
-using FileResult = CVaS.Web.Models.FileResult;
 
 namespace CVaS.Web.Controllers
 {
@@ -29,9 +29,10 @@ namespace CVaS.Web.Controllers
         private readonly ICurrentUserProvider _currentUserProvider;
         private readonly AppDbContext _context;
         private readonly TemporaryFileProvider _temporaryFileProvider;
+        private readonly RunFacade _runFacade;
 
         public FileController(ILogger<FileController> logger, TemporaryFileProvider fileProvider, FileRepository fileRepository, 
-            ICurrentUserProvider currentUserProvider, AppDbContext context, TemporaryFileProvider temporaryFileProvider)
+            ICurrentUserProvider currentUserProvider, AppDbContext context, TemporaryFileProvider temporaryFileProvider, RunFacade runFacade)
         {
             _logger = logger;
             this._fileProvider = fileProvider;
@@ -39,32 +40,10 @@ namespace CVaS.Web.Controllers
             _currentUserProvider = currentUserProvider;
             _context = context;
             _temporaryFileProvider = temporaryFileProvider;
+            _runFacade = runFacade;
         }
 
         [HttpPost("")]
-        public async Task<IActionResult> UploadSingleFile(IFormFile image)
-        {
-            //if (!files.Any())
-            //{
-            //    return BadRequest("You have to upload atleast 1 file");
-            //}
-
-            //foreach (var file in files)
-            {
-                await _fileProvider.CreateTempFile(image);
-            }
-
-            return Ok(new FileResult
-            {
-                //FileNames = files.Select(x => x.FileName),
-                //ContentTypes = files.Select(x => x.ContentType),
-                CreatedTimestamp = DateTime.UtcNow,
-                UpdatedTimestamp = DateTime.UtcNow,
-                DownloadLink = image.FileName
-            });
-        }
-
-        [HttpPost("upload")]
         public async Task<IActionResult> UploadMultipleFiles()
         {
             if (!IsMultipartContentType(HttpContext.Request.ContentType))
@@ -101,15 +80,17 @@ namespace CVaS.Web.Controllers
             return Ok(files);
         }
 
-        [HttpGet, Route("{zipName}", Name = nameof(GetResultZip))]
-        public async Task GetResultZip(string zipName)
+        [HttpGet, Route("{runId}", Name = nameof(GetResultZip))]
+        public async Task GetResultZip(int runId)
         {
             const string zipMime = "application/zip";
             HttpContext.Response.ContentType = zipMime;
 
             var service = HttpContext.Features.Get<IHttpSendFileFeature>();
 
-            var pathToFile = _temporaryFileProvider.ResolveTemporaryFilePath(zipName);
+            var run = await _runFacade.GetSafely(runId);
+
+            var pathToFile = _temporaryFileProvider.ResolveTemporaryFilePath(run.Path);
             IFileInfo fileInfo = new PhysicalFileInfo(new FileInfo(pathToFile));
 
             if (service != null)

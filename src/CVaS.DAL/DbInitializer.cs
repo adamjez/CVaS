@@ -39,13 +39,6 @@ namespace CVaS.DAL
                     Description = "Detect Faces number on given Image - Print out to standard output number of faces on image!"
                 };
 
-                algorithm2.Arguments.Add(new Argument()
-                {
-                    Type = ArgumentType.File,
-                    Description = "Image which where will be detected faces",
-                    Name = "Image"
-                });
-
                 _context.Algorithms.Add(algorithm2);
 
                 var algorithm3 = new Algorithm()
@@ -55,13 +48,6 @@ namespace CVaS.DAL
                     Title = "Conversion to grayscale",
                     Description = "Converts given image to grayscale!"
                 };
-
-                algorithm3.Arguments.Add(new Argument()
-                {
-                    Type = ArgumentType.File,
-                    Description = "Image which where will be converted to grayscale",
-                    Name = "Image"
-                });
 
                 _context.Algorithms.Add(algorithm3);
 

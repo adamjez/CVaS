@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 
-namespace CVaS.Web.Services
+namespace CVaS.BL.Services.File
 {
     public class AlgorithmFileProvider
     {
@@ -25,7 +25,7 @@ namespace CVaS.Web.Services
     {
         public bool Exists(string path)
         {
-            return File.Exists(path);
+            return System.IO.File.Exists(path);
         }
 
         public bool IsEmpty(string directory)

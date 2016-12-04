@@ -1,20 +1,20 @@
 ﻿using System.Threading.Tasks;
+using CVaS.BL.Core.Provider;
 using CVaS.DAL;
 using CVaS.DAL.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace CVaS.BL.Repositories
 {
-    public class AlgorithmRepository : AppRepositoryBase<Algorithm, int>
+    public class AlgorithmRepository : EntityFrameworkRepository<Algorithm, int>
     {
-        public AlgorithmRepository(AppDbContext context) : base(context)
+        public AlgorithmRepository(IUnitOfWorkProvider provider) : base(provider)
         {
         }
 
         public async Task<Algorithm> GetByCodeNameWithArgs(string codeName)
         {
             return await Context.Algorithms
-                .Include(a => a.Arguments)
                 .FirstOrDefaultAsync(a => a.CodeName == codeName);
         }
     }

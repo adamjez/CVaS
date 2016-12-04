@@ -68,6 +68,13 @@ namespace CVaS.Web
 
                     // User settings
                     options.User.RequireUniqueEmail = true;
+
+                    options.Cookies.ApplicationCookie.ExpireTimeSpan = TimeSpan.FromDays(150);
+                    options.Cookies.ApplicationCookie.LoginPath = "/Account/Login/";
+                    options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOff";
+                    options.Cookies.ApplicationCookie.AuthenticationScheme = "WebCookieScheme";
+                    options.Cookies.ApplicationCookie.AutomaticAuthenticate = true;
+                    options.Cookies.ApplicationCookie.AutomaticChallenge = true;
                 })
                 .AddEntityFrameworkStores<AppDbContext, int>()
                 .AddDefaultTokenProviders();
@@ -114,8 +121,13 @@ namespace CVaS.Web
                 app.UseDeveloperExceptionPage();
             }
 
-            //app.UseIdentity();
-            app.UseCustomAuthentication();
+            app.UseStaticFiles();
+
+            app.UseApiAuthentication(new ApiAuthenticationOptions()
+                {
+                    AuthenticationScheme = "ApiKey"
+                });
+            app.UseIdentity();
 
             initializer.Initialize();
 

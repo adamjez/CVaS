@@ -8,12 +8,12 @@ using Microsoft.Extensions.Options;
 
 namespace CVaS.Web.Authentication
 {
-    public class CustomAuthenticationMiddleware : AuthenticationMiddleware<BasicAuthenticationOptions>
+    public class BasicAuthenticationMiddleware : AuthenticationMiddleware<BasicAuthenticationOptions>
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
 
-        public CustomAuthenticationMiddleware(RequestDelegate next, SignInManager<AppUser> signInManager,
+        public BasicAuthenticationMiddleware(RequestDelegate next, SignInManager<AppUser> signInManager,
             ILoggerFactory loggerFactory, UrlEncoder urlEncoder, IOptions<BasicAuthenticationOptions> options,
             UserManager<AppUser> userManager)
             : base(next, options, loggerFactory, urlEncoder)
@@ -24,7 +24,7 @@ namespace CVaS.Web.Authentication
 
         protected override AuthenticationHandler<BasicAuthenticationOptions> CreateHandler()
         {
-            return new CustomAuthenticationHandler(_signInManager, _userManager);
+            return new BasicAuthenticationHandler(_signInManager, _userManager);
         }
     }
 }

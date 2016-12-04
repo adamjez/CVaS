@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CVaS.Web.Controllers
 {
-    [Authorize]
+    [Authorize(ActiveAuthenticationSchemes = "ApiKey")]
     public abstract class ApiController : Controller
     {
     }

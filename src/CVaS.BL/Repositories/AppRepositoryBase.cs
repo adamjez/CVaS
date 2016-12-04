@@ -1,25 +1,40 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CVaS.BL.Core.Provider;
+using CVaS.BL.Exceptions;
 using CVaS.DAL;
 using CVaS.DAL.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace CVaS.BL.Repositories
 {
-    public abstract class AppRepositoryBase<TEntity, TKey> where TEntity : class, IEntity<TKey>, new()
+    public abstract class EntityFrameworkRepository<TEntity, TKey> where TEntity : class, IEntity<TKey>, new()
     {
-        protected AppDbContext Context { get; set; }
+        private readonly IUnitOfWorkProvider _provider;
 
-        protected AppRepositoryBase(AppDbContext context)
+        protected AppDbContext Context => _provider.GetCurrent().Context;
+
+        protected EntityFrameworkRepository(IUnitOfWorkProvider provider)
         {
-            Context = context;
+            _provider = provider;
         }
 
         public async Task<TEntity> GetById(TKey id)
         {
             return (await GetByIds(new TKey[] { id })).FirstOrDefault();
+        }
 
+        public async Task<TEntity> GetByIdSafely(TKey id)
+        {
+            var result = await GetById(id);
+
+            if (result == null)
+            {
+                throw new NotFoundException();
+            }
+
+            return result;
         }
 
         public virtual async Task<IList<TEntity>> GetByIds(IEnumerable<TKey> ids)
@@ -30,10 +45,9 @@ namespace CVaS.BL.Repositories
         }
 
 
-        public virtual async Task Insert(TEntity entity)
+        public virtual void Insert(TEntity entity)
         {
             Context.Set<TEntity>().Add(entity);
-            await Context.SaveChangesAsync();
         }
     }
 }
