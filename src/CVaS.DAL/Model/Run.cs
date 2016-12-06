@@ -23,5 +23,7 @@ namespace CVaS.DAL.Model
         public string StdOut { get; set; }
         
         public string StdErr { get; set; }
+
+        public RunResultType Result { get; set; }
     }
 }

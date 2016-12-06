@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using CVaS.BL.Services.Process;
 
 namespace CVaS.Web.Services
@@ -12,7 +14,7 @@ namespace CVaS.Web.Services
             _processService = processService;
         }
 
-        public ProcessResult Run(string filePath, string workingDirectory, IList<string> arguments)
+        public async Task<ProcessResult> RunAsync(string filePath, string workingDirectory, IList<string> arguments, CancellationToken cancellationToken)
         {
             var fileExt = Path.GetExtension(filePath);
 
@@ -22,7 +24,7 @@ namespace CVaS.Web.Services
                 filePath = @"C:\Users\adamj\AppData\Local\Programs\Python\Python35-32\python.exe";
             }
 
-            return _processService.Run(filePath, workingDirectory, arguments);
+            return await _processService.RunAsync(filePath, workingDirectory, arguments, cancellationToken);
         }
     }
 }

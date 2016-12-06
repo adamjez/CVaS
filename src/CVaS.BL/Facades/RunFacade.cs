@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Compression;
+using System.Threading;
 using System.Threading.Tasks;
 using CVaS.BL.Core.Provider;
 using CVaS.BL.Exceptions;
@@ -64,7 +65,20 @@ namespace CVaS.BL.Facades
                 var runFolder = _fileSystemProvider.CreateTemporaryFolder();
 
                 args.Insert(0, runFolder);
-                var result = _processService.Run(filePath, _fileProvider.GetDirectoryFromFile(filePath), args);
+
+                int timeout = 1000;
+                var tokenSource = new CancellationTokenSource(timeout);
+
+                ProcessResult result = null;
+                try
+                {
+                    result = await _processService.RunAsync(filePath, _fileProvider.GetDirectoryFromFile(filePath), args, tokenSource.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw new TimeOutException();
+                }
+
 
                 var zipFile = new BasicFileInfo();
                 if (!_fileProvider.IsEmpty(runFolder))
@@ -78,7 +92,8 @@ namespace CVaS.BL.Facades
                     AlgorithmId = algorithm.Id,
                     UserId = CurrentUserProvider.Id,
                     StdOut = result.StdOut,
-                    StdErr = result.StdError
+                    StdErr = result.StdError,
+                    Result = result.ExitCode == 0 ? RunResultType.Success : RunResultType.Fail
                 };
 
                 _runRepository.Insert(run);
