@@ -1,4 +1,6 @@
-﻿namespace CVaS.Web.Models
+﻿using CVaS.DAL.Model;
+
+namespace CVaS.Web.Models
 {
     public class AlgorithmResult
     {
@@ -7,5 +9,6 @@
         public string StdError { get; set; }
         public string Zip { get; set; }
         public int RunId { get; set; }
+        public RunResultType Result { get; set; }
     }
 }

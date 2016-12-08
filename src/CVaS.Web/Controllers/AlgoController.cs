@@ -38,7 +38,8 @@ namespace CVaS.Web.Controllers
                 RunId = result.RunId,
                 StdOut = result.StdOut,
                 StdError = result.StdErr,
-                Zip = result.FileName != null ? Url.Link(nameof(FileController.GetResultZip), new { zipName = result.FileName }) : "<no-output>"
+                Zip = result.FileName != null ? Url.Link(nameof(FileController.GetResultZip), new { zipName = result.FileName }) : "<no-output>",
+                Result = result.Result
             });
         }
 

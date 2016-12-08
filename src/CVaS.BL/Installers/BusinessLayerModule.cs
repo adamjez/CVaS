@@ -4,6 +4,7 @@ using CVaS.BL.Core.Provider;
 using CVaS.BL.Core.Registry;
 using CVaS.BL.Facades;
 using CVaS.BL.Repositories;
+using CVaS.BL.Services.ApiKey;
 using CVaS.BL.Services.File;
 using CVaS.DAL;
 using Microsoft.AspNetCore.Http;
@@ -39,6 +40,9 @@ namespace CVaS.BL.Installers
             builder.RegisterType<AlgorithmFileProvider>();
             builder.RegisterType<TemporaryFileProvider>();
             builder.RegisterType<FileProvider>();
+
+            builder.RegisterType<RndApiKeyGenerator>()
+                .As<IApiKeyGenerator>();
 
         }
     }

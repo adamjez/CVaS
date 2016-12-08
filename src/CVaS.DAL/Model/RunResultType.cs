@@ -4,6 +4,7 @@
     {
         Success,
         Fail,
-        TimeOut
+        TimeOut,
+        NotFinished
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using CVaS.DAL.Common;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
@@ -12,7 +13,8 @@ namespace CVaS.DAL.Model
 
         public ICollection<Run> Runs { get; private set; } = new List<Run>();
 
-        public Guid? ApiKey { get; set; }
+        [Required, StringLength(44)]
+        public string ApiKey { get; set; }
 
     }
 }

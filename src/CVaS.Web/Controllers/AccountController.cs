@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CVaS.BL.Services.ApiKey;
 using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Web.Models.AccountViewModels;
@@ -7,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,13 +23,16 @@ namespace CVaS.Web.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
         private readonly AppDbContext _context;
+        private readonly IApiKeyGenerator _apiKeyGenerator;
 
-        public AccountController(ILogger<AccountController> logger, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, AppDbContext context)
+        public AccountController(ILogger<AccountController> logger, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, AppDbContext context,
+            IApiKeyGenerator apiKeyGenerator)
         {
             _logger = logger;
             _signInManager = signInManager;
             _userManager = userManager;
             _context = context;
+            _apiKeyGenerator = apiKeyGenerator;
         }
 
         // GET: /Account/Login
@@ -77,17 +83,13 @@ namespace CVaS.Web.Controllers
         public async Task<IActionResult> RevokeApiKey()
         {
             var user = await _userManager.GetUserAsync(User);
-            user.ApiKey = null;
-            await _context.SaveChangesAsync();
-            return View("ManageApiKey");
-        }
+            do
+            {
 
-        [HttpPost("api-key/create")]
-        public async Task<IActionResult> CreateApiKey()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            user.ApiKey = Guid.NewGuid();
-            await _context.SaveChangesAsync();
+                user.ApiKey = _apiKeyGenerator.Generate();
+                await _context.SaveChangesAsync();
+            } while (await _context.Users.Where(u => u.ApiKey == user.ApiKey).CountAsync() > 1);
+
             return View("ManageApiKey");
         }
 
@@ -131,8 +133,8 @@ namespace CVaS.Web.Controllers
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation(4, "User logged out.");
-            return null;
-            //return RedirectToAction(nameof(HomeController.Index), "Home");
+
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
         private IActionResult RedirectToLocal(string returnUrl)

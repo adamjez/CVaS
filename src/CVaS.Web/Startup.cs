@@ -37,7 +37,7 @@ namespace CVaS.Web
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
-            
+
             hostingEnvironment = env;
         }
 
@@ -56,7 +56,7 @@ namespace CVaS.Web
                 services.AddDbContext<AppDbContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             }
-                
+
             services.AddIdentity<AppUser, AppRole>(options =>
                 {
                     // Password settings
@@ -124,14 +124,19 @@ namespace CVaS.Web
             app.UseStaticFiles();
 
             app.UseApiAuthentication(new ApiAuthenticationOptions()
-                {
-                    AuthenticationScheme = "ApiKey"
-                });
+            {
+                AuthenticationScheme = "ApiKey"
+            });
             app.UseIdentity();
 
             initializer.Initialize();
 
-            app.UseMvc();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}");
+            });
         }
     }
 }

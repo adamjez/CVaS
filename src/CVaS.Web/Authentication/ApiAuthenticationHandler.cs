@@ -32,12 +32,12 @@ namespace CVaS.Web.Authentication
                 //Extract credentials
                 string apiKey = authHeader.Substring(Scheme.Length).Trim();
 
-                Guid apiKeyGuid;
-                if (Guid.TryParse(apiKey, out apiKeyGuid))
+                //Guid apiKeyGuid;
+                //if (Guid.TryParse(apiKey, out apiKeyGuid))
                 {
                     using (_unitOfWorkProvider.Create())
                     {
-                        var user = await _userManager.Users.FirstOrDefaultAsync(us => us.ApiKey == apiKeyGuid);
+                        var user = await _userManager.Users.FirstOrDefaultAsync(us => us.ApiKey == apiKey);
                         if (user != null)
                         {
                             var principals = await _signInManager.CreateUserPrincipalAsync(user);

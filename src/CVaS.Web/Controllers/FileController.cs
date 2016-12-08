@@ -88,7 +88,7 @@ namespace CVaS.Web.Controllers
 
             var service = HttpContext.Features.Get<IHttpSendFileFeature>();
 
-            var run = await _runFacade.GetSafely(runId);
+            var run = await _runFacade.GetSafelyAsync(runId);
 
             var pathToFile = _temporaryFileProvider.ResolveTemporaryFilePath(run.Path);
             IFileInfo fileInfo = new PhysicalFileInfo(new FileInfo(pathToFile));

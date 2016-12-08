@@ -8,9 +8,10 @@ using CVaS.DAL;
 namespace CVaS.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20161206102206_ChangedApiKey")]
+    partial class ChangedApiKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.1")
@@ -68,8 +69,7 @@ namespace CVaS.DAL.Migrations
                     b.Property<int>("AccessFailedCount");
 
                     b.Property<string>("ApiKey")
-                        .IsRequired()
-                        .HasAnnotation("MaxLength", 44);
+                        .HasAnnotation("MaxLength", 30);
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
