@@ -1,12 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using CVaS.Web.Helpers;
 using Newtonsoft.Json.Linq;
 
-namespace CVaS.Web.Helpers
+namespace CVaS.Web.Providers
 {
-    public static class JsonCustomArgumentParser
+    public class JsonArgumentParserProvider : IArgumentParserProvider
     {
-        public static List<object> CustomArgumentParser(JToken root)
+        public bool CanParse(object arguments)
+        {
+            return arguments is JToken;
+        }
+
+        public List<object> Parse(object arguments)
+        {
+            return CustomArgumentParser((JToken) arguments);
+        }
+
+        private static List<object> CustomArgumentParser(JToken root)
         {
             if (root == null)
             {

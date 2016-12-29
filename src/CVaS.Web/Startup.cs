@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Runtime.InteropServices;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CVaS.BL.Installers;
@@ -7,25 +7,15 @@ using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Web.Authentication;
 using CVaS.Web.Filters;
-using CVaS.Web.Helpers;
 using CVaS.Web.Installers;
-using CVaS.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Internal;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MySQL.Data.EntityFrameworkCore.Extensions;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 
 namespace CVaS.Web
 {
@@ -50,7 +40,9 @@ namespace CVaS.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            if (hostingEnvironment.IsStaging())
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+            if (!isWindows)
             {
                 services.AddDbContext<AppDbContext>(options =>
                     options.UseMySQL(Configuration.GetConnectionString("DefaultConnection")));
@@ -84,14 +76,9 @@ namespace CVaS.Web
                 .AddDefaultTokenProviders();
 
             // Add framework services.
-            services.AddMvc(options =>
-                {
-                    options.Filters.Add(typeof(HttpExceptionFilterAttribute));
-                })
-                    .AddJsonOptions(options =>
-                {
-                    options.SerializerSettings.Converters.Add(new StringEnumConverter(true));
-                });
+            services.AddMvc(options => { options.Filters.Add(typeof(HttpExceptionFilterAttribute)); })
+                .AddJsonOptions(options => { options.SerializerSettings.Converters.Add(new StringEnumConverter(true)); })
+                .AddXmlDataContractSerializerFormatters();
 
             // Register Autofac
             var containerBuilder = new ContainerBuilder();
@@ -120,7 +107,7 @@ namespace CVaS.Web
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            //if (env.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }

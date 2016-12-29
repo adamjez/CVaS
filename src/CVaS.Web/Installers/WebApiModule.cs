@@ -30,7 +30,6 @@ namespace CVaS.Web.Installers
                     .As<IProcessService>();
             }
 
-
             builder.RegisterType<CurrentUserProvider>()
                 .As<ICurrentUserProvider>();
 

@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using CVaS.BL.Facades;
 using CVaS.BL.Providers;
-using CVaS.BL.Repositories;
 using CVaS.BL.Services.File;
 using CVaS.DAL;
 using CVaS.Web.Helpers;
@@ -19,25 +18,23 @@ using Microsoft.Extensions.Logging;
 namespace CVaS.Web.Controllers
 {
     [Route("[controller]")]
-    public class FileController : ApiController
+    public class FilesController : ApiController
     {
-        private readonly ILogger<FileController> _logger;
+        private readonly ILogger<FilesController> _logger;
         private readonly TemporaryFileProvider _fileProvider;
-        private readonly FileRepository _fileRepository;
+        private readonly FileFacade _fileFacade;
         private readonly ICurrentUserProvider _currentUserProvider;
         private readonly AppDbContext _context;
-        private readonly TemporaryFileProvider _temporaryFileProvider;
         private readonly RunFacade _runFacade;
 
-        public FileController(ILogger<FileController> logger, TemporaryFileProvider fileProvider, FileRepository fileRepository,
-            ICurrentUserProvider currentUserProvider, AppDbContext context, TemporaryFileProvider temporaryFileProvider, RunFacade runFacade)
+        public FilesController(ILogger<FilesController> logger, TemporaryFileProvider fileProvider, FileFacade fileFacade,
+            ICurrentUserProvider currentUserProvider, AppDbContext context, RunFacade runFacade)
         {
             _logger = logger;
-            this._fileProvider = fileProvider;
-            this._fileRepository = fileRepository;
+            _fileProvider = fileProvider;
+            _fileFacade = fileFacade;
             _currentUserProvider = currentUserProvider;
             _context = context;
-            _temporaryFileProvider = temporaryFileProvider;
             _runFacade = runFacade;
         }
 
@@ -81,15 +78,14 @@ namespace CVaS.Web.Controllers
         public async Task GetResultZip(int runId)
         {
             const string zipMime = "application/zip";
-            HttpContext.Response.ContentType = zipMime;
-
-            var service = HttpContext.Features.Get<IHttpSendFileFeature>();
 
             var run = await _runFacade.GetSafelyAsync(runId);
 
-            var pathToFile = _temporaryFileProvider.ResolveTemporaryFilePath(run.Path);
+            var pathToFile = _fileProvider.ResolveTemporaryFilePath(run.Path);
             IFileInfo fileInfo = new PhysicalFileInfo(new FileInfo(pathToFile));
 
+            HttpContext.Response.ContentType = zipMime;
+            var service = HttpContext.Features.Get<IHttpSendFileFeature>();
             if (service != null)
             {
                 await service.SendFileAsync(pathToFile, 0, fileInfo.Length, CancellationToken.None);
@@ -99,6 +95,15 @@ namespace CVaS.Web.Controllers
                 await HttpContext.Response.SendFileAsync(fileInfo);
 
             }
+        }
+
+        [HttpGet, Route("{fileId}")]
+        public async Task DeleteUserFile(int fileId)
+        {
+            const string zipMime = "application/zip";
+            HttpContext.Response.ContentType = zipMime;
+
+            await _fileFacade.DeleteAsync(fileId, _currentUserProvider.Id);
         }
     }
 }

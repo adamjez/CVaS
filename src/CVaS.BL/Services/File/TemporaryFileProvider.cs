@@ -55,5 +55,10 @@ namespace CVaS.BL.Services.File
         {
             return Path.Combine(temporaryDirectory, file);
         }
+
+        public void Delete(string filePath)
+        {
+            System.IO.File.Delete(filePath);
+        }
     }
 }

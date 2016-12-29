@@ -22,7 +22,6 @@ namespace CVaS.BL.Facades
         private const int HardTimeout = 10000; // in milliseconds
         private const int LightTimeout = 3000; // in milliseconds
 
-
         private readonly AlgorithmRepository _algorithmRepository;
         private readonly FileProvider _fileProvider;
         private readonly AlgorithmFileProvider _algFileProvider;

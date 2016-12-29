@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CVaS.Web.Helpers
+namespace CVaS.Web.Providers
 {
     public interface IArgumentParserProvider
     {
