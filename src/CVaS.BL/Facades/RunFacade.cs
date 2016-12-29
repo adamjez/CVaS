@@ -3,45 +3,50 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
-using CVaS.BL.Core;
 using CVaS.BL.Core.Provider;
 using CVaS.BL.Exceptions;
 using CVaS.BL.Helpers;
 using CVaS.BL.Models;
 using CVaS.BL.Providers;
 using CVaS.BL.Repositories;
+using CVaS.BL.Services.ArgumentTranslator;
 using CVaS.BL.Services.File;
 using CVaS.BL.Services.Process;
 using CVaS.DAL.Model;
+using System.Linq;
 
 namespace CVaS.BL.Facades
 {
     public class RunFacade : AppFacadeBase
     {
+        private const int HardTimeout = 10000; // in milliseconds
+        private const int LightTimeout = 3000; // in milliseconds
+
+
         private readonly AlgorithmRepository _algorithmRepository;
         private readonly FileProvider _fileProvider;
         private readonly AlgorithmFileProvider _algFileProvider;
         private readonly IProcessService _processService;
-        private readonly FileRepository _fileRepository;
         private readonly TemporaryFileProvider _fileSystemProvider;
         private readonly RunRepository _runRepository;
+        private readonly IArgumentTranslator _argumentTranslator;
 
         public RunFacade(IUnitOfWorkProvider unitOfWorkProvider, ICurrentUserProvider currentUserProvider,
-            AlgorithmRepository algorithmRepository, IProcessService processService, FileRepository fileRepository,
-            FileProvider fileProvider, AlgorithmFileProvider algFileProvider, TemporaryFileProvider fileSystemProvider,
-            RunRepository runRepository)
+            AlgorithmRepository algorithmRepository, IProcessService processService, FileProvider fileProvider, 
+            AlgorithmFileProvider algFileProvider, TemporaryFileProvider fileSystemProvider,
+            RunRepository runRepository, IArgumentTranslator argumentTranslator)
             : base(unitOfWorkProvider, currentUserProvider)
         {
             _algorithmRepository = algorithmRepository;
-            this._processService = processService;
-            _fileRepository = fileRepository;
+            _processService = processService;
             _fileProvider = fileProvider;
-            this._algFileProvider = algFileProvider;
+            _algFileProvider = algFileProvider;
             _fileSystemProvider = fileSystemProvider;
             _runRepository = runRepository;
+            _argumentTranslator = argumentTranslator;
         }
 
-        public async Task<RunResult> RunProcessAsync(string codeName, IEnumerable<string> arguments)
+        public async Task<RunResult> RunProcessAsync(string codeName, IEnumerable<object> arguments)
         {
             using (var uow = UnitOfWorkProvider.Create())
             {
@@ -59,11 +64,8 @@ namespace CVaS.BL.Facades
                     throw new NotFoundException("Given algorithm execution file doesn't exists");
                 }
 
-                List<string> args = new List<string>();
-                foreach (var arg in arguments)
-                {
-                    args.Add(await ProcessArgument(arg));
-                }
+                var args = (await Task.WhenAll(
+                    arguments.Select(_argumentTranslator.ProcessAsync))).ToList();
 
                 var runFolder = _fileSystemProvider.CreateTemporaryFolder();
 
@@ -80,15 +82,13 @@ namespace CVaS.BL.Facades
 
                 args.Insert(0, runFolder);
 
-                int timeout = 10000;
-                var tokenSource = new CancellationTokenSource(timeout);
+                var tokenSource = new CancellationTokenSource(HardTimeout);
 
                 var task = _processService.RunAsync(filePath, _fileProvider.GetDirectoryFromFile(filePath), args,
                     tokenSource.Token);
 
-                var lightTimeOut = 1000;
                 var lightTokenSource = new CancellationTokenSource();
-                var firstTimeOutedTask = await Task.WhenAny(task, Task.Delay(lightTimeOut, lightTokenSource.Token));
+                var firstTimeOutedTask = await Task.WhenAny(task, Task.Delay(LightTimeout, lightTokenSource.Token));
 
                 ProcessResult result = null;
                 if (firstTimeOutedTask == task)
@@ -113,7 +113,6 @@ namespace CVaS.BL.Facades
                         Result = run.Result
                     };
                 }
-
 
                 var zipFile = await SaveSuccessRun(runFolder, run, result);
 
@@ -169,28 +168,6 @@ namespace CVaS.BL.Facades
                 //_runRepository.Insert(run);
                 await uow.CommitAsync();
                 return zipFile;
-            }
-        }
-
-        private async Task<string> ProcessArgument(string arg)
-        {
-            //TODO localFile to scheme configuration
-            if (arg.StartsWith("localFile://"))
-            {
-                //TODO Check for user
-                var argEntity = await _fileRepository.GetById(int.Parse(arg.Substring("localFile://".Length)));
-
-                if (argEntity.UserId != CurrentUserProvider.Id)
-                {
-                    throw new UnauthorizedAccessException();
-                }
-
-                return argEntity.Path;
-            }
-            else
-            {
-                //TODO Validate?
-                return arg;
             }
         }
 

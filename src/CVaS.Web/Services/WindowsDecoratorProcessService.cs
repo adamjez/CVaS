@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using CVaS.BL.Services.Interpreter;
 using CVaS.BL.Services.Process;
 
 namespace CVaS.Web.Services
@@ -9,19 +10,24 @@ namespace CVaS.Web.Services
     public class WindowsDecoratorProcessService : IProcessService
     {
         private readonly IProcessService _processService;
-        public WindowsDecoratorProcessService(IProcessService processService)
+        private readonly IInterpreterResolver _interpreterResolver;
+
+        public WindowsDecoratorProcessService(IProcessService processService, IInterpreterResolver interpreterResolver)
         {
             _processService = processService;
+            _interpreterResolver = interpreterResolver;
         }
 
         public async Task<ProcessResult> RunAsync(string filePath, string workingDirectory, IList<string> arguments, CancellationToken cancellationToken)
         {
             var fileExt = Path.GetExtension(filePath);
 
-            if (fileExt == ".py")
+            var interpreter = _interpreterResolver.Resolve(fileExt);
+
+            if (!string.IsNullOrEmpty(interpreter))
             {
                 arguments.Insert(0, filePath);
-                filePath = @"C:\Users\adamj\AppData\Local\Programs\Python\Python35-32\python.exe";
+                filePath = interpreter;
             }
 
             return await _processService.RunAsync(filePath, workingDirectory, arguments, cancellationToken);

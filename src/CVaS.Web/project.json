@@ -63,5 +63,6 @@
     "postpublish": [
       "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
     ]
-  }
+  },
+  "userSecretsId": "aspnet-CVaS.Web-20161227062634"
 }

@@ -1,4 +1,6 @@
-﻿namespace CVaS.BL.Providers
+﻿using System.Security.Claims;
+
+namespace CVaS.BL.Providers
 {
     public interface ICurrentUserProvider
     {
@@ -13,5 +15,7 @@
         string Email { get; }
 
         bool IsInRole(string roleName);
+
+        ClaimsPrincipal GetClaims();
     }
 }

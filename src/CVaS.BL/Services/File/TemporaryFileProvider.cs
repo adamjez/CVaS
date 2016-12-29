@@ -33,17 +33,17 @@ namespace CVaS.BL.Services.File
             return directory.FullName;
         }
 
-        public FileStream CreateTemporaryFile(out string filePath)
+        public FileStream CreateTemporaryFile(string extension, out string filePath)
         {
-            var info = GetTemporaryFile();
+            var info = GetTemporaryFile(extension);
             filePath = info.FullPath;
 
             return System.IO.File.Create(filePath);
         }
 
-        public BasicFileInfo GetTemporaryFile()
+        public BasicFileInfo GetTemporaryFile(string extesion = "")
         {
-            var filePath = ResolveTemporaryFilePath(Path.GetRandomFileName());
+            var filePath = ResolveTemporaryFilePath(Path.GetRandomFileName() + extesion);
             return new BasicFileInfo
             {
                 FullPath = filePath,

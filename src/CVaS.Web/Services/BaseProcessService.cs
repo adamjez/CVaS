@@ -1,33 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CVaS.BL.Services.File;
 using CVaS.BL.Services.Process;
 
 namespace CVaS.Web.Services
 {
     public class BaseProcessService : IProcessService
     {
-        private readonly FileProvider _fileProvider;
-        public BaseProcessService(FileProvider fileProvider)
-        {
-            _fileProvider = fileProvider;
-        }
-
         public async Task<ProcessResult> RunAsync(string filePath, string workingDirectory, IList<string> arguments, CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<ProcessResult>();
 
-            var escapedArguments = String.Join(" ", arguments.Select(x => $"\"{x}\""));
             Process process = new Process()
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = filePath,
-                    Arguments = escapedArguments,
+                    Arguments = String.Join(" ", arguments),
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,

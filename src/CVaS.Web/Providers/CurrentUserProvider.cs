@@ -58,6 +58,11 @@ namespace CVaS.Web.Providers
             return _contextAccessor.HttpContext.User?.IsInRole(roleName) ?? false;
         }
 
+        public ClaimsPrincipal GetClaims()
+        {
+            return _contextAccessor.HttpContext.User;
+        }
+
         private int GetId()
         {
             var id = TryGetId;

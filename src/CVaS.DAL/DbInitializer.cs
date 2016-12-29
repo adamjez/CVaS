@@ -19,6 +19,31 @@ namespace CVaS.DAL
         {
             _context.Database.EnsureCreated();
 
+            if (!_context.Roles.Any())
+            {
+                var role = new AppRole()
+                {
+                    Name = Roles.Admin,
+                    NormalizedName = Roles.Admin
+                };
+                _context.Roles.Add(role);
+
+                _context.SaveChanges();
+            }
+
+            if (!_context.Users.Any())
+            {
+                var user = new AppUser()
+                {
+                    UserName = "username",
+                    Email = "spiritakcz@gmail.com"
+                };
+
+                _userManager.CreateAsync(user, "Password1!").Wait();
+
+                _userManager.AddToRoleAsync(user, Roles.Admin).Wait();
+            }
+
             if (!_context.Algorithms.Any())
             {
                 var algorithm1 = new Algorithm()
@@ -51,32 +76,57 @@ namespace CVaS.DAL
 
                 _context.Algorithms.Add(algorithm3);
 
-                _context.SaveChanges();
-            }
-
-            if (!_context.Roles.Any())
-            {
-                var role = new AppRole()
+                var algorithm4 = new Algorithm()
                 {
-                    Name = Roles.Admin,
-                    NormalizedName = Roles.Admin
-                };
-                _context.Roles.Add(role);
-
-                _context.SaveChanges();
-            }
-
-            if (!_context.Users.Any())
-            {
-                var user = new AppUser()
-                {
-                    UserName = "username",
-                    Email = "spiritakcz@gmail.com"
+                    CodeName = "license-plate-recognition",
+                    FilePath = "run.ps1",
+                    Title = "Recognize car license plate",
+                    Description = "Recognize car license plate!"
                 };
 
-                _userManager.CreateAsync(user, "Password1!").Wait();
+                _context.Algorithms.Add(algorithm4);
 
-                _userManager.AddToRoleAsync(user, Roles.Admin).Wait();
+                var algorithm5 = new Algorithm()
+                {
+                    CodeName = "panorama",
+                    FilePath = "panorama.py",
+                    Title = "Creates panorama from two images",
+                    Description = "Creates panorama from two images"
+                };
+
+                _context.Algorithms.Add(algorithm5);
+
+                var algorithm6 = new Algorithm()
+                {
+                    CodeName = "long-running",
+                    FilePath = "long_running.py",
+                    Title = "Long running script for testing purpose",
+                    Description = "Long running script for testing purpose"
+                };
+
+                _context.Algorithms.Add(algorithm6);
+
+                var algorithm7 = new Algorithm()
+                {
+                    CodeName = "cascade",
+                    FilePath = "cascade.py",
+                    Title = "General Haar cascade - first conf file, second image",
+                    Description = "General Haar cascade - first conf file, second image"
+                };
+
+                _context.Algorithms.Add(algorithm7);
+
+                var algorithm8 = new Algorithm()
+                {
+                    CodeName = "video-stabilization",
+                    FilePath = "run.ps1",
+                    Title = "Stabilize shake input video",
+                    Description = "Stabilize shake input video"
+                };
+
+                _context.Algorithms.Add(algorithm8);
+
+                _context.SaveChanges();
             }
         }
     }

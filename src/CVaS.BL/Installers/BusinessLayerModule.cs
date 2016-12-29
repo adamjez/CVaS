@@ -5,6 +5,8 @@ using CVaS.BL.Core.Registry;
 using CVaS.BL.Facades;
 using CVaS.BL.Repositories;
 using CVaS.BL.Services.ApiKey;
+using CVaS.BL.Services.ArgumentTranslator;
+using CVaS.BL.Services.Email;
 using CVaS.BL.Services.File;
 using CVaS.DAL;
 using Microsoft.AspNetCore.Http;
@@ -43,6 +45,12 @@ namespace CVaS.BL.Installers
 
             builder.RegisterType<RndApiKeyGenerator>()
                 .As<IApiKeyGenerator>();
+
+            builder.RegisterType<BaseArgumentTranslator>()
+                .As<IArgumentTranslator>();
+
+            builder.RegisterType<AuthMessageSender>()
+                .As<IEmailSender>();
 
         }
     }
