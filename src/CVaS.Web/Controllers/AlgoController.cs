@@ -81,14 +81,9 @@ namespace CVaS.Web.Controllers
         [HttpGet, Route("{codeName}")]
         public async Task<IActionResult> RetrieveHelp(string codeName)
         {
-            var algorithm = await repository.GetByCodeNameWithArgs(codeName);
+            var result = await _runFacade.RunHelpAsync(codeName);
 
-            if (algorithm == null)
-            {
-                return NotFound(Json("Given algorithm codeName doesn't exists"));
-            }
-
-            return Ok(algorithm);
+            return Ok(result);
         }
     }
 }

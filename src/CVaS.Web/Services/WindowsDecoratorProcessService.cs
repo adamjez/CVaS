@@ -18,7 +18,7 @@ namespace CVaS.Web.Services
             _interpreterResolver = interpreterResolver;
         }
 
-        public async Task<ProcessResult> RunAsync(string filePath, string workingDirectory, IList<string> arguments, CancellationToken cancellationToken)
+        public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments, CancellationToken cancellationToken)
         {
             var fileExt = Path.GetExtension(filePath);
 
@@ -30,7 +30,7 @@ namespace CVaS.Web.Services
                 filePath = interpreter;
             }
 
-            return await _processService.RunAsync(filePath, workingDirectory, arguments, cancellationToken);
+            return await _processService.RunAsync(filePath, arguments, cancellationToken);
         }
     }
 }

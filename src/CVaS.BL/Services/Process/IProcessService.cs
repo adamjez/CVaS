@@ -6,8 +6,7 @@ namespace CVaS.BL.Services.Process
 {
     public interface IProcessService
     {
-        Task<ProcessResult> RunAsync(string filePath, string workingDirectory, IList<string> arguments,
-            CancellationToken cancellationToken);
+        Task<ProcessResult> RunAsync(string filePath, IList<string> arguments, CancellationToken cancellationToken);
     }
 
     public class ProcessResult

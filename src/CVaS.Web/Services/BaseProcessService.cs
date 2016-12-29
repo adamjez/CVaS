@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using CVaS.BL.Services.File;
 using CVaS.BL.Services.Process;
 
 namespace CVaS.Web.Services
 {
     public class BaseProcessService : IProcessService
     {
-        public async Task<ProcessResult> RunAsync(string filePath, string workingDirectory, IList<string> arguments, CancellationToken cancellationToken)
+        private readonly FileProvider _fileProvider;
+        public BaseProcessService(FileProvider fileProvider)
+        {
+            _fileProvider = fileProvider;
+        }
+
+        public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments, CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<ProcessResult>();
 
@@ -23,7 +30,7 @@ namespace CVaS.Web.Services
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    WorkingDirectory = workingDirectory
+                    WorkingDirectory = _fileProvider.GetDirectoryFromFile(filePath)
                 },
                 EnableRaisingEvents = true
             };

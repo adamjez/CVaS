@@ -84,8 +84,7 @@ namespace CVaS.BL.Facades
 
                 var tokenSource = new CancellationTokenSource(HardTimeout);
 
-                var task = _processService.RunAsync(filePath, _fileProvider.GetDirectoryFromFile(filePath), args,
-                    tokenSource.Token);
+                var task = _processService.RunAsync(filePath, args, tokenSource.Token);
 
                 var lightTokenSource = new CancellationTokenSource();
                 var firstTimeOutedTask = await Task.WhenAny(task, Task.Delay(LightTimeout, lightTokenSource.Token));
@@ -125,6 +124,29 @@ namespace CVaS.BL.Facades
                     StdErr = result.StdError,
                     RunId = run.Id
                 };
+            }
+        }
+
+        public async Task<ProcessResult> RunHelpAsync(string codeName)
+        {
+            using (UnitOfWorkProvider.Create())
+            {
+                var algorithm = await _algorithmRepository.GetByCodeNameWithArgs(codeName);
+
+                if (algorithm == null)
+                {
+                    throw new NotFoundException("Given algorithm codeName doesn't exists");
+                }
+
+                var filePath = _algFileProvider.GetAlgorithmFilePath(codeName, algorithm.FilePath);
+
+                if (!_fileProvider.Exists(filePath))
+                {
+                    throw new NotFoundException("Given algorithm execution file doesn't exists");
+                }
+
+                var arguments = new List<string>() {"--help"};
+                return await _processService.RunAsync(filePath, arguments, CancellationToken.None);
             }
         }
 

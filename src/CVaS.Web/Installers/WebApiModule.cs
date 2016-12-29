@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Autofac;
 using CVaS.BL.Providers;
+using CVaS.BL.Services.File;
 using CVaS.BL.Services.Interpreter;
 using CVaS.BL.Services.Process;
 using CVaS.Web.Helpers;
@@ -21,7 +22,7 @@ namespace CVaS.Web.Installers
                     .As<IInterpreterResolver>();
                 builder.Register<IProcessService>(
                     (c) => new WindowsDecoratorProcessService(
-                        new BaseProcessService(), c.Resolve<IInterpreterResolver>()));
+                        new BaseProcessService(c.Resolve<FileProvider>()), c.Resolve<IInterpreterResolver>()));
             }
             else
             {
