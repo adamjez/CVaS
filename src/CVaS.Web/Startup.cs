@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MySQL.Data.EntityFrameworkCore.Extensions;
 using Newtonsoft.Json.Converters;
+using Swashbuckle.Swagger.Model;
 
 namespace CVaS.Web
 {
@@ -80,6 +81,26 @@ namespace CVaS.Web
                 .AddJsonOptions(options => { options.SerializerSettings.Converters.Add(new StringEnumConverter(true)); })
                 .AddXmlDataContractSerializerFormatters();
 
+            // Inject an implementation of ISwaggerProvider with defaulted settings applied
+            services.AddSwaggerGen(c =>
+            {
+                c.SingleApiVersion(new Info
+                {
+                    Version = "v1",
+                    Title = "Computer Vision as Service API",
+                    Description = "A simple api to run computer vision algorithms.",
+                    TermsOfService = "None"
+                });
+                c.AddSecurityDefinition("Bearer", new ApiKeyScheme()
+                {
+                    In = "header",
+                    Name = "Authorization",
+                    Description = "Api Key Authentication",
+                    Type = "apiKey"
+                });
+                c.IncludeXmlComments(ResolvePathToXmlCommentFile());
+            });
+
             // Register Autofac
             var containerBuilder = new ContainerBuilder();
 
@@ -120,7 +141,7 @@ namespace CVaS.Web
             });
             app.UseIdentity();
 
-            initializer.Initialize();
+            initializer.Init();
 
             app.UseMvc(routes =>
             {
@@ -128,6 +149,20 @@ namespace CVaS.Web
                     name: "default",
                     template: "{controller=Home}/{action=Index}");
             });
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui assets (HTML, JS, CSS etc.)
+            app.UseSwaggerUi();
+        }
+
+        private string ResolvePathToXmlCommentFile()
+        {
+            var location = System.Reflection.Assembly.GetEntryAssembly().Location;
+            var directory = System.IO.Path.GetDirectoryName(location);
+            var pathToDoc = System.IO.Path.Combine(directory, Configuration["Swagger:XmlCommentFile"]);
+            return pathToDoc;
         }
     }
 }

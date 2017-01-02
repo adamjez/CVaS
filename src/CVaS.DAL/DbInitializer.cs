@@ -15,7 +15,7 @@ namespace CVaS.DAL
             _context = context;
         }
 
-        public void Initialize()
+        public void Init()
         {
             _context.Database.EnsureCreated();
 

@@ -32,9 +32,6 @@ namespace CVaS.Web.Authentication
                 //Extract credentials
                 string apiKey = authHeader.Substring(Scheme.Length).Trim();
 
-                //Guid apiKeyGuid;
-                //if (Guid.TryParse(apiKey, out apiKeyGuid))
-                {
                     using (_unitOfWorkProvider.Create())
                     {
                         var user = await _userManager.Users.FirstOrDefaultAsync(us => us.ApiKey == apiKey);
@@ -47,8 +44,6 @@ namespace CVaS.Web.Authentication
                     }
 
                     return AuthenticateResult.Fail("bad username or password");
-                }
-
             }
 
             return AuthenticateResult.Fail("Missing authentication header or bad authorization type");

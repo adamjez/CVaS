@@ -17,7 +17,13 @@ namespace CVaS.Web.Controllers
             _currentUserProvider = currentUserProvider;
         }
 
+        /// <summary>
+        /// Lorem Ipsum dolor sit amet
+        /// </summary>
+        /// <param name="runId"></param>
+        /// <returns></returns>
         [HttpGet("{runId}")]
+        [Produces(typeof(DAL.Model.Run))]
         public async Task<IActionResult> Get(int runId)
         {
             if (!ModelState.IsValid)
