@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Sample Algorithm: License Plate Recognition";
+}
+
+@section header {
+
+}
+
+
+
+
+<h2>@ViewData["Title"]</h2>
+<div class="row">
+    <div class="col-md-8">
+        <form id="algorithm-run">
+            <div class="form-group">
+                <label for="inputFileId">Input File Id</label>
+                <input type="number" class="form-control" id="inputFileId" aria-describedby="fileIdHelp" placeholder="Enter file id">
+                <small id="fileIdHelp" class="form-text text-muted">Specify id of file uploaded via <a asp-controller="Presentation" asp-action="Upload">Upload File</a>.</small>
+            </div>
+            <fieldset class="form-group">
+                <legend>Specify license plate region</legend>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" id="euRadioOption" value="eu" checked>
+                        EU
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" id="usRadioOption" value="us">
+                        US
+                    </label>
+                </div>
+            </fieldset>
+            <button type="submit" class="btn btn-primary" onclick="">Run</button>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <p>Algorithm result:</p>
+        <ol id="algorithm-result"></ol>
+    </div>
+</div>
+
+@section Scripts {
+    <environment names="Development">
+        <script src="~/lib/fine-uploader/dist/jquery.fine-uploader.js"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/lib/fine-uploader/dist/jquery.fine-uploader.min.js"></script>
+    </environment>
+
+    <script>
+        var showResult = function (result) {
+            result = $.trim(result).length === 0 ? '&lt;empty output&gt;' : result;
+            $('#algorithm-result').append('<li>' + result + '</li>');
+        };
+
+        $('#algorithm-run')
+            .submit(function(e) {
+
+                var url = '/algorithms/license-plate-recognition';
+
+                var form = $(this);
+                var requestBody = [{ c: form.find('input[type=radio]:checked').val() }, "local://" + form.find('#inputFileId').val()];
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: JSON.stringify(requestBody),
+                    contentType: 'application/json',
+                    success: function(data) {
+                        showResult(data.stdOut);
+                    }
+                });
+
+                e.preventDefault(); // avoid to execute the actual submit of the form.
+            });
+    </script>
+}

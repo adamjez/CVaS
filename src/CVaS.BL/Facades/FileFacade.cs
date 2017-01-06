@@ -46,13 +46,28 @@ namespace CVaS.BL.Facades
                     Path = path,
                     UserId = userId,
                     Type = FileType.Upload
-                });
+                }).ToList();
 
                 uow.Context.Files.AddRange(files);
 
                 await uow.CommitAsync();
 
                 return files;
+            }
+        }
+
+        public async Task<string> GetSafelyAsync(int fileId)
+        {
+            using (UnitOfWorkProvider.Create())
+            {
+                var file = await _fileRepository.GetByIdSafely(fileId);
+
+                if (file.UserId != CurrentUserProvider.Id)
+                {
+                    throw new UnauthorizedAccessException();
+                }
+
+                return _temporaryFileProvider.ResolveTemporaryFilePath(file.Path);
             }
         }
     }

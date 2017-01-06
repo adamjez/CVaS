@@ -6,21 +6,21 @@ using Microsoft.AspNetCore.Mvc;
 namespace CVaS.Web.Controllers.Api
 {
     [Route("[controller]")]
-    public class RunController : ApiController
+    public class RunsController : ApiController
     {
         private readonly RunFacade _runFacade;
         private readonly ICurrentUserProvider _currentUserProvider;
 
-        public RunController(RunFacade runFacade, ICurrentUserProvider currentUserProvider)
+        public RunsController(RunFacade runFacade, ICurrentUserProvider currentUserProvider)
         {
             _runFacade = runFacade;
             _currentUserProvider = currentUserProvider;
         }
 
         /// <summary>
-        /// Lorem Ipsum dolor sit amet
+        /// Retrieve basic informace about Run.
         /// </summary>
-        /// <param name="runId"></param>
+        /// <param name="runId">Identifier of run paired with user</param>
         /// <returns></returns>
         [HttpGet("{runId}")]
         [Produces(typeof(DAL.Model.Run))]

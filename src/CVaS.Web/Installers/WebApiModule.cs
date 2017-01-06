@@ -22,7 +22,7 @@ namespace CVaS.Web.Installers
                     .As<IInterpreterResolver>();
                 builder.Register<IProcessService>(
                     (c) => new WindowsDecoratorProcessService(
-                        new BaseProcessService(c.Resolve<FileProvider>()), c.Resolve<IInterpreterResolver>()));
+                        new BaseProcessService(c.Resolve<FileProvider>()), c.Resolve<IInterpreterResolver>(), c.Resolve<FileProvider>()));
             }
             else
             {

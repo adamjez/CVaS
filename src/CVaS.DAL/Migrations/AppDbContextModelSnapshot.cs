@@ -147,8 +147,7 @@ namespace CVaS.DAL.Migrations
 
                     b.Property<DateTime>("CreatedAt");
 
-                    b.Property<string>("Path")
-                        .HasAnnotation("MaxLength", 256);
+                    b.Property<int?>("FileId");
 
                     b.Property<int>("Result");
 
@@ -161,6 +160,8 @@ namespace CVaS.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AlgorithmId");
+
+                    b.HasIndex("FileId");
 
                     b.HasIndex("UserId");
 
@@ -264,6 +265,10 @@ namespace CVaS.DAL.Migrations
                         .WithMany()
                         .HasForeignKey("AlgorithmId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("CVaS.DAL.Model.File", "File")
+                        .WithMany()
+                        .HasForeignKey("FileId");
 
                     b.HasOne("CVaS.DAL.Model.AppUser", "User")
                         .WithMany("Runs")

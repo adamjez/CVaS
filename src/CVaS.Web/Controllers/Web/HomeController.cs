@@ -16,11 +16,5 @@ namespace CVaS.Web.Controllers.Web
         {
             return View();
         }
-
-        public IActionResult Upload()
-        {
-            return View();
-        }
-
     }
 }

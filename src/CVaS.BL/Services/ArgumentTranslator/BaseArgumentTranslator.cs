@@ -86,7 +86,7 @@ namespace CVaS.BL.Services.ArgumentTranslator
             {
                 builder.Append('-', dictValue.Key.Length == 1 ? 1 : 2);
                 builder.Append(dictValue.Key);
-                builder.Append('=');
+                builder.Append(dictValue.Key.Length == 1 ? ' ' : '=');
                 builder.Append(await ProcessSimpleType(dictValue.Value));
                 builder.Append(' ');
             }

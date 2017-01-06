@@ -173,15 +173,20 @@ namespace CVaS.BL.Facades
         {
             using (var uow = UnitOfWorkProvider.Create())
             {
-
                 var zipFile = new BasicFileInfo();
                 if (!_fileProvider.IsEmpty(runFolder))
                 {
                     zipFile = _fileSystemProvider.GetTemporaryFile();
                     ZipFile.CreateFromDirectory(runFolder, zipFile.FullPath, CompressionLevel.Fastest, false);
+
+                    run.File = new File()
+                    {
+                        Path = zipFile.FullPath,
+                        Type = FileType.Result,
+                        UserId = CurrentUserProvider.Id
+                    };
                 }
 
-                run.Path = zipFile.FullPath;
                 run.StdOut = result.StdOut;
                 run.StdErr = result.StdError;
                 run.Result = result.ExitCode == 0 ? RunResultType.Success : RunResultType.Fail;

@@ -11,14 +11,14 @@ using Microsoft.Extensions.Logging;
 namespace CVaS.Web.Controllers.Api
 {
     [Route("[controller]")]
-    public class AlgoController : ApiController
+    public class AlgorithmsController : ApiController
     {
-        private readonly ILogger<AlgoController> logger;
+        private readonly ILogger<AlgorithmsController> logger;
         private readonly RunFacade _runFacade;
         private readonly AlgoFacade _algoFacade;
         private readonly IEnumerable<IArgumentParserProvider> _argumentParserProviders;
 
-        public AlgoController(ILogger<AlgoController> logger, RunFacade runFacade, AlgoFacade algoFacade, 
+        public AlgorithmsController(ILogger<AlgorithmsController> logger, RunFacade runFacade, AlgoFacade algoFacade, 
             IEnumerable<IArgumentParserProvider> argumentParserProviders)
         {
             this.logger = logger;

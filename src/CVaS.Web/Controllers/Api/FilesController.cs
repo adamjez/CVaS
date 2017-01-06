@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using CVaS.BL.Facades;
 using CVaS.BL.Providers;
 using CVaS.BL.Services.File;
-using CVaS.DAL;
 using CVaS.Web.Helpers;
+using CVaS.Web.Models.FileViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace CVaS.Web.Controllers.Api
 {
@@ -36,6 +37,11 @@ namespace CVaS.Web.Controllers.Api
             _runFacade = runFacade;
         }
 
+        /// <summary>
+        /// Upload multiple files with multipart-form/data
+        /// Files have to have filename with extenion defined
+        /// </summary>
+        /// <returns>Returns files identifier</returns>
         [HttpPost("")]
         public async Task<IActionResult> UploadMultipleFiles()
         {
@@ -66,22 +72,21 @@ namespace CVaS.Web.Controllers.Api
 
             var files = await _fileFacade.AddUploadedAsync(pathFiles, _currentUserProvider.Id);
 
-            return Ok(files);
+            return Ok(new UploadFilesResult { Ids = files.Select(file => file.Id) });
         }
 
         /// <summary>
-        /// Retrieve file paired with given run id.
+        /// Retrieve file with given id.
         /// </summary>
-        /// <param name="runId">Identifier of algorithm run</param>
+        /// <param name="fileId">Identifier of file</param>
         /// <returns></returns>
-        [HttpGet, Route("{runId}", Name = nameof(GetFile))]
-        public async Task GetFile(int runId)
+        [HttpGet, Route("{fileId}", Name = nameof(GetFile))]
+        public async Task GetFile(int fileId)
         {
             const string zipMime = "application/zip";
 
-            var run = await _runFacade.GetSafelyAsync(runId);
+            var pathToFile = await _fileFacade.GetSafelyAsync(fileId);
 
-            var pathToFile = _fileProvider.ResolveTemporaryFilePath(run.Path);
             IFileInfo fileInfo = new PhysicalFileInfo(new FileInfo(pathToFile));
 
             HttpContext.Response.ContentType = zipMime;

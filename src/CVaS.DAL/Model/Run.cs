@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using CVaS.DAL.Common;
 
 namespace CVaS.DAL.Model
@@ -8,10 +7,12 @@ namespace CVaS.DAL.Model
     {
         public int Id { get; set; }
 
-        [MaxLength(256)]
-        public string Path { get; set; }
+        public int? FileId { get; set; }
+
+        public virtual File File { get; set; }
 
         public int UserId { get; set; }
+
         public virtual AppUser User { get; set; }
 
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;

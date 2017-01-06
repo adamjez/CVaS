@@ -16,7 +16,12 @@ namespace CVaS.Web.Services
             _fileProvider = fileProvider;
         }
 
-        public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments, CancellationToken cancellationToken)
+        public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments,  CancellationToken cancellationToken)
+        {
+            return await RunAsync(filePath, arguments, _fileProvider.GetDirectoryFromFile(filePath), cancellationToken);
+        }
+
+        public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments, string workingDirectory, CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<ProcessResult>();
 
@@ -30,7 +35,7 @@ namespace CVaS.Web.Services
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
-                    WorkingDirectory = _fileProvider.GetDirectoryFromFile(filePath)
+                    WorkingDirectory = workingDirectory
                 },
                 EnableRaisingEvents = true
             };
@@ -53,15 +58,6 @@ namespace CVaS.Web.Services
                 process.Dispose();
             };
 
-            //process.Start();
-
-            //process.BeginOutputReadLine();
-            //process.BeginErrorReadLine();
-            ////result.StdOut = process.StandardOutput.ReadToEnd();
-            ////result.StdError = process.StandardError.ReadToEnd();
-            ////process.WaitForExit();
-
-            //return await tcs.Task;
             using (cancellationToken.Register(() =>
             {
                 tcs.TrySetCanceled();
