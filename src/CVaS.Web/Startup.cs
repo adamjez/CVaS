@@ -69,7 +69,7 @@ namespace CVaS.Web
                     options.Cookies.ApplicationCookie.ExpireTimeSpan = TimeSpan.FromDays(150);
                     options.Cookies.ApplicationCookie.LoginPath = "/Account/Login/";
                     options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOff";
-                    options.Cookies.ApplicationCookie.AuthenticationScheme = "WebCookieScheme";
+                    options.Cookies.ApplicationCookie.AuthenticationScheme = AuthenticationScheme.WebCookie;
                     options.Cookies.ApplicationCookie.AutomaticAuthenticate = true;
                     options.Cookies.ApplicationCookie.AutomaticChallenge = true;
                 })
@@ -125,6 +125,8 @@ namespace CVaS.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DbInitializer initializer)
         {
+            initializer.Init();
+
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
@@ -137,11 +139,9 @@ namespace CVaS.Web
 
             app.UseApiAuthentication(new ApiAuthenticationOptions()
             {
-                AuthenticationScheme = "ApiKey"
+                AuthenticationScheme = AuthenticationScheme.ApiKey
             });
             app.UseIdentity();
-
-            initializer.Init();
 
             app.UseMvc(routes =>
             {

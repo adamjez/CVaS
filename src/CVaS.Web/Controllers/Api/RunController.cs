@@ -3,7 +3,7 @@ using CVaS.BL.Facades;
 using CVaS.BL.Providers;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CVaS.Web.Controllers
+namespace CVaS.Web.Controllers.Api
 {
     [Route("[controller]")]
     public class RunController : ApiController

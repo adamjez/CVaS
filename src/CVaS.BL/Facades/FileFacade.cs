@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CVaS.BL.Core.Provider;
 using CVaS.BL.Providers;
 using CVaS.BL.Repositories;
 using CVaS.BL.Services.File;
+using CVaS.DAL.Model;
 
 namespace CVaS.BL.Facades
 {
@@ -31,6 +34,25 @@ namespace CVaS.BL.Facades
                 }
 
                 _temporaryFileProvider.Delete(file.Path);
+            }
+        }
+
+        public async Task<IEnumerable<File>> AddUploadedAsync(IEnumerable<string> pathFiles, int userId)
+        {
+            using (var uow = UnitOfWorkProvider.Create())
+            {
+                var files = pathFiles.Select(path => new File()
+                {
+                    Path = path,
+                    UserId = userId,
+                    Type = FileType.Upload
+                });
+
+                uow.Context.Files.AddRange(files);
+
+                await uow.CommitAsync();
+
+                return files;
             }
         }
     }

@@ -15,7 +15,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Logging;
 
-namespace CVaS.Web.Controllers
+namespace CVaS.Web.Controllers.Api
 {
     [Route("[controller]")]
     public class FilesController : ApiController
@@ -24,17 +24,15 @@ namespace CVaS.Web.Controllers
         private readonly TemporaryFileProvider _fileProvider;
         private readonly FileFacade _fileFacade;
         private readonly ICurrentUserProvider _currentUserProvider;
-        private readonly AppDbContext _context;
         private readonly RunFacade _runFacade;
 
         public FilesController(ILogger<FilesController> logger, TemporaryFileProvider fileProvider, FileFacade fileFacade,
-            ICurrentUserProvider currentUserProvider, AppDbContext context, RunFacade runFacade)
+            ICurrentUserProvider currentUserProvider, RunFacade runFacade)
         {
             _logger = logger;
             _fileProvider = fileProvider;
             _fileFacade = fileFacade;
             _currentUserProvider = currentUserProvider;
-            _context = context;
             _runFacade = runFacade;
         }
 
@@ -49,33 +47,35 @@ namespace CVaS.Web.Controllers
             var boundary = MultipartFormHelpers.GetBoundary(HttpContext.Request.ContentType);
             var reader = new MultipartReader(boundary, HttpContext.Request.Body);
 
-            var files = new List<DAL.Model.File>();
+            var pathFiles = new List<string>();
             MultipartSection section;
             while ((section = await reader.ReadNextSectionAsync()) != null)
             {
+                var fileExtension = MultipartFormHelpers.GetExtension(section.ContentDisposition);
+                if (string.IsNullOrEmpty(fileExtension))
+                    continue;
+
                 string filePath;
-                using (var stream = _fileProvider.CreateTemporaryFile(
-                    MultipartFormHelpers.GetExtension(section.ContentDisposition), 
-                    out filePath))
+                using (var stream = _fileProvider.CreateTemporaryFile(fileExtension, out filePath))
                 {
                     await section.Body.CopyToAsync(stream);
                 }
 
-                files.Add(new DAL.Model.File()
-                {
-                    Path = filePath,
-                    UserId = _currentUserProvider.Id
-                });
+                pathFiles.Add(filePath);
             }
 
-            _context.Files.AddRange(files);
-            await _context.SaveChangesAsync();
+            var files = await _fileFacade.AddUploadedAsync(pathFiles, _currentUserProvider.Id);
 
             return Ok(files);
         }
 
-        [HttpGet, Route("{runId}", Name = nameof(GetResultZip))]
-        public async Task GetResultZip(int runId)
+        /// <summary>
+        /// Retrieve file paired with given run id.
+        /// </summary>
+        /// <param name="runId">Identifier of algorithm run</param>
+        /// <returns></returns>
+        [HttpGet, Route("{runId}", Name = nameof(GetFile))]
+        public async Task GetFile(int runId)
         {
             const string zipMime = "application/zip";
 
@@ -97,7 +97,12 @@ namespace CVaS.Web.Controllers
             }
         }
 
-        [HttpGet, Route("{fileId}")]
+        /// <summary>
+        /// Deletes file with given file Id.
+        /// </summary>
+        /// <param name="fileId">File Identifier</param>
+        /// <returns></returns>
+        [HttpDelete, Route("{fileId}")]
         public async Task DeleteUserFile(int fileId)
         {
             const string zipMime = "application/zip";

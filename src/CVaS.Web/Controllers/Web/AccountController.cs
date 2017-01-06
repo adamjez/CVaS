@@ -1,21 +1,20 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using CVaS.BL.Providers;
 using CVaS.BL.Services.ApiKey;
+using CVaS.BL.Services.Email;
 using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Web.Models.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Linq;
-using CVaS.BL.Providers;
-using CVaS.BL.Services.Email;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Logging;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace CVaS.Web.Controllers
+namespace CVaS.Web.Controllers.Web
 {
     [Authorize(ActiveAuthenticationSchemes = "WebCookieScheme")]
     public class AccountController : WebController

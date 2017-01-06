@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
 using CVaS.BL.Facades;
-using CVaS.Web.Helpers;
 using CVaS.Web.Models;
-using Microsoft.Extensions.Logging;
-using System.Linq;
 using CVaS.Web.Providers;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
-namespace CVaS.Web.Controllers
+namespace CVaS.Web.Controllers.Api
 {
     [Route("[controller]")]
     public class AlgoController : ApiController
@@ -61,7 +60,7 @@ namespace CVaS.Web.Controllers
                 RunId = result.RunId,
                 StdOut = result.StdOut,
                 StdError = result.StdErr,
-                Zip = result.FileName != null ? Url.Link(nameof(FilesController.GetResultZip), new { zipName = result.FileName }) : "<no-output>",
+                Zip = result.FileName != null ? Url.Link(nameof(FilesController.GetFile), new { zipName = result.FileName }) : "<no-output>",
                 Result = result.Result
             });
         }

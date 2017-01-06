@@ -46,7 +46,7 @@ namespace CVaS.Web.Authentication
                     return AuthenticateResult.Fail("bad username or password");
             }
 
-            return AuthenticateResult.Fail("Missing authentication header or bad authorization type");
+            return AuthenticateResult.Skip();
         }
     }
 }

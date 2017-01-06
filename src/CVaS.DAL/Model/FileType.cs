@@ -2,7 +2,8 @@
 {
     public enum FileType
     {
-        Other = 1,
-        Image = 2
+        Upload = 1,
+        Result = 2,
+        Other = 3
     }
 }
