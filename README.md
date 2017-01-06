@@ -1,7 +1,13 @@
 # CVaS
 
+## COLOR
++ 64FFE4 (100, 255, 228)
++ 03B0E8 (3, 176, 232)
++ 1063FF (16, 99, 255)
++ 1103E8 (17, 3, 232)
++ 7C03FF (124, 3, 255)
 
-# TODO
+## TODO
 + Create some nice index page
 + Create page for some algorithm
 + Create some nice designed page - Custom colors and Logo?
