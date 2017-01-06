@@ -7,6 +7,7 @@ using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Web.Models.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -60,21 +61,87 @@ namespace CVaS.Web.Controllers.Web
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, false, lockoutOnFailure: false);
-                if (result.Succeeded)
+                var user = await _userManager.FindByNameAsync(model.UserName);
+
+                if (user != null)
                 {
-                    _logger.LogInformation(1, "User logged in.");
-                    return RedirectToLocal(returnUrl);
+                    if (user.EmailConfirmed)
+                    {
+                        var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, lockoutOnFailure: false);
+                        if (result.Succeeded)
+                        {
+                            _logger.LogInformation(1, "User logged in.");
+                            return RedirectToLocal(returnUrl);
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "You have to confirm email first.");
+                    }
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return View(model);
-                }
+
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             }
 
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                var user = new AppUser { UserName = model.Email, Email = model.Email, ApiKey = _apiKeyGenerator.Generate() };
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
+                    // Send an email with this link
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", 
+                        new { userId = user.Id, code = code }, 
+                        protocol: HttpContext.Request.Scheme);
+
+                    await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
+                        $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+
+                    _logger.LogInformation(3, "User created a new account with password.");
+
+                    return Redirect(callbackUrl);
+                }
+                AddErrors(result);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        {
+            if (userId == null || code == null)
+            {
+                return View("Error");
+            }
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return View("Error");
+            }
+            var result = await _userManager.ConfirmEmailAsync(user, code);
+            return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
         [HttpGet]
@@ -88,12 +155,9 @@ namespace CVaS.Web.Controllers.Web
         public async Task<IActionResult> RevokeApiKey()
         {
             var user = await _userManager.GetUserAsync(User);
-            do
-            {
 
-                user.ApiKey = _apiKeyGenerator.Generate();
-                await _context.SaveChangesAsync();
-            } while (await _context.Users.Where(u => u.ApiKey == user.ApiKey).CountAsync() > 1);
+            user.ApiKey = _apiKeyGenerator.Generate();
+            await _context.SaveChangesAsync();
 
             return View(nameof(Settings));
         }
@@ -211,7 +275,7 @@ namespace CVaS.Web.Controllers.Web
             await _signInManager.SignOutAsync();
             _logger.LogInformation(4, "User logged out.");
 
-            return RedirectToAction(nameof(HomeController.Index), "Presentation");
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
         #region Helpers
