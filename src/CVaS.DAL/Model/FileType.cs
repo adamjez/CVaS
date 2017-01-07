@@ -4,6 +4,6 @@
     {
         Upload = 1,
         Result = 2,
-        Other = 3
+        Removed = 3
     }
 }

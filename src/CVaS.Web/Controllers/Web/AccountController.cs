@@ -65,7 +65,7 @@ namespace CVaS.Web.Controllers.Web
 
                 if (user != null)
                 {
-                    if (user.EmailConfirmed)
+                    if (true/*user.EmailConfirmed*/)
                     {
                         var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, lockoutOnFailure: false);
                         if (result.Succeeded)
@@ -190,7 +190,8 @@ namespace CVaS.Web.Controllers.Web
                 var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
                 await _emailSender.SendEmailAsync(model.Email, "Reset Password",
                    $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-                return View("ForgotPasswordConfirmation");
+
+                return View("Login");
             }
 
             // If we got this far, something failed, redisplay form
