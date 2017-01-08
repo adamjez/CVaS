@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
+using CVaS.BL.Common;
 using CVaS.BL.Installers;
 using CVaS.DAL;
 using CVaS.DAL.Model;
@@ -17,6 +17,9 @@ using Microsoft.Extensions.Logging;
 using MySQL.Data.EntityFrameworkCore.Extensions;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger.Model;
+using LightInject.Microsoft.DependencyInjection;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 
 namespace CVaS.Web
 {
@@ -101,24 +104,17 @@ namespace CVaS.Web
                 c.IncludeXmlComments(ResolvePathToXmlCommentFile());
             });
 
-            // Register Autofac
-            var containerBuilder = new ContainerBuilder();
+            var container = new LightInject.ServiceContainer();
 
-            // Add application services.
             var physicalProvider = hostingEnvironment.ContentRootFileProvider;
-            containerBuilder.RegisterInstance(physicalProvider);
-            containerBuilder.RegisterInstance(Configuration);
-            containerBuilder.RegisterType<DbInitializer>();
+            container.RegisterInstance(physicalProvider);
+            container.RegisterInstance(Configuration);
+            container.Register<DbInitializer>();
 
-            // Register Modules
-            containerBuilder.RegisterModule<BusinessLayerModule>();
-            containerBuilder.RegisterModule<WebApiModule>();
+            container.RegisterFrom<WebApiComposition>();
+            container.RegisterFrom<BusinessLayerComposition>();
 
-            // Populate asp.net core services to autofac
-            containerBuilder.Populate(services);
-            var container = containerBuilder.Build();
-
-            return new AutofacServiceProvider(container);
+            return container.CreateServiceProvider(services);
         }
 
 
@@ -139,7 +135,8 @@ namespace CVaS.Web
 
             app.UseApiAuthentication(new ApiAuthenticationOptions()
             {
-                AuthenticationScheme = AuthenticationScheme.ApiKey
+                AuthenticationScheme = AuthenticationScheme.ApiKey,
+                HeaderScheme = "Simple"
             });
             app.UseIdentity();
 

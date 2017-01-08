@@ -1,8 +1,7 @@
 using System.Text.Encodings.Web;
-using CVaS.DAL.Model;
+using CVaS.BL.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -10,12 +9,12 @@ namespace CVaS.Web.Authentication
 {
     public class BasicAuthenticationMiddleware : AuthenticationMiddleware<BasicAuthenticationOptions>
     {
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly UserManager<AppUser> _userManager;
+        private readonly AppSignInManager _signInManager;
+        private readonly AppUserManager _userManager;
 
-        public BasicAuthenticationMiddleware(RequestDelegate next, SignInManager<AppUser> signInManager,
+        public BasicAuthenticationMiddleware(RequestDelegate next, AppSignInManager signInManager,
             ILoggerFactory loggerFactory, UrlEncoder urlEncoder, IOptions<BasicAuthenticationOptions> options,
-            UserManager<AppUser> userManager)
+            AppUserManager userManager)
             : base(next, options, loggerFactory, urlEncoder)
         {
             _signInManager = signInManager;

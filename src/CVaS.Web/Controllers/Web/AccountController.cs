@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using CVaS.BL.Common;
 using CVaS.BL.Providers;
 using CVaS.BL.Services.ApiKey;
 using CVaS.BL.Services.Email;
@@ -7,10 +7,8 @@ using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Web.Models.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
@@ -21,14 +19,14 @@ namespace CVaS.Web.Controllers.Web
     public class AccountController : WebController
     {
         private readonly ILogger<AccountController> _logger;
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly UserManager<AppUser> _userManager;
+        private readonly AppSignInManager _signInManager;
+        private readonly AppUserManager _userManager;
         private readonly AppDbContext _context;
         private readonly IApiKeyGenerator _apiKeyGenerator;
         private readonly IEmailSender _emailSender;
         private readonly ICurrentUserProvider _currentUserProvider;
 
-        public AccountController(ILogger<AccountController> logger, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, AppDbContext context,
+        public AccountController(ILogger<AccountController> logger, AppSignInManager signInManager, AppUserManager userManager, AppDbContext context,
             IApiKeyGenerator apiKeyGenerator, IEmailSender emailSender, ICurrentUserProvider currentUserProvider)
         {
             _logger = logger;

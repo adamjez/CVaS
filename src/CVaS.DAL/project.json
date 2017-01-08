@@ -6,11 +6,11 @@
   },
 
   "dependencies": {
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0",
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.1",
     "Microsoft.EntityFrameworkCore.SqlServer": "1.0.1",
     "MySql.Data.EntityFrameworkCore": "7.0.5-IR21",
     "NETStandard.Library": "1.6.0",
-    "System.Linq.Queryable": "4.3.0-preview1-24530-04"
+    "System.Linq.Queryable": "4.3.0"
   },
 
   "frameworks": {

@@ -11,7 +11,7 @@ namespace CVaS.Web.Authentication
         /// </summary>
         public ApiAuthenticationOptions()
         {
-            AuthenticationScheme = "ApiKey";
+            HeaderScheme = "ApiKey";
             AutomaticAuthenticate = true;
             AutomaticChallenge = true;
         }
@@ -29,5 +29,7 @@ namespace CVaS.Web.Authentication
  
 
         public ApiAuthenticationOptions Value => this;
+
+        public string HeaderScheme { get; set; }
     }
 }

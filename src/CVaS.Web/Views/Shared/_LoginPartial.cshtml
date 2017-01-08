@@ -1,7 +1,9 @@
-﻿@using CVaS.DAL.Model
+﻿@using System.Threading.Tasks
+@using CVaS.BL.Common
+@using CVaS.DAL.Model
 
-@inject SignInManager<AppUser> SignInManager
-@inject UserManager<AppUser> UserManager
+@inject AppSignInManager SignInManager
+@inject AppUserManager UserManager
 
 @if (SignInManager.IsSignedIn(User))
 {

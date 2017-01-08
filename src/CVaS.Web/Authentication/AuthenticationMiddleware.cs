@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using CVaS.BL.Common;
 using CVaS.DAL.Model;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Authentication;
@@ -11,10 +12,10 @@ namespace CVaS.Web.Authentication
     public class BasicAuthenticationHandler : AuthenticationHandler<BasicAuthenticationOptions>
     {
         private const string Scheme = "Basic";
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly UserManager<AppUser> _userManager;
+        private readonly AppSignInManager _signInManager;
+        private readonly AppUserManager _userManager;
 
-        public BasicAuthenticationHandler(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager)
+        public BasicAuthenticationHandler(AppSignInManager signInManager, AppUserManager userManager)
         {
             _signInManager = signInManager;
             _userManager = userManager;

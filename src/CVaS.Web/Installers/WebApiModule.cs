@@ -7,37 +7,35 @@ using CVaS.BL.Services.Process;
 using CVaS.Web.Helpers;
 using CVaS.Web.Providers;
 using CVaS.Web.Services;
+using LightInject;
 
 namespace CVaS.Web.Installers
 {
-    public class WebApiModule : Module
+    public class WebApiComposition : ICompositionRoot
     {
-        protected override void Load(ContainerBuilder builder)
+        public void Compose(IServiceRegistry serviceRegistry)
         {
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
             if (isWindows)
             {
-                builder.RegisterType<ConfigInterpreterResolver>()
-                    .As<IInterpreterResolver>();
-                builder.Register<IProcessService>(
-                    (c) => new WindowsDecoratorProcessService(
-                        new BaseProcessService(c.Resolve<FileProvider>()), c.Resolve<IInterpreterResolver>(), c.Resolve<FileProvider>()));
+                serviceRegistry.Register<IInterpreterResolver, ConfigInterpreterResolver>();
+
+                serviceRegistry.Register<IProcessService, BaseProcessService>();
+                serviceRegistry.Decorate<IProcessService, WindowsDecoratorProcessService>();
             }
             else
             {
-                builder.RegisterType<BaseProcessService>()
-                    .As<IProcessService>();
+                serviceRegistry.Register<IProcessService, BaseProcessService>();
             }
 
-            builder.RegisterType<CurrentUserProvider>()
-                .As<ICurrentUserProvider>();
-
-            builder.RegisterType<JsonArgumentParserProvider>()
-                .As<IArgumentParserProvider>();
-
-            builder.RegisterType<PrimitiveArgumentParserProvider>()
-                .As<IArgumentParserProvider>();
+            serviceRegistry.Register<ICurrentUserProvider, CurrentUserProvider>();
+            // LightInject: to register multiple classy for 1 interface, different service name
+            // have to be giben
+            serviceRegistry.Register<IArgumentParserProvider, JsonArgumentParserProvider>(
+                nameof(JsonArgumentParserProvider));
+            serviceRegistry.Register<IArgumentParserProvider, PrimitiveArgumentParserProvider>(
+                nameof(PrimitiveArgumentParserProvider));
         }
     }
 }

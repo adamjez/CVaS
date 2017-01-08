@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Security.Claims;
+using CVaS.BL.Common;
 using CVaS.BL.Providers;
-using CVaS.DAL.Model;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 
 namespace CVaS.Web.Providers
 {
     public class CurrentUserProvider : ICurrentUserProvider
     {
-        private readonly UserManager<AppUser> _userManager;
+        private readonly AppUserManager _userManager;
         private readonly IHttpContextAccessor _contextAccessor;
-        public CurrentUserProvider(IHttpContextAccessor contextAccessor, UserManager<AppUser> userManager)
+        public CurrentUserProvider(IHttpContextAccessor contextAccessor, AppUserManager userManager)
         {
             this._userManager = userManager;
             this._contextAccessor = contextAccessor;
