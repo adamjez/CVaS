@@ -7,13 +7,17 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace CVaS.Web.Filters
 {
+    /// <summary>
+    /// Exception filter that catch exception of known type
+    /// and transform them into specific HTTP status code with 
+    /// error message
+    /// </summary>
     public class HttpExceptionFilterAttribute : ExceptionFilterAttribute
     {
         public override void OnException(ExceptionContext context)
         {
             if (context.Exception is ApiException)
             {
-                // handle explicit 'known' API errors
                 var ex = context.Exception as ApiException;
                 var apiError = new ApiError(ex.Message);
 

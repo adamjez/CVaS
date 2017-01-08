@@ -8,6 +8,12 @@ using CVaS.BL.Services.Process;
 
 namespace CVaS.Web.Services
 {
+    /// <summary>
+    /// Decorator pattern for proces service to
+    /// provide intepret for scripts, It's only
+    /// needed for OS Windows bcs Linux-like OS
+    /// can specify interpreter in Shebang
+    /// </summary>
     public class WindowsDecoratorProcessService : IProcessService
     {
         private readonly IProcessService _processService;

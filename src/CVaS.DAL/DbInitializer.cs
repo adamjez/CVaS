@@ -15,7 +15,7 @@ namespace CVaS.DAL
             _context = context;
         }
 
-        public void Init()
+        public void Init(string username = null, string email = null, string password = null)
         {
             _context.Database.EnsureCreated();
 
@@ -35,11 +35,11 @@ namespace CVaS.DAL
             {
                 var user = new AppUser()
                 {
-                    UserName = "username",
-                    Email = "spiritakcz@gmail.com"
+                    UserName = username,
+                    Email = email
                 };
 
-                _userManager.CreateAsync(user, "Password1!").Wait();
+                _userManager.CreateAsync(user, password).Wait();
 
                 _userManager.AddToRoleAsync(user, Roles.Admin).Wait();
             }

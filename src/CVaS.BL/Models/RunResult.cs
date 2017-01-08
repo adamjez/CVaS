@@ -9,5 +9,6 @@ namespace CVaS.BL.Models
         public string StdErr { get; set; }
         public int RunId { get; set; }
         public RunResultType Result { get; set; }
+        public double Duration { get; set; }
     }
 }

@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using CVaS.BL.Core.Provider;
 using CVaS.BL.Exceptions;
 using CVaS.DAL;
 using CVaS.DAL.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace CVaS.BL.Repositories
 {
@@ -20,14 +23,14 @@ namespace CVaS.BL.Repositories
             _provider = provider;
         }
 
-        public async Task<TEntity> GetById(TKey id)
+        public async Task<TEntity> GetById(TKey id, params Expression<Func<TEntity, object>>[] includes)
         {
-            return (await GetByIds(new TKey[] { id })).FirstOrDefault();
+            return (await GetByIds(new TKey[] { id }, includes)).FirstOrDefault();
         }
 
-        public async Task<TEntity> GetByIdSafely(TKey id)
+        public async Task<TEntity> GetByIdSafely(TKey id, params Expression<Func<TEntity, object>>[] includes)
         {
-            var result = await GetById(id);
+            var result = await GetById(id, includes);
 
             if (result == null)
             {
@@ -37,11 +40,16 @@ namespace CVaS.BL.Repositories
             return result;
         }
 
-        public virtual async Task<IList<TEntity>> GetByIds(IEnumerable<TKey> ids)
+        public virtual async Task<IList<TEntity>> GetByIds(IEnumerable<TKey> ids, params Expression<Func<TEntity, object>>[] includes)
         {
-            IQueryable<TEntity> source = this.Context.Set<TEntity>();
+            IQueryable<TEntity> query = this.Context.Set<TEntity>();
 
-            return await source.Where(i => ids.Contains(i.Id)).ToListAsync();
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.Where(i => ids.Contains(i.Id)).ToListAsync();
         }
 
 

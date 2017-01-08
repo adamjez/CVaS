@@ -39,7 +39,7 @@ namespace CVaS.Web.Controllers.Api
 
         /// <summary>
         /// Upload multiple files with multipart-form/data
-        /// Files have to have filename with extenion defined
+        /// Files have to have filename with extenion defined.
         /// </summary>
         /// <returns>Returns files identifier</returns>
         [HttpPost("")]
@@ -79,7 +79,6 @@ namespace CVaS.Web.Controllers.Api
         /// Retrieve file with given id.
         /// </summary>
         /// <param name="fileId">Identifier of file</param>
-        /// <returns></returns>
         [HttpGet, Route("{fileId}", Name = nameof(GetFile))]
         public async Task GetFile(int fileId)
         {
@@ -106,7 +105,6 @@ namespace CVaS.Web.Controllers.Api
         /// Deletes file with given file Id.
         /// </summary>
         /// <param name="fileId">File Identifier</param>
-        /// <returns></returns>
         [HttpDelete, Route("{fileId}")]
         public async Task DeleteUserFile(int fileId)
         {

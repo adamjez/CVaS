@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CVaS.BL.DTO;
 using CVaS.BL.Facades;
 using CVaS.BL.Providers;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +24,7 @@ namespace CVaS.Web.Controllers.Api
         /// <param name="runId">Identifier of run paired with user</param>
         /// <returns></returns>
         [HttpGet("{runId}")]
-        [Produces(typeof(DAL.Model.Run))]
+        [Produces(typeof(RunDTO))]
         public async Task<IActionResult> Get(int runId)
         {
             if (!ModelState.IsValid)

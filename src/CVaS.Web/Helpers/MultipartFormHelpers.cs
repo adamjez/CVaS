@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace CVaS.Web.Helpers
 {
+    /// <summary>
+    /// Helps parse file inputs in multipart/formdata
+    /// </summary>
     internal static class MultipartFormHelpers
     {
         public static bool IsMultipartContentType(string contentType)

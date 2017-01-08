@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using CVaS.Web.Helpers;
 using Newtonsoft.Json.Linq;
 
 namespace CVaS.Web.Providers
 {
+    /// <summary>
+    /// Parses JToken with defined structure
+    /// Arguments can be only one layer deep, so
+    /// JArray can not contains another JArray on so on
+    /// </summary>
     public class JsonArgumentParserProvider : IArgumentParserProvider
     {
         public bool CanParse(object arguments)

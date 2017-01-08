@@ -17,6 +17,8 @@ namespace CVaS.DAL.Model
 
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
+        public DateTime? FinishedAt { get; set; }
+
         public int AlgorithmId { get; set; }
 
         public virtual Algorithm Algorithm { get; set; }

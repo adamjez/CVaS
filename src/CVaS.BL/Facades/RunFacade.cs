@@ -14,26 +14,27 @@ using CVaS.BL.Services.File;
 using CVaS.BL.Services.Process;
 using CVaS.DAL.Model;
 using System.Linq;
+using CVaS.BL.DTO;
 
 namespace CVaS.BL.Facades
 {
     public class RunFacade : AppFacadeBase
     {
-        private const int HardTimeout = 10000; // in milliseconds
-        private const int LightTimeout = 3000; // in milliseconds
-
         private readonly AlgorithmRepository _algorithmRepository;
+        private readonly RunRepository _runRepository;
+
         private readonly FileProvider _fileProvider;
         private readonly AlgorithmFileProvider _algFileProvider;
-        private readonly IProcessService _processService;
         private readonly TemporaryFileProvider _fileSystemProvider;
-        private readonly RunRepository _runRepository;
+
+        private readonly IProcessService _processService;
         private readonly IArgumentTranslator _argumentTranslator;
+        private readonly AlgorithmConfiguration _configuration;
 
         public RunFacade(IUnitOfWorkProvider unitOfWorkProvider, ICurrentUserProvider currentUserProvider,
             AlgorithmRepository algorithmRepository, IProcessService processService, FileProvider fileProvider, 
             AlgorithmFileProvider algFileProvider, TemporaryFileProvider fileSystemProvider,
-            RunRepository runRepository, IArgumentTranslator argumentTranslator)
+            RunRepository runRepository, IArgumentTranslator argumentTranslator, AlgorithmConfiguration configuration)
             : base(unitOfWorkProvider, currentUserProvider)
         {
             _algorithmRepository = algorithmRepository;
@@ -43,6 +44,7 @@ namespace CVaS.BL.Facades
             _fileSystemProvider = fileSystemProvider;
             _runRepository = runRepository;
             _argumentTranslator = argumentTranslator;
+            _configuration = configuration;
         }
 
         public async Task<RunResult> RunProcessAsync(string codeName, IEnumerable<object> arguments)
@@ -81,12 +83,12 @@ namespace CVaS.BL.Facades
 
                 args.Insert(0, runFolder);
 
-                var tokenSource = new CancellationTokenSource(HardTimeout);
+                var tokenSource = new CancellationTokenSource(_configuration.HardTimeout * 1000);
 
                 var task = _processService.RunAsync(filePath, args, tokenSource.Token);
 
                 var lightTokenSource = new CancellationTokenSource();
-                var firstTimeOutedTask = await Task.WhenAny(task, Task.Delay(LightTimeout, lightTokenSource.Token));
+                var firstTimeOutedTask = await Task.WhenAny(task, Task.Delay(_configuration.LightTimeout * 1000, lightTokenSource.Token));
 
                 ProcessResult result = null;
                 if (firstTimeOutedTask == task)
@@ -121,7 +123,8 @@ namespace CVaS.BL.Facades
                     FileName = zipFile.FileName,
                     StdOut = result.StdOut,
                     StdErr = result.StdError,
-                    RunId = run.Id
+                    RunId = run.Id,
+                    Duration = (result.FinishedAt - result.StartedAt).TotalSeconds
                 };
             }
         }
@@ -157,7 +160,6 @@ namespace CVaS.BL.Facades
 
                 if (action.Status == TaskStatus.Canceled)
                 {
-                    // TimeOut
                     run.Result = RunResultType.TimeOut;
                 }
                 else if (action.Status == TaskStatus.RanToCompletion)
@@ -187,6 +189,7 @@ namespace CVaS.BL.Facades
                     };
                 }
 
+                run.FinishedAt = result.FinishedAt;
                 run.StdOut = result.StdOut;
                 run.StdErr = result.StdError;
                 run.Result = result.ExitCode == 0 ? RunResultType.Success : RunResultType.Fail;
@@ -197,18 +200,27 @@ namespace CVaS.BL.Facades
             }
         }
 
-        public async Task<Run> GetSafelyAsync(int runId)
+        public async Task<RunDTO> GetSafelyAsync(int runId)
         {
             using (UnitOfWorkProvider.Create())
             {
-                var run = await _runRepository.GetByIdSafely(runId);
+                var run = await _runRepository.GetByIdSafely(runId, r => r.Algorithm);
 
                 if (run.UserId != CurrentUserProvider.Id)
                 {
                     throw new UnauthorizedAccessException();
                 }
 
-                return run;
+                return new RunDTO()
+                {
+                    Id = run.Id,
+                    CreatedAt = run.CreatedAt,
+                    FileId = run.FileId,
+                    Result = run.Result,
+                    StdOut = run.StdOut,
+                    StdErr = run.StdErr,
+                    AlgorithmCode = run.Algorithm.CodeName
+                };
             }
         }
     }

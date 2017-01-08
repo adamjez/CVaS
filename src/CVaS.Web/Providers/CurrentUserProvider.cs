@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Http;
 
 namespace CVaS.Web.Providers
 {
+    /// <summary>
+    /// Providers currently logger user and
+    /// his informations
+    /// </summary>
     public class CurrentUserProvider : ICurrentUserProvider
     {
         private readonly AppUserManager _userManager;

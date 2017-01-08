@@ -2,7 +2,7 @@
 
 namespace CVaS.BL.Services.Email
 {
-    public class AuthMessageSender : IEmailSender
+    public class MockMessageSender : IEmailSender
     {
         public Task SendEmailAsync(string email, string subject, string message)
         {

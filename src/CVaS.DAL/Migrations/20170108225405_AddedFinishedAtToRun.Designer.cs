@@ -8,9 +8,10 @@ using CVaS.DAL;
 namespace CVaS.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170108225405_AddedFinishedAtToRun")]
+    partial class AddedFinishedAtToRun
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.2")
@@ -149,7 +150,7 @@ namespace CVaS.DAL.Migrations
 
                     b.Property<int?>("FileId");
 
-                    b.Property<DateTime?>("FinishedAt");
+                    b.Property<DateTime>("FinishedAt");
 
                     b.Property<int>("Result");
 

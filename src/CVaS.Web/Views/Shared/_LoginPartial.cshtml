@@ -8,8 +8,8 @@
 @if (SignInManager.IsSignedIn(User))
 {
     <ul class="nav navbar-nav">
-        <li><a asp-area="" asp-controller="Presentation" asp-action="Algorithms">Algorithms</a></li>
-        <li><a asp-area="" asp-controller="Presentation" asp-action="Upload">Upload Files</a></li>
+        <li><a asp-area="" asp-controller="Core" asp-action="Algorithms">Algorithms</a></li>
+        <li><a asp-area="" asp-controller="Core" asp-action="Upload">Upload Files</a></li>
     </ul>
     <form asp-area="" asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">

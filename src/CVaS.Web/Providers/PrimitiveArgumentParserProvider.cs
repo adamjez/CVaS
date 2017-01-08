@@ -3,6 +3,10 @@ using System.Reflection;
 
 namespace CVaS.Web.Providers
 {
+    /// <summary>
+    /// Parses primite arguments like bool, int, float
+    /// and event String
+    /// </summary>
     public class PrimitiveArgumentParserProvider : IArgumentParserProvider
     {
         public bool CanParse(object argument)

@@ -3,6 +3,7 @@ using CVaS.BL.Common;
 using CVaS.BL.Core.Provider;
 using CVaS.BL.Core.Registry;
 using CVaS.BL.Facades;
+using CVaS.BL.Helpers;
 using CVaS.BL.Repositories;
 using CVaS.BL.Services.ApiKey;
 using CVaS.BL.Services.ArgumentTranslator;
@@ -47,7 +48,9 @@ namespace CVaS.BL.Installers
 
             serviceRegistry.Register<IApiKeyGenerator, RndApiKeyGenerator>();
             serviceRegistry.Register<IArgumentTranslator, BaseArgumentTranslator>();
-            serviceRegistry.Register<IEmailSender, AuthMessageSender>();
+            serviceRegistry.Register<IEmailSender, MockMessageSender>();
+
+            serviceRegistry.Register<ICurrentTimeProvider, UtcNowTimeProvider>(new PerContainerLifetime());
         }
     }
 }

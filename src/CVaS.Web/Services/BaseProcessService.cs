@@ -3,17 +3,26 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using CVaS.BL.Helpers;
 using CVaS.BL.Services.File;
 using CVaS.BL.Services.Process;
 
 namespace CVaS.Web.Services
 {
+    /// <summary>
+    /// Service that runs processes with given arguments
+    /// Processing of process outputs is asynchronous and
+    /// can be canceled
+    /// </summary>
     public class BaseProcessService : IProcessService
     {
         private readonly FileProvider _fileProvider;
-        public BaseProcessService(FileProvider fileProvider)
+        private readonly ICurrentTimeProvider _currentTimeProvider;
+
+        public BaseProcessService(FileProvider fileProvider, ICurrentTimeProvider currentTimeProvider)
         {
             _fileProvider = fileProvider;
+            _currentTimeProvider = currentTimeProvider;
         }
 
         public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments,  CancellationToken cancellationToken)
@@ -54,6 +63,7 @@ namespace CVaS.Web.Services
             process.Exited += (sender, args) =>
             {
                 result.ExitCode = process.ExitCode;
+                result.FinishedAt = _currentTimeProvider.Now();
                 tcs.TrySetResult(result);
                 process.Dispose();
             };
@@ -75,6 +85,7 @@ namespace CVaS.Web.Services
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
+                result.StartedAt = _currentTimeProvider.Now();
                 if (process.Start() == false)
                 {
                     tcs.TrySetException(new InvalidOperationException("Failed to start process"));

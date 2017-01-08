@@ -2,7 +2,7 @@
 
 namespace CVaS.Web.Controllers.Web
 {
-    public class PresentationController : WebController
+    public class CoreController : WebController
     {
         public IActionResult Upload()
         {

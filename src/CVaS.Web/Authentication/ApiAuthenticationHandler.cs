@@ -33,7 +33,7 @@ namespace CVaS.Web.Authentication
                 {
                     var userManager = _userManagerFactory();
                
-                        var user = await userManager.Users.FirstOrDefaultAsync(us => us.ApiKey == apiKey);
+                    var user = await userManager.Users.FirstOrDefaultAsync(us => us.ApiKey == apiKey);
                     if (user != null)
                     {
                         var principals = await _signInManagerFactory().CreateUserPrincipalAsync(user);

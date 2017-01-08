@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using CVaS.BL.Common;
 using CVaS.BL.Installers;
+using CVaS.BL.Services.Process;
 using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Web.Authentication;
 using CVaS.Web.Filters;
 using CVaS.Web.Installers;
+using CVaS.Web.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -18,15 +17,14 @@ using MySQL.Data.EntityFrameworkCore.Extensions;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger.Model;
 using LightInject.Microsoft.DependencyInjection;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
-using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 
 namespace CVaS.Web
 {
     public class Startup
     {
         private readonly IHostingEnvironment hostingEnvironment;
-
+        private DatabaseConfiguration databaseConfiguration;
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -44,9 +42,11 @@ namespace CVaS.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-
-            if (!isWindows)
+            databaseConfiguration = new DatabaseConfiguration();
+            Configuration.GetSection("Database").Bind(databaseConfiguration);
+            // We choose what database provider we will use
+            // In configuration have to be "MySQL" or "MSSQL" 
+            if (databaseConfiguration.Provider == "MySQL")
             {
                 services.AddDbContext<AppDbContext>(options =>
                     options.UseMySQL(Configuration.GetConnectionString("DefaultConnection")));
@@ -57,6 +57,7 @@ namespace CVaS.Web
                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             }
 
+            // Set ASP.NET Identity and cooie authentication
             services.AddIdentity<AppUser, AppRole>(options =>
                 {
                     // Password settings
@@ -81,7 +82,11 @@ namespace CVaS.Web
 
             // Add framework services.
             services.AddMvc(options => { options.Filters.Add(typeof(HttpExceptionFilterAttribute)); })
-                .AddJsonOptions(options => { options.SerializerSettings.Converters.Add(new StringEnumConverter(true)); })
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter(true));
+                })
                 .AddXmlDataContractSerializerFormatters();
 
             // Inject an implementation of ISwaggerProvider with defaulted settings applied
@@ -104,11 +109,15 @@ namespace CVaS.Web
                 c.IncludeXmlComments(ResolvePathToXmlCommentFile());
             });
 
+            var algorithmConfiguration = new AlgorithmConfiguration();
+            Configuration.GetSection("Algorithm").Bind(algorithmConfiguration);
+
             var container = new LightInject.ServiceContainer();
 
             var physicalProvider = hostingEnvironment.ContentRootFileProvider;
             container.RegisterInstance(physicalProvider);
             container.RegisterInstance(Configuration);
+            container.RegisterInstance(algorithmConfiguration);
             container.Register<DbInitializer>();
 
             container.RegisterFrom<WebApiComposition>();
@@ -121,7 +130,9 @@ namespace CVaS.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DbInitializer initializer)
         {
-            initializer.Init();
+            initializer.Init(databaseConfiguration.DefaultUsername, 
+                databaseConfiguration.DefaultEmail, 
+                databaseConfiguration.DefaultPassword);
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
