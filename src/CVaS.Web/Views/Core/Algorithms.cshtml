@@ -10,6 +10,13 @@
 
 
 <h2>@ViewData["Title"]</h2>
+<div class="row col-md-12">
+    <dl>
+        <dt>Description</dt>
+        <dd>Algorithm for recognition license plate in images or videos is provided by <a href="https://github.com/openalpr/openalpr">OpenAlpr</a>.</dd>
+    </dl>
+</div>
+
 <div class="row">
     <div class="col-md-4">
         <form id="algorithm-run">
@@ -17,6 +24,10 @@
                 <label for="inputFileId">Input File Id</label>
                 <input type="number" class="form-control" id="inputFileId" aria-describedby="fileIdHelp" placeholder="Enter file id">
                 <small id="fileIdHelp" class="form-text text-muted">Specify id of uploaded file via <a asp-controller="Core" asp-action="Upload">Upload File</a>.</small>
+            </div>
+            <div class="form-group">
+                <label for="inputPlatesCount">Result plates count</label>
+                <input type="number" class="form-control" id="inputPlatesCount" placeholder="Enter result count" min="1" max="10" value="1">
             </div>
             <fieldset class="form-group">
                 <legend>Specify license plate region</legend>
@@ -37,7 +48,7 @@
         </form>
     </div>
     <div class="col-md-8">
-        <p>Algorithm result:</p>
+        <p>Algorithm results:</p>
         <ol id="algorithm-result"></ol>
     </div>
 </div>
@@ -62,7 +73,7 @@
                 var url = '/algorithms/license-plate-recognition';
 
                 var form = $(this);
-                var requestBody = [{ c: form.find('input[type=radio]:checked').val() }, "local://" + form.find('#inputFileId').val()];
+                var requestBody = [{ c: form.find('input[type=radio]:checked').val(), n: form.find('#inputPlatesCount').val() }, "local://" + form.find('#inputFileId').val()];
                 $.ajax({
                     type: 'POST',
                     url: url,
