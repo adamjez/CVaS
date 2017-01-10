@@ -92,11 +92,18 @@ namespace CVaS.Web.Controllers.Api
 
             IFileInfo fileInfo = new PhysicalFileInfo(new FileInfo(pathToFile));
 
-            string contentType;
-            new FileExtensionContentTypeProvider()
-                .TryGetContentType(fileInfo.Name, out contentType);
 
-            HttpContext.Response.ContentType = contentType ?? "application/octet-stream"; ;
+            string contentType;
+            if (new FileExtensionContentTypeProvider()
+                .TryGetContentType(fileInfo.Name, out contentType))
+            {
+                HttpContext.Response.ContentType = contentType;
+            }
+            else
+            {
+                HttpContext.Response.ContentType = "application/octet-stream";
+            }
+
             var service = HttpContext.Features.Get<IHttpSendFileFeature>();
             if (service != null)
             {
