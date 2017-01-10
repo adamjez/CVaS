@@ -1,9 +1,10 @@
 using System;
 using System.Threading.Tasks;
+using CVaS.BL.Core.Provider;
 using CVaS.DAL;
 using Microsoft.EntityFrameworkCore;
 
-namespace CVaS.BL.Core.Provider
+namespace CVaS.BL.Core
 {
     /// <summary>
     /// An implementation of unit of work in Entity ramework.

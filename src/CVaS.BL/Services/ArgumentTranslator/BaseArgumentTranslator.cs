@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using CVaS.BL.Core;
 using CVaS.BL.Core.Provider;
 using CVaS.BL.Providers;
 using CVaS.BL.Repositories;
@@ -97,7 +98,7 @@ namespace CVaS.BL.Services.ArgumentTranslator
         {
             if (arg.StartsWith(LocalFileScheme))
             {
-                using (_unitOfWorkProvider.Create())
+                //using (_unitOfWorkProvider.Create())
                 {
                     var argEntity = await _fileRepository.GetById(int.Parse(arg.Substring(LocalFileScheme.Length)));
 

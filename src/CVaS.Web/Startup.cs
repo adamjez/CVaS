@@ -1,4 +1,5 @@
 ﻿using System;
+using CVaS.BL.Common;
 using CVaS.BL.Installers;
 using CVaS.BL.Services.Process;
 using CVaS.DAL;

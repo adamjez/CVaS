@@ -27,6 +27,14 @@ namespace CVaS.BL.Core.Provider
         }
 
         /// <summary>
+        /// Creates a new unit of work.
+        /// </summary>
+        public IUnitOfWork Create(DbContextOptions options)
+        {
+            return CreateCore(options);
+        }
+
+        /// <summary>
         /// Creates a new unit of work instance with specified parameters.
         /// </summary>
         protected IUnitOfWork CreateCore(object parameter)

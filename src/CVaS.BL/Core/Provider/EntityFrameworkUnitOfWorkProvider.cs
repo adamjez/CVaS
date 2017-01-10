@@ -9,20 +9,20 @@ namespace CVaS.BL.Core.Provider
     /// </summary>
     public class EntityFrameworkUnitOfWorkProvider : UnitOfWorkProviderBase
     {
-        private readonly Func<AppDbContext> dbContextFactory;
+        private readonly Func<AppDbContext> _dbContextFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityFrameworkUnitOfWorkProvider"/> class.
         /// </summary>
         public EntityFrameworkUnitOfWorkProvider(IUnitOfWorkRegistry registry, Func<AppDbContext> dbContextFactory) : base(registry)
         {
-            this.dbContextFactory = dbContextFactory;
+            this._dbContextFactory = dbContextFactory;
         }
 
         /// <summary>
         /// Creates the unit of work with specified options.
         /// </summary>
-        public IUnitOfWork Create(DbContextOptions options)
+        public new IUnitOfWork Create(DbContextOptions options)
         {
             return CreateCore(options);
         }
@@ -33,7 +33,7 @@ namespace CVaS.BL.Core.Provider
         protected sealed override IUnitOfWork CreateUnitOfWork(object parameter)
         {
             var options = (parameter as DbContextOptions?) ?? DbContextOptions.ReuseParentContext;
-            return CreateUnitOfWork(dbContextFactory, options);
+            return CreateUnitOfWork(_dbContextFactory, options);
         }
 
         /// <summary>

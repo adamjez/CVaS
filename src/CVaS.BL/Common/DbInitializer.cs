@@ -1,18 +1,21 @@
 ﻿using System.Linq;
+using CVaS.BL.Services.ApiKey;
+using CVaS.DAL;
 using CVaS.DAL.Model;
-using Microsoft.AspNetCore.Identity;
 
-namespace CVaS.DAL
+namespace CVaS.BL.Common
 {
     public class DbInitializer
     {
-        private readonly UserManager<AppUser> _userManager;
+        private readonly AppUserManager _userManager;
         private readonly AppDbContext _context;
+        private readonly IApiKeyGenerator _apiKeyGenerator;
 
-        public DbInitializer(UserManager<AppUser> userManager, AppDbContext context)
+        public DbInitializer(AppUserManager userManager, AppDbContext context, IApiKeyGenerator apiKeyGenerator)
         {
             _userManager = userManager;
             _context = context;
+            _apiKeyGenerator = apiKeyGenerator;
         }
 
         public void Init(string username = null, string email = null, string password = null)
@@ -21,12 +24,19 @@ namespace CVaS.DAL
 
             if (!_context.Roles.Any())
             {
-                var role = new AppRole()
+                var role1 = new AppRole()
                 {
                     Name = Roles.Admin,
                     NormalizedName = Roles.Admin
                 };
-                _context.Roles.Add(role);
+
+                var role2 = new AppRole()
+                {
+                    Name = Roles.Developer,
+                    NormalizedName = Roles.Developer
+                };
+
+                _context.Roles.AddRange(role1, role2);
 
                 _context.SaveChanges();
             }
@@ -36,7 +46,8 @@ namespace CVaS.DAL
                 var user = new AppUser()
                 {
                     UserName = username,
-                    Email = email
+                    Email = email,
+                    ApiKey = _apiKeyGenerator.Generate()
                 };
 
                 _userManager.CreateAsync(user, password).Wait();
@@ -49,7 +60,7 @@ namespace CVaS.DAL
                 var algorithm1 = new Algorithm()
                 {
                     CodeName = "hello-world",
-                    FilePath = "hello-world.py",
+                    FilePath = "hello_world.py",
                     Title = "Hello World ",
                     Description = "Hello world Example App - Just print to standard output Hello World!"
                 };
@@ -59,7 +70,7 @@ namespace CVaS.DAL
                 var algorithm2 = new Algorithm()
                 {
                     CodeName = "face-detection",
-                    FilePath = "facedetect.py",
+                    FilePath = "face_detect.py",
                     Title = "Face Detection",
                     Description = "Detect Faces number on given Image - Print out to standard output number of faces on image!"
                 };

@@ -29,7 +29,7 @@ namespace CVaS.Web.Authentication
                 //Extract credentials
                 string apiKey = authHeader.Substring(Options.HeaderScheme.Length).Trim();
 
-                using (_unitOfWorkProvider.Create())
+                //using (_unitOfWorkProvider.Create())
                 {
                     var userManager = _userManagerFactory();
                

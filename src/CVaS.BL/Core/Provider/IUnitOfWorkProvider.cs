@@ -5,11 +5,15 @@
     /// </summary>
     public interface IUnitOfWorkProvider
     {
-
         /// <summary>
         /// Creates a new unit of work.
         /// </summary>
         IUnitOfWork Create();
+
+        /// <summary>
+        /// Creates a new unit of work.
+        /// </summary>
+        IUnitOfWork Create(DbContextOptions options);
 
         /// <summary>
         /// Gets the unit of work in the current scope.

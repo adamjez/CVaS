@@ -15,6 +15,9 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Logging;
 using System.Linq;
+using CVaS.BL.Exceptions;
+using Microsoft.AspNetCore.Server.Kestrel;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace CVaS.Web.Controllers.Api
 {
@@ -25,7 +28,6 @@ namespace CVaS.Web.Controllers.Api
         private readonly TemporaryFileProvider _fileProvider;
         private readonly FileFacade _fileFacade;
         private readonly ICurrentUserProvider _currentUserProvider;
-        private readonly RunFacade _runFacade;
 
         public FilesController(ILogger<FilesController> logger, TemporaryFileProvider fileProvider, FileFacade fileFacade,
             ICurrentUserProvider currentUserProvider, RunFacade runFacade)
@@ -34,7 +36,6 @@ namespace CVaS.Web.Controllers.Api
             _fileProvider = fileProvider;
             _fileFacade = fileFacade;
             _currentUserProvider = currentUserProvider;
-            _runFacade = runFacade;
         }
 
         /// <summary>
@@ -82,13 +83,20 @@ namespace CVaS.Web.Controllers.Api
         [HttpGet, Route("{fileId}", Name = nameof(GetFile))]
         public async Task GetFile(int fileId)
         {
-            const string zipMime = "application/zip";
+            if (!ModelState.IsValid)
+            {
+                throw new BadRequestException("File Id has to  be specified");
+            }
 
             var pathToFile = await _fileFacade.GetSafelyAsync(fileId);
 
             IFileInfo fileInfo = new PhysicalFileInfo(new FileInfo(pathToFile));
 
-            HttpContext.Response.ContentType = zipMime;
+            string contentType;
+            new FileExtensionContentTypeProvider()
+                .TryGetContentType(fileInfo.Name, out contentType);
+
+            HttpContext.Response.ContentType = contentType ?? "application/octet-stream"; ;
             var service = HttpContext.Features.Get<IHttpSendFileFeature>();
             if (service != null)
             {
@@ -106,12 +114,15 @@ namespace CVaS.Web.Controllers.Api
         /// </summary>
         /// <param name="fileId">File Identifier</param>
         [HttpDelete, Route("{fileId}")]
-        public async Task DeleteUserFile(int fileId)
+        public async Task<IActionResult> DeleteUserFile(int fileId)
         {
-            const string zipMime = "application/zip";
-            HttpContext.Response.ContentType = zipMime;
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
 
             await _fileFacade.DeleteAsync(fileId, _currentUserProvider.Id);
+            return Ok();
         }
     }
 }

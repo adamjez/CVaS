@@ -14,6 +14,7 @@ using CVaS.BL.Services.File;
 using CVaS.BL.Services.Process;
 using CVaS.DAL.Model;
 using System.Linq;
+using CVaS.BL.Core;
 using CVaS.BL.DTO;
 
 namespace CVaS.BL.Facades
@@ -154,7 +155,7 @@ namespace CVaS.BL.Facades
 
         private async Task AfterRunFinished(int runId, Task<ProcessResult> action, string runFolder)
         {
-            using (var uow = UnitOfWorkProvider.Create())
+            using (var uow = UnitOfWorkProvider.Create(DbContextOptions.AlwaysCreateOwnContext))
             {
                 var run = await _runRepository.GetById(runId);
 
