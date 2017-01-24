@@ -5,13 +5,12 @@ using CVaS.BL.Services.ApiKey;
 using CVaS.BL.Services.Email;
 using CVaS.DAL;
 using CVaS.DAL.Model;
+using CVaS.Web.Models;
 using CVaS.Web.Models.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CVaS.Web.Controllers.Web
 {
@@ -27,7 +26,8 @@ namespace CVaS.Web.Controllers.Web
         private readonly ICurrentUserProvider _currentUserProvider;
 
         public AccountController(ILogger<AccountController> logger, AppSignInManager signInManager, AppUserManager userManager, AppDbContext context,
-            IApiKeyGenerator apiKeyGenerator, IEmailSender emailSender, ICurrentUserProvider currentUserProvider)
+            IApiKeyGenerator apiKeyGenerator, IEmailSender emailSender, ICurrentUserProvider currentUserProvider) 
+            : base(currentUserProvider)
         {
             _logger = logger;
             _signInManager = signInManager;
@@ -43,8 +43,14 @@ namespace CVaS.Web.Controllers.Web
         [AllowAnonymous]
         public IActionResult Login(string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
+            var viewModel = new LoginViewModel()
+            {
+                ReturnUrl = returnUrl,
+                Title = "Log In"
+            };
+
+            InitializeLayoutModel(viewModel);
+            return View(viewModel);
         }
 
         //
@@ -63,7 +69,7 @@ namespace CVaS.Web.Controllers.Web
 
                 if (user != null)
                 {
-                    if (true/*user.EmailConfirmed*/)
+                    if (user.EmailConfirmed)
                     {
                         var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, lockoutOnFailure: false);
                         if (result.Succeeded)
@@ -89,7 +95,13 @@ namespace CVaS.Web.Controllers.Web
         [AllowAnonymous]
         public IActionResult Register()
         {
-            return View();
+            var viewModel = new RegisterViewModel()
+            {
+                Title = "Register"
+            };
+
+            InitializeLayoutModel(viewModel);
+            return View(viewModel);
         }
 
         [HttpPost]
@@ -107,7 +119,7 @@ namespace CVaS.Web.Controllers.Web
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                     // Send an email with this link
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", 
+                    var callbackUrl = Url.Action(nameof(ConfirmEmail), "Account", 
                         new { userId = user.Id, code = code }, 
                         protocol: HttpContext.Request.Scheme);
 
@@ -131,33 +143,49 @@ namespace CVaS.Web.Controllers.Web
         {
             if (userId == null || code == null)
             {
-                return View("Error");
+                return ErrorView();
             }
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return View("Error");
+                return ErrorView();
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+
+            if (result.Succeeded)
+            {
+                return View(InitializeLayoutModel("Confirm Email"));
+            }
+            else
+            {
+                return ErrorView();
+            }
         }
 
         [HttpGet]
-        public IActionResult Settings()
+        public async Task<IActionResult> Settings()
         {
-            return View();
+            var viewModel = new SettingsViewModel()
+            {
+                Title = "Settings",
+                ApiKey = (await _userManager.GetUserAsync(User)).ApiKey
+            };
+
+            InitializeLayoutModel(viewModel);
+
+            return View(viewModel);
         }
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> RevokeApiKey()
+        public async Task<IActionResult> RevokeApiKey(SettingsViewModel viewModel)
         {
             var user = await _userManager.GetUserAsync(User);
 
             user.ApiKey = _apiKeyGenerator.Generate();
             await _context.SaveChangesAsync();
 
-            return View(nameof(Settings));
+            return View(nameof(Settings), viewModel);
         }
 
 
@@ -165,7 +193,14 @@ namespace CVaS.Web.Controllers.Web
         [AllowAnonymous]
         public IActionResult ForgotPassword()
         {
-            return View();
+            var viewModel = new ForgotPasswordViewModel()
+            {
+                Title = "Forgot your password?"
+            };
+
+            InitializeLayoutModel(viewModel);
+
+            return View(viewModel);
         }
 
         [HttpPost]
@@ -179,17 +214,17 @@ namespace CVaS.Web.Controllers.Web
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
-                    return View("ForgotPasswordConfirmation");
+                    return RedirectToAction(nameof(ForgotPasswordConfirmation));
                 }
 
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                 // Send an email with this link
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+                var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
                 await _emailSender.SendEmailAsync(model.Email, "Reset Password",
                    $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
 
-                return View("Login");
+                return RedirectToAction(nameof(Login));
             }
 
             // If we got this far, something failed, redisplay form
@@ -200,14 +235,26 @@ namespace CVaS.Web.Controllers.Web
         [AllowAnonymous]
         public IActionResult ForgotPasswordConfirmation()
         {
-            return View();
+            return View(InitializeLayoutModel("Forgot Password Confirmation"));
         }
 
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ResetPassword(string code = null)
         {
-            return code == null ? View("Error") : View();
+            if (code == null)
+            {
+                return ErrorView();
+            }
+
+            var layout = new ResetPasswordViewModel()
+            {
+                Title = "Reset Password"
+            };
+
+            InitializeLayoutModel(layout);
+
+            return View(layout);
         }
 
         [HttpPost]
@@ -223,29 +270,28 @@ namespace CVaS.Web.Controllers.Web
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                return RedirectToAction(nameof(ResetPasswordConfirmation), "Account");
+                return RedirectToAction(nameof(ResetPasswordConfirmation));
             }
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
             if (result.Succeeded)
             {
-                return RedirectToAction(nameof(ResetPasswordConfirmation), "Account");
+                return RedirectToAction(nameof(ResetPasswordConfirmation));
             }
             AddErrors(result);
-            return View();
+
+            return View(model);
         }
 
-        //
-        // GET: /Account/ResetPasswordConfirmation
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ResetPasswordConfirmation()
         {
-            return View();
+            return View(InitializeLayoutModel("Reset Password Confirmation"));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        public async Task<IActionResult> ChangePassword(SettingsViewModel model)
         {
             if (!ModelState.IsValid)
             {

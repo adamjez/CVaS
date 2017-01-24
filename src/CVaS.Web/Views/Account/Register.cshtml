@@ -1,13 +1,11 @@
 ﻿@using System.Threading.Tasks
 @using CVaS.Web.Models.AccountViewModels
 @model RegisterViewModel
-@{
-    ViewData["Title"] = "Register";
-}
 
-<h2>@ViewData["Title"].</h2>
 
-<form asp-controller="Account" asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
+<h2>@Model.Title</h2>
+
+<form asp-controller="Account" asp-action="Register" asp-route-returnurl="@Model.ReturnUrl" method="post" class="form-horizontal">
     <h4>Create a new account.</h4>
     <hr />
     <div asp-validation-summary="All" class="text-danger"></div>

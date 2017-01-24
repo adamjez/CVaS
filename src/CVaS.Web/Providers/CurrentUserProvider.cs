@@ -43,6 +43,8 @@ namespace CVaS.Web.Providers
 
         public string Email => ClaimsIdentity?.FindFirst(ClaimTypes.Email).Value ?? string.Empty;
 
+        public bool Exists => _contextAccessor.HttpContext.User != null;
+
         public int? TryGetId
         {
             get

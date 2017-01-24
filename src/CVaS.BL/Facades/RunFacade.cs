@@ -66,8 +66,7 @@ namespace CVaS.BL.Facades
                     throw new NotFoundException("Given algorithm execution file doesn't exists");
                 }
 
-                var args = (await Task.WhenAll(
-                    arguments.Select(_argumentTranslator.ProcessAsync))).ToList();
+                var args = await _argumentTranslator.ProcessAsync(arguments);
 
                 var runFolder = _fileSystemProvider.CreateTemporaryFolder();
 

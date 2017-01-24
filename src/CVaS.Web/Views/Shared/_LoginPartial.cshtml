@@ -1,11 +1,6 @@
-﻿@using System.Threading.Tasks
-@using CVaS.BL.Common
-@using CVaS.DAL.Model
+﻿@model CVaS.Web.Models.LayoutViewModel
 
-@inject AppSignInManager SignInManager
-@inject AppUserManager UserManager
-
-@if (SignInManager.IsSignedIn(User))
+@if (Model.SignedIn)
 {
     <ul class="nav navbar-nav">
         <li><a asp-area="" asp-controller="Core" asp-action="Algorithms">Algorithms</a></li>
@@ -14,7 +9,7 @@
     <form asp-area="" asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">
             <li>
-                <a asp-controller="Account" asp-action="Settings">Hello @UserManager.GetUserName(User)!</a>
+                <a asp-controller="Account" asp-action="Settings">Hello @Model.CurrentUserName!</a>
             </li>
             <li>
                 <button type="submit" class="btn btn-link navbar-btn navbar-link">Log off</button>

@@ -2,7 +2,7 @@
 
 namespace CVaS.Web.Models.AccountViewModels
 {
-    public class LoginViewModel
+    public class LoginViewModel : LayoutViewModel
     {
         [Required]
         public string UserName { get; set; }

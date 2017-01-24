@@ -4,6 +4,8 @@ namespace CVaS.BL.Providers
 {
     public interface ICurrentUserProvider
     {
+        bool Exists { get; }
+
         int? TryGetId { get; }
 
         int Id { get; }

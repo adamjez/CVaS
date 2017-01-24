@@ -2,7 +2,7 @@
 
 namespace CVaS.Web.Models.AccountViewModels
 {
-    public class ResetPasswordViewModel
+    public class ResetPasswordViewModel : LayoutViewModel
     {
         [Required]
         [EmailAddress]

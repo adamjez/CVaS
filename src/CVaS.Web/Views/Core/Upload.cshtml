@@ -1,6 +1,4 @@
-﻿@{
-    ViewData["Title"] = "Upload Files";
-}
+﻿@model CVaS.Web.Models.LayoutViewModel
 
 @section header {
     <environment names="Development">
@@ -10,7 +8,6 @@
     <environment names="Staging,Production">
         <link href="~/lib/fine-uploader/dist/fine-uploader-new.min.css" rel="stylesheet">
     </environment>
-
 
     <script type="text/template" id="qq-template-gallery">
         <div class="qq-uploader-selector qq-uploader qq-gallery" qq-drop-area-text="Drop files here">
@@ -93,7 +90,7 @@
 
 
 
-<h2>@ViewData["Title"]</h2>
+<h2>@Model.Title</h2>
 <div class="row">
     <div class="col-md-8">
         <div id="fine-uploader-gallery"></div>

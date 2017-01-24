@@ -2,7 +2,7 @@
 
 namespace CVaS.Web.Models.AccountViewModels
 {
-    public class RegisterViewModel
+    public class RegisterViewModel : LayoutViewModel
     {
         [Required]
         [EmailAddress]

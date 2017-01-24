@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,9 @@ using CVaS.BL.Repositories;
 
 namespace CVaS.BL.Services.ArgumentTranslator
 {
+    /// <summary>
+    /// TODO: Refactor!
+    /// </summary>
     public class BaseArgumentTranslator : IArgumentTranslator
     {
         private const string LocalFileScheme = "local://";
@@ -27,48 +31,36 @@ namespace CVaS.BL.Services.ArgumentTranslator
             _fileRepository = fileRepository;
         }
 
-        public async Task<string> ProcessAsync(object arg)
+        public async Task<List<string>> ProcessAsync(IEnumerable<object> array)
         {
-            if (arg is IEnumerable<object>)
-            {
-                return await ProcessArray((IEnumerable<object>)arg);
-            }
-            else
-            {
-                return await ProcessSimpleType(arg);
-            }
-        }
-
-        private async Task<string> ProcessArray(IEnumerable<object> array)
-        {
-            var builder = new StringBuilder();
+            var args = new List<string>();
             foreach (var argument in array)
             {
-                builder.Append(await ProcessSimpleType(argument));
-                builder.Append(' ');
+                args.AddRange(await ProcessSimpleType(argument));
+
             }
 
-            return builder.ToString();
+            return args;
         }
 
-        private async Task<string> ProcessSimpleType(object arg)
+        private async Task<IEnumerable<string>> ProcessSimpleType(object arg)
         {
             var typeInfo = arg.GetType().GetTypeInfo();
             if (arg is string)
             {
-                return await ProccessStringAsync((string)arg);
+                return new[] { await ProccessStringAsync((string)arg)};
             }
             else if (arg is float)
             {
-                return ((float)arg).ToString(CultureInfo.InvariantCulture);
+                return new[] { ((float)arg).ToString(CultureInfo.InvariantCulture)};
             }
             else if (arg is double)
             {
-                return ((double)arg).ToString(CultureInfo.InvariantCulture);
+                return new[] { ((double)arg).ToString(CultureInfo.InvariantCulture)};
             }
             else if (typeInfo.IsPrimitive)
             {
-                return arg.ToString();
+                return new[] { arg.ToString() };
             }
             else if (arg is Dictionary<string, object>)
             {
@@ -80,25 +72,29 @@ namespace CVaS.BL.Services.ArgumentTranslator
             }
         }
 
-        private async Task<string> ProcessDictionary(object arg)
+        private async Task<List<string>> ProcessDictionary(object arg)
         {
-            var builder = new StringBuilder();
+            var arguments = new List<string>();
             foreach (var dictValue in (Dictionary<string, object>)arg)
             {
+                var builder = new StringBuilder();
+
                 builder.Append('-', dictValue.Key.Length == 1 ? 1 : 2);
                 builder.Append(dictValue.Key);
                 builder.Append(dictValue.Key.Length == 1 ? ' ' : '=');
-                builder.Append(await ProcessSimpleType(dictValue.Value));
-                builder.Append(' ');
+                builder.Append((await ProcessSimpleType(dictValue.Value)).FirstOrDefault());
+
+                arguments.Add(builder.ToString());
             }
-            return builder.ToString();
+
+            return arguments;
         }
 
         private async Task<string> ProccessStringAsync(string arg)
         {
             if (arg.StartsWith(LocalFileScheme))
             {
-                //using (_unitOfWorkProvider.Create())
+                using (_unitOfWorkProvider.Create())
                 {
                     var argEntity = await _fileRepository.GetById(int.Parse(arg.Substring(LocalFileScheme.Length)));
 
