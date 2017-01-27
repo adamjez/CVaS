@@ -15,6 +15,5 @@ namespace CVaS.DAL.Model
 
         [Required, StringLength(44)]
         public string ApiKey { get; set; }
-
     }
 }

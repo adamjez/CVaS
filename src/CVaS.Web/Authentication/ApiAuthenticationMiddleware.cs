@@ -11,23 +11,23 @@ namespace CVaS.Web.Authentication
 {
     public class ApiAuthenticationMiddleware : AuthenticationMiddleware<ApiAuthenticationOptions>
     {
-        private readonly Func<AppSignInManager> _signInManagerFactory;
-        private readonly Func<AppUserManager> _userManagerFactory;
+        private readonly AppSignInManager _signInManager;
+        private readonly AppUserManager _userManager;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
-        public ApiAuthenticationMiddleware(RequestDelegate next, Func<AppSignInManager> signInManagerFactory,
+        public ApiAuthenticationMiddleware(RequestDelegate next, AppSignInManager signInManager,
             ILoggerFactory loggerFactory, UrlEncoder urlEncoder, IOptions<ApiAuthenticationOptions> options,
-            Func<AppUserManager> userManagerFactory, IUnitOfWorkProvider unitOfWorkProvider)
+            AppUserManager userManager, IUnitOfWorkProvider unitOfWorkProvider)
             : base(next, options, loggerFactory, urlEncoder)
         {
-            _signInManagerFactory = signInManagerFactory;
-            _userManagerFactory = userManagerFactory;
+            _signInManager = signInManager;
+            _userManager = userManager;
             _unitOfWorkProvider = unitOfWorkProvider;
         }
 
         protected override AuthenticationHandler<ApiAuthenticationOptions> CreateHandler()
         {
-            return new ApiAuthenticationHandler(_signInManagerFactory, _userManagerFactory, _unitOfWorkProvider);
+            return new ApiAuthenticationHandler(_signInManager, _userManager, _unitOfWorkProvider);
         }
     }
 }

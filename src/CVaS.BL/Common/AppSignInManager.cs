@@ -1,5 +1,4 @@
-﻿using System;
-using CVaS.DAL.Model;
+﻿using CVaS.DAL.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

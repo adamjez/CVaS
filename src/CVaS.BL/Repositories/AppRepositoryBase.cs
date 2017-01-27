@@ -57,5 +57,14 @@ namespace CVaS.BL.Repositories
         {
             Context.Set<TEntity>().Add(entity);
         }
+
+        /// <summary>
+        /// Deletes the specified entity.
+        /// </summary>
+        public virtual void Delete(TEntity entity)
+        {
+            Context.Set<TEntity>().Remove(entity);
+
+        }
     }
 }

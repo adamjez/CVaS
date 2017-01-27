@@ -10,4 +10,11 @@
 
         public string ReturnUrl { get; set; }
     }
+
+    public class LoginPanelViewModel
+    {
+        public bool SignedIn { get; set; }
+
+        public string CurrentUserName { get; set; }
+    }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CVaS.BL.Common;
 using CVaS.BL.Core.Provider;
 using Microsoft.AspNetCore.Authentication;
@@ -10,14 +9,14 @@ namespace CVaS.Web.Authentication
 {
     public class ApiAuthenticationHandler : AuthenticationHandler<ApiAuthenticationOptions>
     {
-        private readonly Func<AppSignInManager> _signInManagerFactory;
-        private readonly Func<AppUserManager> _userManagerFactory;
+        private readonly AppSignInManager _signInManager;
+        private readonly AppUserManager _userManager;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
-        public ApiAuthenticationHandler(Func<AppSignInManager> signInManagerFactory, Func<AppUserManager> userManagerFactory, IUnitOfWorkProvider unitOfWorkProvider)
+        public ApiAuthenticationHandler(AppSignInManager signInManager, AppUserManager userManager, IUnitOfWorkProvider unitOfWorkProvider)
         {
-            _signInManagerFactory = signInManagerFactory;
-            _userManagerFactory = userManagerFactory;
+            _signInManager = signInManager;
+            _userManager = userManager;
             _unitOfWorkProvider = unitOfWorkProvider;
         }
 
@@ -29,14 +28,12 @@ namespace CVaS.Web.Authentication
                 //Extract credentials
                 string apiKey = authHeader.Substring(Options.HeaderScheme.Length).Trim();
 
-                //using (_unitOfWorkProvider.Create())
+                using (_unitOfWorkProvider.Create())
                 {
-                    var userManager = _userManagerFactory();
-               
-                    var user = await userManager.Users.FirstOrDefaultAsync(us => us.ApiKey == apiKey);
+                    var user = await _userManager.Users.FirstOrDefaultAsync(us => us.ApiKey == apiKey);
                     if (user != null)
                     {
-                        var principals = await _signInManagerFactory().CreateUserPrincipalAsync(user);
+                        var principals = await _signInManager.CreateUserPrincipalAsync(user);
                         return AuthenticateResult.Success(
                             new AuthenticationTicket(principals, new AuthenticationProperties(), Options.HeaderScheme));
 

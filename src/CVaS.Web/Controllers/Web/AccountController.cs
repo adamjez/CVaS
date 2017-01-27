@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CVaS.BL.Common;
+using CVaS.BL.Core.Provider;
 using CVaS.BL.Providers;
 using CVaS.BL.Services.ApiKey;
 using CVaS.BL.Services.Email;
 using CVaS.DAL;
 using CVaS.DAL.Model;
-using CVaS.Web.Models;
 using CVaS.Web.Models.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -20,22 +21,22 @@ namespace CVaS.Web.Controllers.Web
         private readonly ILogger<AccountController> _logger;
         private readonly AppSignInManager _signInManager;
         private readonly AppUserManager _userManager;
-        private readonly AppDbContext _context;
         private readonly IApiKeyGenerator _apiKeyGenerator;
         private readonly IEmailSender _emailSender;
         private readonly ICurrentUserProvider _currentUserProvider;
+        private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
-        public AccountController(ILogger<AccountController> logger, AppSignInManager signInManager, AppUserManager userManager, AppDbContext context,
-            IApiKeyGenerator apiKeyGenerator, IEmailSender emailSender, ICurrentUserProvider currentUserProvider) 
+        public AccountController(ILogger<AccountController> logger, AppSignInManager signInManager, AppUserManager userManager,
+            IApiKeyGenerator apiKeyGenerator, IEmailSender emailSender, ICurrentUserProvider currentUserProvider, IUnitOfWorkProvider unitOfWorkProvider)
             : base(currentUserProvider)
         {
             _logger = logger;
             _signInManager = signInManager;
             _userManager = userManager;
-            _context = context;
             _apiKeyGenerator = apiKeyGenerator;
             _emailSender = emailSender;
             _currentUserProvider = currentUserProvider;
+            _unitOfWorkProvider = unitOfWorkProvider;
         }
 
         // GET: /Account/Login
@@ -65,25 +66,27 @@ namespace CVaS.Web.Controllers.Web
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var user = await _userManager.FindByNameAsync(model.UserName);
-
-                if (user != null)
+                using (_unitOfWorkProvider.Create())
                 {
-                    if (user.EmailConfirmed)
+                    var user = await _userManager.FindByNameAsync(model.UserName);
+
+                    if (user != null)
                     {
-                        var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, lockoutOnFailure: false);
-                        if (result.Succeeded)
+                        if (user.EmailConfirmed)
                         {
-                            _logger.LogInformation(1, "User logged in.");
-                            return RedirectToLocal(returnUrl);
+                            var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, lockoutOnFailure: false);
+                            if (result.Succeeded)
+                            {
+                                _logger.LogInformation(1, "User logged in.");
+                                return RedirectToLocal(returnUrl);
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "You have to confirm email first.");
                         }
                     }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "You have to confirm email first.");
-                    }
                 }
-
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             }
 
@@ -112,25 +115,34 @@ namespace CVaS.Web.Controllers.Web
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new AppUser { UserName = model.Email, Email = model.Email, ApiKey = _apiKeyGenerator.Generate() };
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                using (_unitOfWorkProvider.Create())
                 {
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
-                    // Send an email with this link
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Action(nameof(ConfirmEmail), "Account", 
-                        new { userId = user.Id, code = code }, 
-                        protocol: HttpContext.Request.Scheme);
+                    var user = new AppUser
+                    {
+                        UserName = model.Email,
+                        Email = model.Email,
+                        ApiKey = _apiKeyGenerator.Generate()
+                    };
 
-                    await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
-                        $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+                    var result = await _userManager.CreateAsync(user, model.Password);
+                    if (result.Succeeded)
+                    {
+                        // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
+                        // Send an email with this link
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var callbackUrl = Url.Action(nameof(ConfirmEmail), "Account",
+                            new {userId = user.Id, code = code},
+                            protocol: HttpContext.Request.Scheme);
 
-                    _logger.LogInformation(3, "User created a new account with password.");
+                        await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
+                            $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
 
-                    return Redirect(callbackUrl);
+                        _logger.LogInformation(3, "User created a new account with password.");
+
+                        return Redirect(callbackUrl);
+                    }
+                    AddErrors(result);
                 }
-                AddErrors(result);
             }
 
             // If we got this far, something failed, redisplay form
@@ -145,47 +157,57 @@ namespace CVaS.Web.Controllers.Web
             {
                 return ErrorView();
             }
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return ErrorView();
-            }
-            var result = await _userManager.ConfirmEmailAsync(user, code);
 
-            if (result.Succeeded)
+            using (_unitOfWorkProvider.Create())
             {
-                return View(InitializeLayoutModel("Confirm Email"));
-            }
-            else
-            {
-                return ErrorView();
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return ErrorView();
+                }
+                var result = await _userManager.ConfirmEmailAsync(user, code);
+
+                if (result.Succeeded)
+                {
+                    return View(InitializeLayoutModel("Confirm Email"));
+                }
+                else
+                {
+                    return ErrorView();
+                }
             }
         }
 
         [HttpGet]
         public async Task<IActionResult> Settings()
         {
-            var viewModel = new SettingsViewModel()
+            using (_unitOfWorkProvider.Create())
             {
-                Title = "Settings",
-                ApiKey = (await _userManager.GetUserAsync(User)).ApiKey
-            };
+                var viewModel = new SettingsViewModel()
+                {
+                    Title = "Settings",
+                    ApiKey = (await _userManager.GetUserAsync(User)).ApiKey
+                };
 
-            InitializeLayoutModel(viewModel);
+                InitializeLayoutModel(viewModel);
 
-            return View(viewModel);
+                return View(viewModel);
+            }
         }
 
         [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> RevokeApiKey(SettingsViewModel viewModel)
         {
-            var user = await _userManager.GetUserAsync(User);
+            using (var uow = _unitOfWorkProvider.Create())
+            {
+                var user = await _userManager.GetUserAsync(User);
 
-            user.ApiKey = _apiKeyGenerator.Generate();
-            await _context.SaveChangesAsync();
+                user.ApiKey = _apiKeyGenerator.Generate();
+                await uow.CommitAsync();
 
-            return View(nameof(Settings), viewModel);
+                return View(nameof(Settings), viewModel);
+            }
         }
 
 
@@ -210,21 +232,25 @@ namespace CVaS.Web.Controllers.Web
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(model.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                using (_unitOfWorkProvider.Create())
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return RedirectToAction(nameof(ForgotPasswordConfirmation));
+                    var user = await _userManager.FindByNameAsync(model.Email);
+                    if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                    {
+                        // Don't reveal that the user does not exist or is not confirmed
+                        return RedirectToAction(nameof(ForgotPasswordConfirmation));
+                    }
+
+                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
+                    // Send an email with this link
+                    var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new {userId = user.Id, code = code},
+                        protocol: HttpContext.Request.Scheme);
+                    await _emailSender.SendEmailAsync(model.Email, "Reset Password",
+                        $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
+
+                    return RedirectToAction(nameof(Login));
                 }
-
-                // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
-                // Send an email with this link
-                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-                   $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-
-                return RedirectToAction(nameof(Login));
             }
 
             // If we got this far, something failed, redisplay form
@@ -266,20 +292,24 @@ namespace CVaS.Web.Controllers.Web
             {
                 return View(model);
             }
-            var user = await _userManager.FindByNameAsync(model.Email);
-            if (user == null)
-            {
-                // Don't reveal that the user does not exist
-                return RedirectToAction(nameof(ResetPasswordConfirmation));
-            }
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-            if (result.Succeeded)
-            {
-                return RedirectToAction(nameof(ResetPasswordConfirmation));
-            }
-            AddErrors(result);
 
-            return View(model);
+            using (_unitOfWorkProvider.Create())
+            {
+                var user = await _userManager.FindByNameAsync(model.Email);
+                if (user == null)
+                {
+                    // Don't reveal that the user does not exist
+                    return RedirectToAction(nameof(ResetPasswordConfirmation));
+                }
+                var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction(nameof(ResetPasswordConfirmation));
+                }
+                AddErrors(result);
+
+                return View(model);
+            }
         }
 
         [HttpGet]
@@ -297,20 +327,24 @@ namespace CVaS.Web.Controllers.Web
             {
                 return View(nameof(Settings), model);
             }
-            var user = await _userManager.GetUserAsync(_currentUserProvider.GetClaims());
-            if (user != null)
+
+            using (_unitOfWorkProvider.Create())
             {
-                var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-                if (result.Succeeded)
+                var user = await _userManager.GetUserAsync(_currentUserProvider.GetClaims());
+                if (user != null)
                 {
-                    await _signInManager.SignInAsync(user, false);
-                    _logger.LogInformation(3, "User changed their password successfully.");
-                    return RedirectToAction(nameof(Settings), new { Message = ManageMessageId.ChangePasswordSuccess });
+                    var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        await _signInManager.SignInAsync(user, false);
+                        _logger.LogInformation(3, "User changed their password successfully.");
+                        return RedirectToAction(nameof(Settings), new {Message = ManageMessageId.ChangePasswordSuccess});
+                    }
+                    AddErrors(result);
+                    return View(nameof(Settings), model);
                 }
-                AddErrors(result);
-                return View(nameof(Settings), model);
+                return RedirectToAction(nameof(Settings), new {Message = ManageMessageId.Error});
             }
-            return RedirectToAction(nameof(Settings), new { Message = ManageMessageId.Error });
         }
 
         [HttpPost]

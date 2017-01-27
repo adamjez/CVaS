@@ -30,7 +30,7 @@
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                 </ul>
-                @await Html.PartialAsync("_LoginPartial", Model)
+                @await Component.InvokeAsync("LoginPanel")
             </div>
         </div>
     </div>

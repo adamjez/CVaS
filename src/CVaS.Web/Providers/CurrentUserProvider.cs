@@ -12,11 +12,11 @@ namespace CVaS.Web.Providers
     /// </summary>
     public class CurrentUserProvider : ICurrentUserProvider
     {
-        private readonly AppUserManager _userManager;
+        private readonly Func<AppUserManager> _userManagerFactory;
         private readonly IHttpContextAccessor _contextAccessor;
-        public CurrentUserProvider(IHttpContextAccessor contextAccessor, AppUserManager userManager)
+        public CurrentUserProvider(IHttpContextAccessor contextAccessor, Func<AppUserManager> userManagerFactory)
         {
-            this._userManager = userManager;
+            this._userManagerFactory = userManagerFactory;
             this._contextAccessor = contextAccessor;
         }
 
@@ -43,13 +43,13 @@ namespace CVaS.Web.Providers
 
         public string Email => ClaimsIdentity?.FindFirst(ClaimTypes.Email).Value ?? string.Empty;
 
-        public bool Exists => _contextAccessor.HttpContext.User != null;
+        public bool Exists => _contextAccessor.HttpContext.User.Identity?.IsAuthenticated ?? false;
 
         public int? TryGetId
         {
             get
             {
-                var user = _userManager.GetUserId(_contextAccessor.HttpContext.User);
+                var user = _userManagerFactory().GetUserId(_contextAccessor.HttpContext.User);
 
                 if (user == null)
                     return null;

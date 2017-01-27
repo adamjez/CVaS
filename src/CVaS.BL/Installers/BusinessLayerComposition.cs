@@ -20,8 +20,8 @@ namespace CVaS.BL.Installers
         public void Compose(IServiceRegistry serviceRegistry)
         {
             serviceRegistry.Register<AppUserStore>();
-            serviceRegistry.Register<AppUserManager>(new PerScopeLifetime());
-            serviceRegistry.Register<AppSignInManager>(new PerScopeLifetime());
+            serviceRegistry.Register<AppUserManager>(new PerRequestLifeTime());
+            serviceRegistry.Register<AppSignInManager>(new PerRequestLifeTime());
 
             serviceRegistry.Register<Func<AppDbContext>>(c =>
             {
@@ -41,6 +41,7 @@ namespace CVaS.BL.Installers
             serviceRegistry.Register<FileRepository>();
             serviceRegistry.Register<AlgorithmRepository>();
             serviceRegistry.Register<RunRepository>();
+            serviceRegistry.Register<UserRepository>();
 
             serviceRegistry.Register<AlgorithmFileProvider>();
             serviceRegistry.Register<TemporaryFileProvider>();
