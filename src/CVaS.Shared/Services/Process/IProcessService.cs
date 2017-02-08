@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CVaS.BL.Services.Process
+namespace CVaS.Shared.Services.Process
 {
     public interface IProcessService
     {

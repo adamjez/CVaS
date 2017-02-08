@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Linq;
 using Microsoft.Extensions.Configuration;
 
 namespace CVaS.BL.Services.File
@@ -18,24 +17,6 @@ namespace CVaS.BL.Services.File
             var pathToFolder = Path.Combine(configuration["DirectoryPaths:Algorithm"], codeName);
             var pathToFile = Path.Combine(pathToFolder, algFile);
             return pathToFile;
-        }
-    }
-
-    public class FileProvider
-    {
-        public bool Exists(string path)
-        {
-            return System.IO.File.Exists(path);
-        }
-
-        public bool IsEmpty(string directory)
-        {
-            return !Directory.EnumerateFiles(directory).Any();
-        }
-
-        public string GetDirectoryFromFile(string filePath)
-        {
-            return Directory.GetParent(filePath).FullName;
         }
     }
 }

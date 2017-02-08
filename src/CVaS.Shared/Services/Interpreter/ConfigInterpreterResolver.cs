@@ -1,12 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace CVaS.BL.Services.Interpreter
+namespace CVaS.Shared.Services.Interpreter
 {
-    public interface IInterpreterResolver
-    {
-        string Resolve(string extension);
-    }
-
     public class ConfigInterpreterResolver : IInterpreterResolver
     {
         private static string ConfigurationKey = "Interpreters";

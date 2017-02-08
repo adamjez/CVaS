@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using CVaS.BL.Helpers;
-using CVaS.BL.Services.File;
-using CVaS.BL.Services.Process;
+using CVaS.Shared.Services.File;
+using CVaS.Shared.Services.Time;
 
-namespace CVaS.Web.Services
+namespace CVaS.Shared.Services.Process
 {
     /// <summary>
     /// Service that runs processes with given arguments
@@ -34,7 +33,7 @@ namespace CVaS.Web.Services
         {
             var tcs = new TaskCompletionSource<ProcessResult>();
 
-            Process process = new Process()
+            System.Diagnostics.Process process = new System.Diagnostics.Process()
             {
                 StartInfo = new ProcessStartInfo
                 {

@@ -1,4 +1,4 @@
-﻿namespace CVaS.Web.Models
+﻿namespace CVaS.Shared.Options
 {
     public class DatabaseConfiguration
     {

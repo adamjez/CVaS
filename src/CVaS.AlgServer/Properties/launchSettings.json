@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "CVaS.AlgServer": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "NETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

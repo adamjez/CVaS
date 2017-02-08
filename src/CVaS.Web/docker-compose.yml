@@ -8,3 +8,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80"
+  rabbitmq:
+    image: rabbitmq
+    hostname: rmq
+    ports:
+      - "15672:15672"

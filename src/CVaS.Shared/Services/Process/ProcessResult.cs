@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CVaS.BL.Services.Process
+namespace CVaS.Shared.Services.Process
 {
     public class ProcessResult
     {

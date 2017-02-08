@@ -1,9 +1,12 @@
 ﻿using System;
+using CVaS.AlgServer.Options;
 using CVaS.BL.Common;
 using CVaS.BL.Installers;
-using CVaS.BL.Services.Process;
 using CVaS.DAL;
 using CVaS.DAL.Model;
+using CVaS.Shared.Installers;
+using CVaS.Shared.Options;
+using CVaS.Shared.Services.Process;
 using CVaS.Web.Authentication;
 using CVaS.Web.Filters;
 using CVaS.Web.Installers;
@@ -19,6 +22,8 @@ using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger.Model;
 using LightInject.Microsoft.DependencyInjection;
 using Newtonsoft.Json;
+using Swashbuckle.SwaggerGen.Application;
+using AlgorithmOptions = CVaS.Shared.Services.Process.AlgorithmOptions;
 
 namespace CVaS.Web
 {
@@ -43,19 +48,24 @@ namespace CVaS.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions();
+            services.Configure<BrokerOptions>(Configuration.GetSection("Broker"));
+            services.Configure<AlgorithmOptions>(Configuration.GetSection("Algorithm"));
+
             databaseConfiguration = new DatabaseConfiguration();
             Configuration.GetSection("Database").Bind(databaseConfiguration);
             // We choose what database provider we will use
             // In configuration have to be "MySQL" or "MSSQL" 
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
             if (databaseConfiguration.Provider == "MySQL")
             {
                 services.AddDbContext<AppDbContext>(options =>
-                    options.UseMySQL(Configuration.GetConnectionString("DefaultConnection")));
+                    options.UseMySQL(connectionString));
             }
             else
             {
                 services.AddDbContext<AppDbContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                    options.UseSqlServer(connectionString));
             }
 
             // Set ASP.NET Identity and cooie authentication
@@ -91,42 +101,21 @@ namespace CVaS.Web
                 .AddXmlDataContractSerializerFormatters();
 
             // Inject an implementation of ISwaggerProvider with defaulted settings applied
-            services.AddSwaggerGen(c =>
-            {
-                c.SingleApiVersion(new Info
-                {
-                    Version = "v1",
-                    Title = "Computer Vision as Service API",
-                    Description = "A simple api to run computer vision algorithms.",
-                    TermsOfService = "None"
-                });
-                c.AddSecurityDefinition("Bearer", new ApiKeyScheme()
-                {
-                    In = "header",
-                    Name = "Authorization",
-                    Description = "Api Key Authentication",
-                    Type = "apiKey"
-                });
-                c.IncludeXmlComments(ResolvePathToXmlCommentFile());
-            });
-
-            var algorithmConfiguration = new AlgorithmConfiguration();
-            Configuration.GetSection("Algorithm").Bind(algorithmConfiguration);
+            services.AddSwaggerGen(SwaggerSetup);
 
             var container = new LightInject.ServiceContainer();
 
             var physicalProvider = hostingEnvironment.ContentRootFileProvider;
             container.RegisterInstance(physicalProvider);
             container.RegisterInstance(Configuration);
-            container.RegisterInstance(algorithmConfiguration);
             container.Register<DbInitializer>();
 
             container.RegisterFrom<WebApiComposition>();
             container.RegisterFrom<BusinessLayerComposition>();
+            container.RegisterFrom<BasicComposition>();
 
             return container.CreateServiceProvider(services);
         }
-
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DbInitializer initializer)
@@ -164,6 +153,25 @@ namespace CVaS.Web
 
             // Enable middleware to serve swagger-ui assets (HTML, JS, CSS etc.)
             app.UseSwaggerUi();
+        }
+
+        private void SwaggerSetup(SwaggerGenOptions options)
+        {
+            options.SingleApiVersion(new Info
+            {
+                Version = "v1",
+                Title = "Computer Vision as Service API",
+                Description = "A simple api to run computer vision algorithms.",
+                TermsOfService = "None"
+            });
+            options.AddSecurityDefinition("Bearer", new ApiKeyScheme()
+            {
+                In = "header",
+                Name = "Authorization",
+                Description = "Api Key Authentication",
+                Type = "apiKey"
+            });
+            options.IncludeXmlComments(ResolvePathToXmlCommentFile());
         }
 
         private string ResolvePathToXmlCommentFile()

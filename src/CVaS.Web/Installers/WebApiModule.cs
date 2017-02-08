@@ -1,9 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 using CVaS.BL.Providers;
-using CVaS.BL.Services.Interpreter;
-using CVaS.BL.Services.Process;
+using CVaS.BL.Services.Broker;
+using CVaS.Shared.Services.Interpreter;
+using CVaS.Shared.Services.Process;
 using CVaS.Web.Providers;
-using CVaS.Web.Services;
 using LightInject;
 
 namespace CVaS.Web.Installers
@@ -25,6 +25,9 @@ namespace CVaS.Web.Installers
             {
                 serviceRegistry.Register<IProcessService, BaseProcessService>();
             }
+
+            serviceRegistry.Register<BrokerSender>(new PerContainerLifetime());
+            serviceRegistry.Register<IBrokeSender, EasyNetQBrokerSender>(new PerRequestLifeTime());
 
             serviceRegistry.Register<ICurrentUserProvider, CurrentUserProvider>();
 

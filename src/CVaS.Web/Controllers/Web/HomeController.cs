@@ -1,4 +1,6 @@
 ﻿using CVaS.BL.Providers;
+using CVaS.BL.Services.Broker;
+using CVaS.Shared.Messages;
 using CVaS.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,17 +9,23 @@ namespace CVaS.Web.Controllers.Web
 {
     public class HomeController : WebController
     {
-        public HomeController(ICurrentUserProvider currentUserProvider) 
+        private readonly IBrokeSender _brokerSender;
+
+        public HomeController(ICurrentUserProvider currentUserProvider, IBrokeSender brokerSender) 
             : base(currentUserProvider)
         {
+            _brokerSender = brokerSender;
         }
 
         [AllowAnonymous]
         public IActionResult Index()
         {
+            var result = _brokerSender.Send(new CreateAlgorithmMessage() {AlgorithmId = 2400});
+
+
             var layout = new LayoutViewModel
             {
-                Title = "Home"
+                Title = "Home" + result.StdOut
             };
 
             return View(InitializeLayoutModel(layout));

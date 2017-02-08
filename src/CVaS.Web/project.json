@@ -1,8 +1,8 @@
 {
   "dependencies": {
     "Microsoft.NETCore.App": {
-      "version": "1.0.1",
-      "type": "platform"
+      "type": "platform",
+      "version": "1.0.3"
     },
     "CVaS.BL": "1.0.0-*",
     "CVaS.DAL": "1.0.0-*",
@@ -30,7 +30,8 @@
     "Microsoft.EntityFrameworkCore.Tools": "1.0.0-preview2-final",
     "Swashbuckle": "6.0.0-beta902",
     "LightInject": "4.1.5",
-    "LightInject.Microsoft.DependencyInjection": "1.1.1"
+    "LightInject.Microsoft.DependencyInjection": "1.1.1",
+    "CVaS.Shared": "1.0.0-*"
   },
   "tools": {},
   "frameworks": {
@@ -68,5 +69,8 @@
       "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
     ]
   },
-  "userSecretsId": "aspnet-CVaS.Web-20161227062634"
+  "userSecretsId": "aspnet-CVaS.Web-20161227062634",
+  "configurations": {
+    "AlgServer": {}
+  }
 }

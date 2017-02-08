@@ -11,11 +11,11 @@ using CVaS.BL.Providers;
 using CVaS.BL.Repositories;
 using CVaS.BL.Services.ArgumentTranslator;
 using CVaS.BL.Services.File;
-using CVaS.BL.Services.Process;
 using CVaS.DAL.Model;
-using System.Linq;
 using CVaS.BL.Core;
 using CVaS.BL.DTO;
+using CVaS.Shared.Services.Process;
+using Microsoft.Extensions.Options;
 
 namespace CVaS.BL.Facades
 {
@@ -30,12 +30,12 @@ namespace CVaS.BL.Facades
 
         private readonly IProcessService _processService;
         private readonly IArgumentTranslator _argumentTranslator;
-        private readonly AlgorithmConfiguration _configuration;
+        private readonly IOptions<AlgorithmOptions> _options;
 
         public RunFacade(IUnitOfWorkProvider unitOfWorkProvider, ICurrentUserProvider currentUserProvider,
             AlgorithmRepository algorithmRepository, IProcessService processService, FileProvider fileProvider, 
             AlgorithmFileProvider algFileProvider, TemporaryFileProvider fileSystemProvider,
-            RunRepository runRepository, IArgumentTranslator argumentTranslator, AlgorithmConfiguration configuration)
+            RunRepository runRepository, IArgumentTranslator argumentTranslator, IOptions<AlgorithmOptions> options)
             : base(unitOfWorkProvider, currentUserProvider)
         {
             _algorithmRepository = algorithmRepository;
@@ -45,7 +45,7 @@ namespace CVaS.BL.Facades
             _fileSystemProvider = fileSystemProvider;
             _runRepository = runRepository;
             _argumentTranslator = argumentTranslator;
-            _configuration = configuration;
+            _options = options;
         }
 
         public async Task<RunResult> RunProcessAsync(string codeName, IEnumerable<object> arguments)
@@ -83,12 +83,12 @@ namespace CVaS.BL.Facades
 
                 args.Insert(0, runFolder);
 
-                var tokenSource = new CancellationTokenSource(_configuration.HardTimeout * 1000);
+                var tokenSource = new CancellationTokenSource(_options.Value.HardTimeout * 1000);
 
                 var task = _processService.RunAsync(filePath, args, tokenSource.Token);
 
                 var lightTokenSource = new CancellationTokenSource();
-                var firstTimeOutedTask = await Task.WhenAny(task, Task.Delay(_configuration.LightTimeout * 1000, lightTokenSource.Token));
+                var firstTimeOutedTask = await Task.WhenAny(task, Task.Delay(_options.Value.LightTimeout * 1000, lightTokenSource.Token));
 
                 ProcessResult result = null;
                 if (firstTimeOutedTask == task)

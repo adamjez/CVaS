@@ -2,11 +2,10 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using CVaS.BL.Services.File;
-using CVaS.BL.Services.Interpreter;
-using CVaS.BL.Services.Process;
+using CVaS.Shared.Services.File;
+using CVaS.Shared.Services.Interpreter;
 
-namespace CVaS.Web.Services
+namespace CVaS.Shared.Services.Process
 {
     /// <summary>
     /// Decorator pattern for proces service to
