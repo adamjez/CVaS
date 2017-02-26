@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CVaS.BL.Core.Provider;
 using CVaS.BL.DTO;
-using CVaS.BL.Providers;
-using CVaS.BL.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using CVaS.Shared.Core.Provider;
+using CVaS.Shared.Providers;
+using CVaS.Shared.Repositories;
 
 namespace CVaS.BL.Facades
 {

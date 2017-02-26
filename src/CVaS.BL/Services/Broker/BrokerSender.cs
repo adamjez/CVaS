@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
-using CVaS.AlgServer.Options;
 using CVaS.Shared.Messages;
+using CVaS.Shared.Options;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 
@@ -9,6 +9,8 @@ namespace CVaS.BL.Services.Broker
 {
     public class BrokerSender : IBrokeSender
     {
+        private const string QueueName = "algBasicQueue";
+
         private readonly IOptions<BrokerOptions> _brokerOptions;
         private IConnection _connection;
         private IModel _channel;
@@ -22,7 +24,7 @@ namespace CVaS.BL.Services.Broker
 
             _channel = _connection.CreateModel();
 
-            _channel.QueueDeclare(queue: _brokerOptions.Value.Queue,
+            _channel.QueueDeclare(queue: QueueName,
                                      durable: false,
                                      exclusive: false,
                                      autoDelete: false,
@@ -37,7 +39,7 @@ namespace CVaS.BL.Services.Broker
             var properties = _channel.CreateBasicProperties();
 
             _channel.BasicPublish(exchange: "",
-                                    routingKey: _brokerOptions.Value.Queue,
+                                    routingKey: QueueName,
                                     basicProperties: properties,
                                     body: body);
 

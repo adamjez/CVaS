@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 using CVaS.BL.Common;
-using CVaS.BL.Providers;
+using CVaS.Shared.Providers;
 using Microsoft.AspNetCore.Http;
 
 namespace CVaS.Web.Providers

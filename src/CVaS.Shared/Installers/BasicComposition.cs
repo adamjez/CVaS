@@ -1,11 +1,17 @@
-﻿using System.Runtime.InteropServices;
-using CVaS.AlgServer.Options;
+﻿using System;
+using System.Runtime.InteropServices;
+using CVaS.DAL;
+using CVaS.Shared.Core.Provider;
+using CVaS.Shared.Core.Registry;
+using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.Broker;
+using CVaS.Shared.Services.File;
 using CVaS.Shared.Services.Interpreter;
 using CVaS.Shared.Services.Process;
+using CVaS.Shared.Services.Time;
 using EasyNetQ;
 using LightInject;
-using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 
 namespace CVaS.Shared.Installers
 {
@@ -30,6 +36,30 @@ namespace CVaS.Shared.Installers
 
             serviceRegistry.Register<BrokerFactory>(new PerContainerLifetime());
             serviceRegistry.Register<IBus>(s => s.GetInstance<BrokerFactory>().Bus, new PerContainerLifetime());
+
+            serviceRegistry.Register<Func<AppDbContext>>(c =>
+            {
+                var options = c.TryGetInstance<DbContextOptions<AppDbContext>>();
+                return () => new AppDbContext(options);
+            });
+
+            serviceRegistry.Register<IUnitOfWorkProvider, EntityFrameworkUnitOfWorkProvider>(new PerContainerLifetime());
+
+
+            serviceRegistry.Register<UnitOfWorkRegistryBase, ThreadLocalUnitOfWorkRegistry>();
+            serviceRegistry.Register<IUnitOfWorkRegistry, HttpContextUnitOfWorkRegistry>();
+
+            serviceRegistry.Register<FileRepository>();
+            serviceRegistry.Register<AlgorithmRepository>();
+            serviceRegistry.Register<RunRepository>();
+            serviceRegistry.Register<UserRepository>();
+
+            serviceRegistry.Register<AlgorithmFileProvider>();
+            serviceRegistry.Register<TemporaryFileProvider>();
+            serviceRegistry.Register<FileProvider>();
+
+            serviceRegistry.Register<ICurrentTimeProvider, UtcNowTimeProvider>(new PerContainerLifetime());
+
         }
     }
 }

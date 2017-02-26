@@ -1,4 +1,4 @@
-﻿using CVaS.BL.Providers;
+﻿using CVaS.Shared.Providers;
 using CVaS.Web.Authentication;
 using CVaS.Web.Models;
 using Microsoft.AspNetCore.Authorization;

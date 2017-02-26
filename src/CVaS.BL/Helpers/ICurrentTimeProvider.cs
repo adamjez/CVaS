@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CVaS.BL.Helpers
+namespace CVaS.Shared.Helpers
 {
     public interface ICurrentTimeProvider
     {

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CVaS.BL.Core.Provider;
-using CVaS.BL.Providers;
-using CVaS.BL.Repositories;
-using CVaS.BL.Services.File;
 using CVaS.DAL.Model;
+using CVaS.Shared.Core.Provider;
+using CVaS.Shared.Providers;
+using CVaS.Shared.Repositories;
+using CVaS.Shared.Services.File;
 
 namespace CVaS.BL.Facades
 {

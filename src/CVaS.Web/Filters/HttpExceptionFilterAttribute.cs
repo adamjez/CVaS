@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-using CVaS.BL.Exceptions;
+using CVaS.Shared.Exceptions;
 using CVaS.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;

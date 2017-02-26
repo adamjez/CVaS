@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CVaS.BL.Common;
-using CVaS.BL.Core.Provider;
+using CVaS.Shared.Core.Provider;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.EntityFrameworkCore;

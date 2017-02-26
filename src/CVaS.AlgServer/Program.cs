@@ -3,6 +3,7 @@ using CVaS.AlgServer.Services;
 using CVaS.DAL;
 using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
+using CVaS.Shared.Services.Launch;
 using CVaS.Shared.Services.Process;
 using LightInject;
 using Microsoft.Extensions.Configuration;
@@ -33,8 +34,8 @@ namespace CVaS.AlgServer
 
             using (provider)
             {
-                var core = provider.GetInstance<Core>();
-                core.Start();
+                var server = provider.GetInstance<Server>();
+                server.Start();
             }
         }
 
@@ -49,7 +50,9 @@ namespace CVaS.AlgServer
             services.Configure<AlgorithmOptions>(Configuration.GetSection("Algorithm"));
 
             services.AddTransient<IBrokerReceiver, EasyNetQReceiver>();
-            services.AddTransient<Core>();
+            services.AddTransient<IMessageProcessor, RunMessageProcessor>();
+            services.AddTransient<Server>();
+            services.AddTransient<ILaunchService, LocalLaunchService>();
 
             var databaseConfiguration = new DatabaseConfiguration();
             Configuration.GetSection("Database").Bind(databaseConfiguration);

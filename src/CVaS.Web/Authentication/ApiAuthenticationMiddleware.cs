@@ -1,7 +1,7 @@
 using System;
 using System.Text.Encodings.Web;
 using CVaS.BL.Common;
-using CVaS.BL.Core.Provider;
+using CVaS.Shared.Core.Provider;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;

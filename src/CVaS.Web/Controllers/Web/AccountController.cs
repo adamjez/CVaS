@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CVaS.BL.Common;
-using CVaS.BL.Core.Provider;
-using CVaS.BL.Providers;
 using CVaS.BL.Services.ApiKey;
 using CVaS.BL.Services.Email;
 using CVaS.DAL;
 using CVaS.DAL.Model;
+using CVaS.Shared.Core.Provider;
+using CVaS.Shared.Providers;
 using CVaS.Web.Models.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

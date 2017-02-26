@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq;
-using CVaS.BL.Core.Provider;
-using CVaS.BL.Providers;
 using CVaS.BL.Services.ApiKey;
 using CVaS.DAL;
 using CVaS.DAL.Model;
+using CVaS.Shared.Core.Provider;
 
 namespace CVaS.BL.Common
 {

@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
-using CVaS.BL.Core.Provider;
-using CVaS.BL.Exceptions;
-using CVaS.BL.Helpers;
-using CVaS.BL.Models;
-using CVaS.BL.Providers;
-using CVaS.BL.Repositories;
 using CVaS.BL.Services.ArgumentTranslator;
-using CVaS.BL.Services.File;
 using CVaS.DAL.Model;
-using CVaS.BL.Core;
 using CVaS.BL.DTO;
+using CVaS.Shared.Core;
+using CVaS.Shared.Core.Provider;
+using CVaS.Shared.Exceptions;
+using CVaS.Shared.Helpers;
+using CVaS.Shared.Models;
+using CVaS.Shared.Providers;
+using CVaS.Shared.Repositories;
+using CVaS.Shared.Services.File;
 using CVaS.Shared.Services.Process;
 using Microsoft.Extensions.Options;
 
@@ -68,8 +68,6 @@ namespace CVaS.BL.Facades
 
                 var args = await _argumentTranslator.ProcessAsync(arguments);
 
-                var runFolder = _fileSystemProvider.CreateTemporaryFolder();
-
                 // Create Run In Db
                 var run = new Run()
                 {
@@ -81,6 +79,7 @@ namespace CVaS.BL.Facades
                 _runRepository.Insert(run);
                 await uow.CommitAsync();
 
+                var runFolder = _fileSystemProvider.CreateTemporaryFolder();
                 args.Insert(0, runFolder);
 
                 var tokenSource = new CancellationTokenSource(_options.Value.HardTimeout * 1000);

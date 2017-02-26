@@ -1,5 +1,5 @@
-﻿using CVaS.BL.Core.Provider;
-using CVaS.BL.Providers;
+﻿using CVaS.Shared.Core.Provider;
+using CVaS.Shared.Providers;
 
 namespace CVaS.BL.Facades
 {

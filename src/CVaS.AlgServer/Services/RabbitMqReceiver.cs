@@ -2,6 +2,7 @@
 using System.Text;
 using CVaS.AlgServer.Options;
 using CVaS.Shared.Messages;
+using CVaS.Shared.Options;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -10,6 +11,7 @@ namespace CVaS.AlgServer.Services
 {
     public class RabbitMqReceiver : IBrokerReceiver
     {
+        private const string QueueName = "algBasicQueue";
         private readonly IOptions<BrokerOptions> _brokerOptions;
         private IConnection _connection;
         private IModel _channel;
@@ -19,13 +21,13 @@ namespace CVaS.AlgServer.Services
             _brokerOptions = brokerOptions;
         }
 
-        public void Setup(Func<CreateAlgorithmMessage, AlgorithmResultMessage> messageProcessingFunc)
+        public void Setup(IMessageProcessor messagesProcessor)
         {
             var factory = new ConnectionFactory() { HostName = _brokerOptions.Value.Hostname };
 
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
-            _channel.QueueDeclare(queue: _brokerOptions.Value.Queue,
+            _channel.QueueDeclare(queue: QueueName,
                                  durable: false,
                                  exclusive: false,
                                  autoDelete: false,
@@ -40,14 +42,14 @@ namespace CVaS.AlgServer.Services
                 var message = Encoding.UTF8.GetString(body);
 
                 // ToDo add deserializing
-                messageProcessingFunc(new CreateAlgorithmMessage());
+                messagesProcessor.ProcessAsync(new CreateAlgorithmMessage());
                 Console.WriteLine(" [x] Received {0}", message);
 
                 var eventRecieved = model as EventingBasicConsumer;
                 eventRecieved?.Model?.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
             };
 
-            _channel.BasicConsume(queue: _brokerOptions.Value.Queue, noAck: false, consumer: consumer);
+            _channel.BasicConsume(queue: QueueName, noAck: false, consumer: consumer);
 
         }
 

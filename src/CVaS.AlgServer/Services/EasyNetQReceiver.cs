@@ -1,26 +1,21 @@
-﻿using System;
-using CVaS.AlgServer.Options;
-using CVaS.Shared.Messages;
+﻿using CVaS.Shared.Messages;
 using EasyNetQ;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CVaS.AlgServer.Services
 {
     public class EasyNetQReceiver : IBrokerReceiver
     {
-        private readonly IOptions<BrokerOptions> _brokerOptions;
         private readonly IBus _bus;
         private readonly ILogger<EasyNetQReceiver> _logger;
 
-        public EasyNetQReceiver(IOptions<BrokerOptions> brokerOptions, IBus bus, ILogger<EasyNetQReceiver> logger)
+        public EasyNetQReceiver(IBus bus, ILogger<EasyNetQReceiver> logger)
         {
-            _brokerOptions = brokerOptions;
             _bus = bus;
             _logger = logger;
         }
 
-        public void Setup(Func<CreateAlgorithmMessage, AlgorithmResultMessage> messageProcessingFunc)
+        public void Setup(IMessageProcessor messageProcessor)
         {
             if (!_bus.IsConnected)
             {
@@ -31,10 +26,10 @@ namespace CVaS.AlgServer.Services
                 _logger.LogInformation("Connected to RabbitMq server and setting respond");
             }
             
-            _bus.Respond<CreateAlgorithmMessage, AlgorithmResultMessage>((request) =>
+            _bus.RespondAsync<CreateAlgorithmMessage, AlgorithmResultMessage>(async (request) =>
             {
                 _logger.LogInformation("Received request!");
-                var result =  messageProcessingFunc(request);
+                var result = await messageProcessor.ProcessAsync(request);
                 _logger.LogInformation("Sending respond!");
                 return result;
             });

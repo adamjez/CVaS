@@ -1,6 +1,6 @@
-﻿using CVaS.BL.Providers;
-using CVaS.BL.Services.Broker;
+﻿using CVaS.BL.Services.Broker;
 using CVaS.Shared.Messages;
+using CVaS.Shared.Providers;
 using CVaS.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +25,7 @@ namespace CVaS.Web.Controllers.Web
 
             var layout = new LayoutViewModel
             {
-                Title = "Home" + result.StdOut
+                Title = "Home"
             };
 
             return View(InitializeLayoutModel(layout));

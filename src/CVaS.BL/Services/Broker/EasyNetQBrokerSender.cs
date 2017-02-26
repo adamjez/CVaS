@@ -1,5 +1,5 @@
-﻿using CVaS.AlgServer.Options;
-using CVaS.Shared.Messages;
+﻿using CVaS.Shared.Messages;
+using CVaS.Shared.Options;
 using EasyNetQ;
 using Microsoft.Extensions.Options;
 

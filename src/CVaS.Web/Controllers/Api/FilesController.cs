@@ -3,8 +3,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CVaS.BL.Facades;
-using CVaS.BL.Providers;
-using CVaS.BL.Services.File;
 using CVaS.Web.Helpers;
 using CVaS.Web.Models.FileViewModels;
 using Microsoft.AspNetCore.Http;
@@ -15,8 +13,9 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Logging;
 using System.Linq;
-using CVaS.BL.Exceptions;
-using Microsoft.AspNetCore.Server.Kestrel;
+using CVaS.Shared.Exceptions;
+using CVaS.Shared.Providers;
+using CVaS.Shared.Services.File;
 using Microsoft.AspNetCore.StaticFiles;
 
 namespace CVaS.Web.Controllers.Api

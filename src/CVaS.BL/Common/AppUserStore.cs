@@ -4,10 +4,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CVaS.BL.Core.Provider;
-using CVaS.BL.Repositories;
 using CVaS.DAL;
 using CVaS.DAL.Model;
+using CVaS.Shared.Core.Provider;
+using CVaS.Shared.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,6 +1,7 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
+    "CVaS.DAL": "1.0.0-*",
     "NETStandard.Library": "1.6.0",
     "Microsoft.Extensions.Configuration": "1.0.1",
     "System.Diagnostics.Process": "4.3.0",

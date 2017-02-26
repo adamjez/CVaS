@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CVaS.BL.DTO;
 using CVaS.BL.Facades;
-using CVaS.BL.Providers;
+using CVaS.Shared.Providers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CVaS.Web.Controllers.Api

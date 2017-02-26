@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CVaS.BL.Providers;
+using CVaS.Shared.Providers;
 using CVaS.Web.Models;
 using CVaS.Web.Providers;
 using Microsoft.AspNetCore.Mvc;

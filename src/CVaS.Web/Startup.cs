@@ -1,5 +1,4 @@
 ﻿using System;
-using CVaS.AlgServer.Options;
 using CVaS.BL.Common;
 using CVaS.BL.Installers;
 using CVaS.DAL;
@@ -112,7 +111,6 @@ namespace CVaS.Web
 
             container.RegisterFrom<WebApiComposition>();
             container.RegisterFrom<BusinessLayerComposition>();
-            container.RegisterFrom<BasicComposition>();
 
             return container.CreateServiceProvider(services);
         }

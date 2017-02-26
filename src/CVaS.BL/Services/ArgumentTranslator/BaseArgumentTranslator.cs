@@ -5,10 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using CVaS.BL.Core;
-using CVaS.BL.Core.Provider;
-using CVaS.BL.Providers;
-using CVaS.BL.Repositories;
+using CVaS.Shared.Core.Provider;
+using CVaS.Shared.Providers;
+using CVaS.Shared.Repositories;
 
 namespace CVaS.BL.Services.ArgumentTranslator
 {

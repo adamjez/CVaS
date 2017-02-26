@@ -1,4 +1,4 @@
-﻿using CVaS.AlgServer.Options;
+﻿using CVaS.Shared.Options;
 using EasyNetQ;
 using Microsoft.Extensions.Options;
 

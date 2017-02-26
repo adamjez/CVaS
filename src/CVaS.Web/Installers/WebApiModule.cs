@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
-using CVaS.BL.Providers;
 using CVaS.BL.Services.Broker;
+using CVaS.Shared.Providers;
 using CVaS.Shared.Services.Interpreter;
 using CVaS.Shared.Services.Process;
 using CVaS.Web.Providers;
