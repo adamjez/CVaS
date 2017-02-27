@@ -1,6 +1,10 @@
 ﻿using CVaS.AlgServer.Options;
 using CVaS.AlgServer.Services;
+using CVaS.AlgServer.Services.BrokerReceiver;
+using CVaS.AlgServer.Services.MessageProcessor;
+using CVaS.AlgServer.Services.Server;
 using CVaS.DAL;
+using CVaS.Shared.Core.Registry;
 using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
 using CVaS.Shared.Services.Launch;
@@ -71,10 +75,10 @@ namespace CVaS.AlgServer
             }
 
             var container = new LightInject.ServiceContainer();
-            container.RegisterInstance(Configuration);
             container.CreateServiceProvider(services);
-            container.RegisterFrom<BasicComposition>();
 
+            container.RegisterFrom<BasicComposition>();
+            container.RegisterInstance(Configuration);
             container.RegisterInstance<IServiceContainer>(container);
 
             return container;

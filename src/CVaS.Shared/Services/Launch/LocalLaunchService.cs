@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace CVaS.Shared.Services.Launch
 
         public async Task<RunResult> LaunchAsync(string filePath, List<string> args, Run run)
         {
-            using (var uow = _unitOfWorkProvider.Create(DbContextOptions.AlwaysCreateOwnContext))
+            using (var uow = _unitOfWorkProvider.Create())
             {
                 var runFolder = _fileSystemProvider.CreateTemporaryFolder();
                 args.Insert(0, runFolder);
@@ -47,19 +48,9 @@ namespace CVaS.Shared.Services.Launch
 
                 var task = _processService.RunAsync(filePath, args, tokenSource.Token);
 
-                var lightTokenSource = new CancellationTokenSource();
-                var firstTimeOutedTask = await Task.WhenAny(task, Task.Delay(_options.Value.LightTimeout * 1000, lightTokenSource.Token));
 
-                ProcessResult result = null;
-                if (firstTimeOutedTask == task)
-                {
-                    lightTokenSource.Cancel();
-                    // Task completed within timeout.
-                    // Consider that the task may have faulted or been canceled.
-                    // We re-await the task so that any exceptions/cancellation is rethrown.
-                    result = await task;
-                }
-                else
+                var result = await task.WithTimeout(TimeSpan.FromSeconds(_options.Value.LightTimeout));
+                if (result.Timeouted)
                 {
                     // timeout/cancellation logic
                     task.ContinueWith(async action =>
@@ -74,19 +65,18 @@ namespace CVaS.Shared.Services.Launch
                     };
                 }
 
-                var zipFile = await SaveSuccessRun(runFolder, run, result);
+                var zipFile = await SaveSuccessRun(runFolder, run, result.Value);
 
                 await uow.CommitAsync();
 
                 return new RunResult()
                 {
                     FileName = zipFile.FileName,
-                    StdOut = result.StdOut,
-                    StdErr = result.StdError,
+                    StdOut = result.Value.StdOut,
+                    StdErr = result.Value.StdError,
                     RunId = run.Id,
-                    Duration = (result.FinishedAt - result.StartedAt).TotalSeconds
+                    Duration = (result.Value.FinishedAt - result.Value.StartedAt).TotalSeconds
                 };
-
             }
         }
 

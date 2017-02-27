@@ -18,6 +18,8 @@ namespace CVaS.Shared.Installers
 {
     public class BasicComposition : ICompositionRoot
     {
+        public static bool IsWebApplication { get; set; }
+
         public void Compose(IServiceRegistry serviceRegistry)
         {
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -38,27 +40,22 @@ namespace CVaS.Shared.Installers
             serviceRegistry.Register<BrokerFactory>(new PerContainerLifetime());
             serviceRegistry.Register<IBus>(s => s.GetInstance<BrokerFactory>().Bus, new PerContainerLifetime());
 
-            //serviceRegistry.Register<Func<AppDbContext>>(c =>
-            //{
-            //    var options = c.TryGetInstance<DbContextOptions<AppDbContext>>();
-            //    return () => new AppDbContext(options);
-            //});
+            serviceRegistry.Register<Func<AppDbContext>>(c =>
+            {
+                var options = c.TryGetInstance<DbContextOptions<AppDbContext>>();
+                return () => new AppDbContext(options);
+            });
 
             serviceRegistry.Register<IUnitOfWorkProvider, EntityFrameworkUnitOfWorkProvider>(new PerContainerLifetime());
 
-            serviceRegistry.Register<AppDbContext>(new PerScopeLifetime());
-
-
-            // Todo: resolve if its web application or not
-            //if ()
-            //{
-            //    serviceRegistry.Register<UnitOfWorkRegistryBase, ThreadLocalUnitOfWorkRegistry>();
-            //    serviceRegistry.Register<IUnitOfWorkRegistry, HttpContextUnitOfWorkRegistry>();
-            //}
-            //else
+            if (IsWebApplication)
             {
-                serviceRegistry.Register<IUnitOfWorkRegistry, LightInjectUnitOfWorkRegistry>();
-
+                serviceRegistry.Register<UnitOfWorkRegistryBase, ThreadLocalUnitOfWorkRegistry>();
+                serviceRegistry.Register<IUnitOfWorkRegistry, HttpContextUnitOfWorkRegistry>();
+            }
+            else
+            {
+                serviceRegistry.Register<IUnitOfWorkRegistry, AsyncLocalUnitOfWorkRegistry>();
             }
 
 

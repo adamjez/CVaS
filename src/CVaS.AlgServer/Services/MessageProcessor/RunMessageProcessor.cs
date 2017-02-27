@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CVaS.Shared.Core;
 using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Messages;
 using CVaS.Shared.Repositories;
@@ -6,7 +7,7 @@ using CVaS.Shared.Services.Launch;
 using LightInject;
 using Microsoft.Extensions.Logging;
 
-namespace CVaS.AlgServer.Services
+namespace CVaS.AlgServer.Services.MessageProcessor
 {
     internal class RunMessageProcessor : IMessageProcessor
     {
@@ -31,8 +32,7 @@ namespace CVaS.AlgServer.Services
 
             using (_serviceContainer.BeginScope())
             {
-
-                using (_unitOfWorkProvider.Create())
+                using (_unitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
                 {
                     var run = await _runRepository.GetById(request.RunId);
 
@@ -48,7 +48,6 @@ namespace CVaS.AlgServer.Services
                         RunId = result.RunId
                     };
                 }
-
             }
         }
     }

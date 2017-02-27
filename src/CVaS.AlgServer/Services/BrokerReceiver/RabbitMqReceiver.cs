@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Text;
-using CVaS.AlgServer.Options;
+using CVaS.AlgServer.Services.MessageProcessor;
 using CVaS.Shared.Messages;
 using CVaS.Shared.Options;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace CVaS.AlgServer.Services
+namespace CVaS.AlgServer.Services.BrokerReceiver
 {
     public class RabbitMqReceiver : IBrokerReceiver
     {

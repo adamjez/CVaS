@@ -14,10 +14,11 @@ namespace CVaS.BL.Installers
 {
     public class BusinessLayerComposition : ICompositionRoot
     {
-        public IOptions<ModeOptions> ModeOptions { get; set; }
+        public static ModeOptions ModeOptions { get; set; } = new ModeOptions();
 
         public void Compose(IServiceRegistry serviceRegistry)
         {
+            BasicComposition.IsWebApplication = true;
             serviceRegistry.RegisterFrom<BasicComposition>();
 
             serviceRegistry.Register<AppUserStore>();
@@ -32,11 +33,11 @@ namespace CVaS.BL.Installers
             serviceRegistry.Register<IArgumentTranslator, BaseArgumentTranslator>();
             serviceRegistry.Register<IEmailSender, MockMessageSender>();
 
-            //if (ModeOptions.Value.IsLocal)
-            //{
-            //    serviceRegistry.Register<ILaunchService, LocalLaunchService>();
-            //}
-            //else
+            if (ModeOptions.IsLocal)
+            {
+                serviceRegistry.Register<ILaunchService, LocalLaunchService>();
+            }
+            else
             {
                 serviceRegistry.Register<ILaunchService, RemoteLaunchService>();
             }

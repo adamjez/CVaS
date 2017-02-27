@@ -49,6 +49,11 @@ namespace CVaS.BL.Services.Broker
             return null;
         }
 
+        public Task<AlgorithmResultMessage> SendAsync(CreateAlgorithmMessage message, TimeSpan timeout)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Dispose()
         {
             _channel?.Dispose();

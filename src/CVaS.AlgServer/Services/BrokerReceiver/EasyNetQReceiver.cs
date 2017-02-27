@@ -1,8 +1,9 @@
-﻿using CVaS.Shared.Messages;
+﻿using CVaS.AlgServer.Services.MessageProcessor;
+using CVaS.Shared.Messages;
 using EasyNetQ;
 using Microsoft.Extensions.Logging;
 
-namespace CVaS.AlgServer.Services
+namespace CVaS.AlgServer.Services.BrokerReceiver
 {
     public class EasyNetQReceiver : IBrokerReceiver
     {

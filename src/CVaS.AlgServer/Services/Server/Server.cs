@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading;
-using CVaS.Shared.Messages;
+using CVaS.AlgServer.Services.BrokerReceiver;
+using CVaS.AlgServer.Services.MessageProcessor;
 using Microsoft.Extensions.Logging;
 
-namespace CVaS.AlgServer.Services
+namespace CVaS.AlgServer.Services.Server
 {
     public class Server
     {

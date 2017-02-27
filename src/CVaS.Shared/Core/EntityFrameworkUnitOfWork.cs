@@ -11,7 +11,7 @@ namespace CVaS.Shared.Core
     /// </summary>
     public class EntityFrameworkUnitOfWork : UnitOfWorkBase
     {
-        private readonly bool hasOwnContext;
+        private readonly bool canCommit;
 
         /// <summary>
         /// Gets the <see cref="Microsoft.EntityFrameworkCore.DbContext"/>.
@@ -19,22 +19,37 @@ namespace CVaS.Shared.Core
         public override AppDbContext Context { get; }
 
         /// <summary>
+        /// If TransactionalMode is enabled, child unit of works are not allowed to commit changes.
+        /// </summary>
+        public bool TransactionalModeEnabled { get; set; } = true;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EntityFrameworkUnitOfWork"/> class.
         /// </summary>
         public EntityFrameworkUnitOfWork(IUnitOfWorkProvider provider, Func<AppDbContext> dbContextFactory, DbContextOptions options)
         {
-            if (options == DbContextOptions.ReuseParentContext)
+            if (options.HasFlag(DbContextOptions.DisableTransactionMode))
+            {
+                TransactionalModeEnabled = false;
+            }
+
+            if (options.HasFlag(DbContextOptions.ReuseParentContext))
             {
                 var parentUow = provider.GetCurrent() as EntityFrameworkUnitOfWork;
                 if (parentUow != null)
                 {
                     this.Context = parentUow.Context;
+                    if (!parentUow.TransactionalModeEnabled)
+                    {
+                        canCommit = true;
+                    }
+
                     return;
                 }
             }
 
             this.Context = dbContextFactory();
-            hasOwnContext = true;
+            canCommit = true;
         }
 
 
@@ -44,7 +59,7 @@ namespace CVaS.Shared.Core
         /// </summary>
         public override async Task CommitAsync()
         {
-            if (hasOwnContext)
+            if (canCommit)
             {
                 await base.CommitAsync();
             }
@@ -63,7 +78,7 @@ namespace CVaS.Shared.Core
         /// </summary>
         protected override void DisposeCore()
         {
-            if (hasOwnContext)
+            if (canCommit)
             {
                 Context.Dispose();
             }

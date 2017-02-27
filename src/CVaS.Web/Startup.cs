@@ -17,6 +17,7 @@ using MySQL.Data.EntityFrameworkCore.Extensions;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger.Model;
 using LightInject.Microsoft.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Swashbuckle.SwaggerGen.Application;
 using AlgorithmOptions = CVaS.Shared.Services.Process.AlgorithmOptions;
@@ -46,7 +47,6 @@ namespace CVaS.Web
         {
             ConfigureOptions(services);
 
-            Configuration.GetSection("Database").Bind(_databaseOptions);
             // We choose what database provider we will use
             // In configuration have to be "MySQL" or "MSSQL" 
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
@@ -112,9 +112,14 @@ namespace CVaS.Web
         private void ConfigureOptions(IServiceCollection services)
         {
             services.AddOptions();
+
             services.Configure<BrokerOptions>(Configuration.GetSection("Broker"));
             services.Configure<AlgorithmOptions>(Configuration.GetSection("Algorithm"));
             services.Configure<ModeOptions>(Configuration.GetSection("Mode"));
+
+            Configuration.GetSection("Mode").Bind(BusinessLayerComposition.ModeOptions);
+            Configuration.GetSection("Database").Bind(_databaseOptions);
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,7 +1,6 @@
-﻿using System;
-using CVaS.Shared.Messages;
+﻿using CVaS.AlgServer.Services.MessageProcessor;
 
-namespace CVaS.AlgServer.Services
+namespace CVaS.AlgServer.Services.BrokerReceiver
 {
     public interface IBrokerReceiver
     {

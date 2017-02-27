@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CVaS.BL.Services.Broker;
 using CVaS.DAL.Model;
@@ -33,14 +34,19 @@ namespace CVaS.BL.Services.Launch
             {
                 return await _brokerSender.SendAsync(message);
             }
-            catch(System.Exception exc)
+            catch (TimeoutException)
+            {
+            }
+            catch (System.Exception exc)
             {
                 _logger.LogCritical(exc.ToString());
             }
 
+
             return new RunResult()
             {
-                Result = RunResultType.NotFinished
+                Result = RunResultType.NotFinished,
+                RunId = run.Id
             };
         }
     }
