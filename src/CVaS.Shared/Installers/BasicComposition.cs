@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using CVaS.DAL;
+using CVaS.Shared.Core;
 using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Core.Registry;
 using CVaS.Shared.Repositories;
@@ -37,17 +38,29 @@ namespace CVaS.Shared.Installers
             serviceRegistry.Register<BrokerFactory>(new PerContainerLifetime());
             serviceRegistry.Register<IBus>(s => s.GetInstance<BrokerFactory>().Bus, new PerContainerLifetime());
 
-            serviceRegistry.Register<Func<AppDbContext>>(c =>
-            {
-                var options = c.TryGetInstance<DbContextOptions<AppDbContext>>();
-                return () => new AppDbContext(options);
-            });
+            //serviceRegistry.Register<Func<AppDbContext>>(c =>
+            //{
+            //    var options = c.TryGetInstance<DbContextOptions<AppDbContext>>();
+            //    return () => new AppDbContext(options);
+            //});
 
             serviceRegistry.Register<IUnitOfWorkProvider, EntityFrameworkUnitOfWorkProvider>(new PerContainerLifetime());
 
+            serviceRegistry.Register<AppDbContext>(new PerScopeLifetime());
 
-            serviceRegistry.Register<UnitOfWorkRegistryBase, ThreadLocalUnitOfWorkRegistry>();
-            serviceRegistry.Register<IUnitOfWorkRegistry, HttpContextUnitOfWorkRegistry>();
+
+            // Todo: resolve if its web application or not
+            //if ()
+            //{
+            //    serviceRegistry.Register<UnitOfWorkRegistryBase, ThreadLocalUnitOfWorkRegistry>();
+            //    serviceRegistry.Register<IUnitOfWorkRegistry, HttpContextUnitOfWorkRegistry>();
+            //}
+            //else
+            {
+                serviceRegistry.Register<IUnitOfWorkRegistry, LightInjectUnitOfWorkRegistry>();
+
+            }
+
 
             serviceRegistry.Register<FileRepository>();
             serviceRegistry.Register<AlgorithmRepository>();

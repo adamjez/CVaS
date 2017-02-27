@@ -3,7 +3,7 @@ using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Messages;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.Launch;
-using CVaS.Shared.Services.Process;
+using LightInject;
 using Microsoft.Extensions.Logging;
 
 namespace CVaS.AlgServer.Services
@@ -14,26 +14,41 @@ namespace CVaS.AlgServer.Services
         private readonly ILaunchService _launchService;
         private readonly RunRepository _runRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+        private readonly IServiceContainer _serviceContainer;
 
         public RunMessageProcessor(ILogger<RunMessageProcessor> logger, ILaunchService launchService, RunRepository runRepository,
-            IUnitOfWorkProvider unitOfWorkProvider)
+            IUnitOfWorkProvider unitOfWorkProvider, IServiceContainer serviceContainer)
         {
             _logger = logger;
             _launchService = launchService;
             _runRepository = runRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
+            _serviceContainer = serviceContainer;
         }
         public async Task<AlgorithmResultMessage> ProcessAsync(CreateAlgorithmMessage request)
         {
             _logger.LogInformation("Processing message - Run Id: " + request.RunId);
 
-            using (_unitOfWorkProvider.Create())
+            using (_serviceContainer.BeginScope())
             {
-                var run = await _runRepository.GetById(request.RunId);
 
-                var result = await _launchService.LaunchAsync(request.FilePath, request.Arguments, run);
+                using (_unitOfWorkProvider.Create())
+                {
+                    var run = await _runRepository.GetById(request.RunId);
 
-                return new AlgorithmResultMessage() { StdOut = result.StdOut };
+                    var result = await _launchService.LaunchAsync(request.FilePath, request.Arguments, run);
+
+                    return new AlgorithmResultMessage()
+                    {
+                        StdOut = result.StdOut,
+                        StdErr = result.StdErr,
+                        Duration = result.Duration,
+                        FileName = result.FileName,
+                        Result = result.Result,
+                        RunId = result.RunId
+                    };
+                }
+
             }
         }
     }

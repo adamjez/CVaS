@@ -54,7 +54,7 @@ namespace CVaS.AlgServer
             services.AddTransient<Server>();
             services.AddTransient<ILaunchService, LocalLaunchService>();
 
-            var databaseConfiguration = new DatabaseConfiguration();
+            var databaseConfiguration = new DatabaseOptions();
             Configuration.GetSection("Database").Bind(databaseConfiguration);
             // We choose what database provider we will use
             // In configuration have to be "MySQL" or "MSSQL" 
@@ -71,8 +71,11 @@ namespace CVaS.AlgServer
             }
 
             var container = new LightInject.ServiceContainer();
+            container.RegisterInstance(Configuration);
             container.CreateServiceProvider(services);
             container.RegisterFrom<BasicComposition>();
+
+            container.RegisterInstance<IServiceContainer>(container);
 
             return container;
         }

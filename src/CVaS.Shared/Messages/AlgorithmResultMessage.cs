@@ -1,7 +1,8 @@
-﻿namespace CVaS.Shared.Messages
+﻿using CVaS.Shared.Models;
+
+namespace CVaS.Shared.Messages
 {
-    public class AlgorithmResultMessage
+    public class AlgorithmResultMessage : RunResult
     {
-        public string StdOut { get; set; }
     }
 }

@@ -1,22 +1,21 @@
-﻿using CVaS.Shared.Messages;
-using CVaS.Shared.Options;
+﻿using System.Threading.Tasks;
+using CVaS.Shared.Messages;
 using EasyNetQ;
-using Microsoft.Extensions.Options;
 
 namespace CVaS.BL.Services.Broker
 {
-    public class EasyNetQBrokerSender : IBrokeSender
+    public class EasyNetQBrokerSender : IBrokerSender
     {
         private readonly IBus _bus;
 
-        public EasyNetQBrokerSender(IOptions<BrokerOptions> brokerOptions, IBus bus)
+        public EasyNetQBrokerSender(IBus bus)
         {
             _bus = bus;
         }
 
-        public AlgorithmResultMessage Send(CreateAlgorithmMessage message)
+        public async Task<AlgorithmResultMessage> SendAsync(CreateAlgorithmMessage message)
         {
-            return _bus.Request<CreateAlgorithmMessage, AlgorithmResultMessage>(message);
+            return await _bus.RequestAsync<CreateAlgorithmMessage, AlgorithmResultMessage>(message);
         }
     }
 }

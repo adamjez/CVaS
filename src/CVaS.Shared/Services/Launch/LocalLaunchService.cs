@@ -22,25 +22,23 @@ namespace CVaS.Shared.Services.Launch
         private readonly IProcessService _processService;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly RunRepository _runRepository;
-        private readonly ICurrentUserProvider _currentUserProvider;
         private readonly TemporaryFileProvider _fileSystemProvider;
         private readonly FileProvider _fileProvider;
 
         public LocalLaunchService(IOptions<AlgorithmOptions> options, IProcessService processService, IUnitOfWorkProvider unitOfWorkProvider,
-            RunRepository runRepository, ICurrentUserProvider currentUserProvider, TemporaryFileProvider fileSystemProvider, FileProvider fileProvider)
+            RunRepository runRepository, TemporaryFileProvider fileSystemProvider, FileProvider fileProvider)
         {
             _options = options;
             _processService = processService;
             _unitOfWorkProvider = unitOfWorkProvider;
             _runRepository = runRepository;
-            _currentUserProvider = currentUserProvider;
             _fileSystemProvider = fileSystemProvider;
             _fileProvider = fileProvider;
         }
 
         public async Task<RunResult> LaunchAsync(string filePath, List<string> args, Run run)
         {
-            using (var uow = _unitOfWorkProvider.Create())
+            using (var uow = _unitOfWorkProvider.Create(DbContextOptions.AlwaysCreateOwnContext))
             {
                 var runFolder = _fileSystemProvider.CreateTemporaryFolder();
                 args.Insert(0, runFolder);
@@ -125,7 +123,7 @@ namespace CVaS.Shared.Services.Launch
                     {
                         Path = zipFile.FullPath,
                         Type = FileType.Result,
-                        UserId = _currentUserProvider.Id
+                        UserId = run.UserId
                     };
                 }
 
@@ -133,6 +131,9 @@ namespace CVaS.Shared.Services.Launch
                 run.StdOut = result.StdOut;
                 run.StdErr = result.StdError;
                 run.Result = result.ExitCode == 0 ? RunResultType.Success : RunResultType.Fail;
+
+                // Attach run, bcs we are not sure if it comes from same context
+                _runRepository.Update(run);
 
                 await uow.CommitAsync();
                 return zipFile;

@@ -30,4 +30,23 @@ namespace CVaS.Shared.Core
         /// </summary>
         AppDbContext Context { get; }
     }
+
+    public class TestUnitOfWork : UnitOfWorkBase
+    {
+        public TestUnitOfWork(AppDbContext context)
+        {
+            Context = context;
+        }
+
+        public override AppDbContext Context { get; }
+        protected override async Task CommitCoreAsync()
+        {
+            await Context.SaveChangesAsync();
+        }
+
+        protected override void DisposeCore()
+        {
+            //Context.Dispose();
+        }
+    }
 }

@@ -9,9 +9,9 @@ namespace CVaS.Web.Controllers.Web
 {
     public class HomeController : WebController
     {
-        private readonly IBrokeSender _brokerSender;
+        private readonly IBrokerSender _brokerSender;
 
-        public HomeController(ICurrentUserProvider currentUserProvider, IBrokeSender brokerSender) 
+        public HomeController(ICurrentUserProvider currentUserProvider, IBrokerSender brokerSender) 
             : base(currentUserProvider)
         {
             _brokerSender = brokerSender;
@@ -20,7 +20,7 @@ namespace CVaS.Web.Controllers.Web
         [AllowAnonymous]
         public IActionResult Index()
         {
-            var result = _brokerSender.Send(new CreateAlgorithmMessage() {AlgorithmId = 2400});
+            //var result = _brokerSender.Send(new CreateAlgorithmMessage() {AlgorithmId = 2400});
 
 
             var layout = new LayoutViewModel

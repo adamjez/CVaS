@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using CVaS.Shared.Messages;
 using CVaS.Shared.Options;
 using Microsoft.Extensions.Options;
@@ -7,7 +8,7 @@ using RabbitMQ.Client;
 
 namespace CVaS.BL.Services.Broker
 {
-    public class BrokerSender : IBrokeSender
+    public class BrokerSender : IBrokerSender
     {
         private const string QueueName = "algBasicQueue";
 
@@ -31,7 +32,7 @@ namespace CVaS.BL.Services.Broker
                                      arguments: null);
         }
 
-        public AlgorithmResultMessage Send(CreateAlgorithmMessage msg)
+        public Task<AlgorithmResultMessage> SendAsync(CreateAlgorithmMessage msg)
         {
             var message = "Hello World";
             var body = Encoding.UTF8.GetBytes(message);

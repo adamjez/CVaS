@@ -57,6 +57,11 @@ namespace CVaS.Shared.Repositories
             Context.Set<TEntity>().Add(entity);
         }
 
+        public virtual void Update(TEntity entity)
+        {
+            Context.Entry(entity).State = EntityState.Modified;
+        }
+
         /// <summary>
         /// Deletes the specified entity.
         /// </summary>

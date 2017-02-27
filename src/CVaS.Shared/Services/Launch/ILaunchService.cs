@@ -9,12 +9,4 @@ namespace CVaS.Shared.Services.Launch
     {
         Task<RunResult> LaunchAsync(string filePath, List<string> args, Run run);
     }
-
-    public class RemoteLaunchService : ILaunchService
-    {
-        public Task<RunResult> LaunchAsync(string filePath, List<string> args, Run run)
-        {
-            throw new System.NotImplementedException();
-        }
-    }
 }

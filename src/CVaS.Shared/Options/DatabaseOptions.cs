@@ -1,6 +1,6 @@
 ﻿namespace CVaS.Shared.Options
 {
-    public class DatabaseConfiguration
+    public class DatabaseOptions
     {
         public string DefaultUsername { get; set; }
         public string DefaultEmail { get; set; }

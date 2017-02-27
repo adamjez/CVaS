@@ -3,13 +3,10 @@ using CVaS.BL.Common;
 using CVaS.BL.Installers;
 using CVaS.DAL;
 using CVaS.DAL.Model;
-using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
-using CVaS.Shared.Services.Process;
 using CVaS.Web.Authentication;
 using CVaS.Web.Filters;
 using CVaS.Web.Installers;
-using CVaS.Web.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +26,7 @@ namespace CVaS.Web
     public class Startup
     {
         private readonly IHostingEnvironment hostingEnvironment;
-        private DatabaseConfiguration databaseConfiguration;
+        private readonly DatabaseOptions _databaseOptions = new DatabaseOptions();
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -47,16 +44,13 @@ namespace CVaS.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddOptions();
-            services.Configure<BrokerOptions>(Configuration.GetSection("Broker"));
-            services.Configure<AlgorithmOptions>(Configuration.GetSection("Algorithm"));
+            ConfigureOptions(services);
 
-            databaseConfiguration = new DatabaseConfiguration();
-            Configuration.GetSection("Database").Bind(databaseConfiguration);
+            Configuration.GetSection("Database").Bind(_databaseOptions);
             // We choose what database provider we will use
             // In configuration have to be "MySQL" or "MSSQL" 
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            if (databaseConfiguration.Provider == "MySQL")
+            if (_databaseOptions.Provider == "MySQL")
             {
                 services.AddDbContext<AppDbContext>(options =>
                     options.UseMySQL(connectionString));
@@ -115,12 +109,20 @@ namespace CVaS.Web
             return container.CreateServiceProvider(services);
         }
 
+        private void ConfigureOptions(IServiceCollection services)
+        {
+            services.AddOptions();
+            services.Configure<BrokerOptions>(Configuration.GetSection("Broker"));
+            services.Configure<AlgorithmOptions>(Configuration.GetSection("Algorithm"));
+            services.Configure<ModeOptions>(Configuration.GetSection("Mode"));
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DbInitializer initializer)
         {
-            initializer.Init(databaseConfiguration.DefaultUsername, 
-                databaseConfiguration.DefaultEmail, 
-                databaseConfiguration.DefaultPassword);
+            initializer.Init(_databaseOptions.DefaultUsername, 
+                _databaseOptions.DefaultEmail, 
+                _databaseOptions.DefaultPassword);
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
