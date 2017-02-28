@@ -36,8 +36,9 @@ namespace CVaS.BL.Services.Launch
             }
             catch (TimeoutException)
             {
+                _logger.LogWarning("Timeouted when sending message to broker");
             }
-            catch (System.Exception exc)
+            catch (Exception exc)
             {
                 _logger.LogCritical(exc.ToString());
             }

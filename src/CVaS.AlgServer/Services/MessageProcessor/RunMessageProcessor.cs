@@ -15,22 +15,22 @@ namespace CVaS.AlgServer.Services.MessageProcessor
         private readonly ILaunchService _launchService;
         private readonly RunRepository _runRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-        private readonly IServiceContainer _serviceContainer;
+        private readonly IServiceFactory _serviceFactory;
 
         public RunMessageProcessor(ILogger<RunMessageProcessor> logger, ILaunchService launchService, RunRepository runRepository,
-            IUnitOfWorkProvider unitOfWorkProvider, IServiceContainer serviceContainer)
+            IUnitOfWorkProvider unitOfWorkProvider, IServiceFactory serviceFactory)
         {
             _logger = logger;
             _launchService = launchService;
             _runRepository = runRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
-            _serviceContainer = serviceContainer;
+            _serviceFactory = serviceFactory;
         }
         public async Task<AlgorithmResultMessage> ProcessAsync(CreateAlgorithmMessage request)
         {
             _logger.LogInformation("Processing message - Run Id: " + request.RunId);
 
-            using (_serviceContainer.BeginScope())
+            using (_serviceFactory.BeginScope())
             {
                 using (_unitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
                 {

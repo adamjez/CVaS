@@ -13,6 +13,9 @@ namespace CVaS.Shared.Services.Broker
             _brokerOptions = brokerOptions;
         }
 
-        public IBus Bus => RabbitHutch.CreateBus($"host={_brokerOptions.Value.Hostname}");
+        public IBus Bus => RabbitHutch.CreateBus(
+            $"host={_brokerOptions.Value.Hostname};" +
+            $"username={_brokerOptions.Value.Username ?? "guest"};" +
+            $"password={_brokerOptions.Value.Password ?? "guest"}");
     }
 }

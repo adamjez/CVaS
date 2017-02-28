@@ -33,9 +33,15 @@ namespace CVaS.AlgServer.Services.Server
 
                 exitEvent.WaitOne();
             }
-            catch (System.TimeoutException)
+            catch (ArgumentException)
             {
-                _logger.LogError("Coudln't connect to RabbitMq server");
+                exitEvent.Set();
+                _logger.LogError("Coudln't connect to RabbitMq server: Disconnected bus");
+            }
+            catch (TimeoutException)
+            {
+                exitEvent.Set();
+                _logger.LogError("Coudln't connect to RabbitMq server: Timeout");
             }
         }
     }

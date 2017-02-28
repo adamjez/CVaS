@@ -1,4 +1,5 @@
-﻿using CVaS.AlgServer.Options;
+﻿using System;
+using CVaS.AlgServer.Options;
 using CVaS.AlgServer.Services;
 using CVaS.AlgServer.Services.BrokerReceiver;
 using CVaS.AlgServer.Services.MessageProcessor;
@@ -33,11 +34,11 @@ namespace CVaS.AlgServer
 
             Configuration = builder.Build();
 
-            var provider = ConfigureServices();
-            Configure(provider);
 
-            using (provider)
+            using (var provider = ConfigureServices())
             {
+                Configure(provider);
+
                 var server = provider.GetInstance<Server>();
                 server.Start();
             }
@@ -79,7 +80,8 @@ namespace CVaS.AlgServer
 
             container.RegisterFrom<BasicComposition>();
             container.RegisterInstance(Configuration);
-            container.RegisterInstance<IServiceContainer>(container);
+            // Just hack to not to try dispose container bcs of StackOverflow Exception (container calling dispose on container ..)
+            container.Register<IServiceFactory>(factory => factory);
 
             return container;
         }

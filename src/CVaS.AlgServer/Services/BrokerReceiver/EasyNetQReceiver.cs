@@ -1,4 +1,5 @@
-﻿using CVaS.AlgServer.Services.MessageProcessor;
+﻿using System;
+using CVaS.AlgServer.Services.MessageProcessor;
 using CVaS.Shared.Messages;
 using EasyNetQ;
 using Microsoft.Extensions.Logging;
@@ -21,6 +22,8 @@ namespace CVaS.AlgServer.Services.BrokerReceiver
             if (!_bus.IsConnected)
             {
                 _logger.LogDebug("Trying to communicate with bus that is not connected to RabbitMq server!");
+
+                //throw new ArgumentException("Trying to communite with disconnected bus");
             }
             else
             {
