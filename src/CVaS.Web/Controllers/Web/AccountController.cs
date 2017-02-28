@@ -11,6 +11,7 @@ using CVaS.Web.Models.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CVaS.Web.Controllers.Web
@@ -25,9 +26,11 @@ namespace CVaS.Web.Controllers.Web
         private readonly IEmailSender _emailSender;
         private readonly ICurrentUserProvider _currentUserProvider;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+        private readonly IMemoryCache _memoryCache;
 
         public AccountController(ILogger<AccountController> logger, AppSignInManager signInManager, AppUserManager userManager,
-            IApiKeyGenerator apiKeyGenerator, IEmailSender emailSender, ICurrentUserProvider currentUserProvider, IUnitOfWorkProvider unitOfWorkProvider)
+            IApiKeyGenerator apiKeyGenerator, IEmailSender emailSender, ICurrentUserProvider currentUserProvider, IUnitOfWorkProvider unitOfWorkProvider,
+            IMemoryCache memoryCache)
             : base(currentUserProvider)
         {
             _logger = logger;
@@ -37,6 +40,7 @@ namespace CVaS.Web.Controllers.Web
             _emailSender = emailSender;
             _currentUserProvider = currentUserProvider;
             _unitOfWorkProvider = unitOfWorkProvider;
+            _memoryCache = memoryCache;
         }
 
         // GET: /Account/Login
@@ -195,18 +199,28 @@ namespace CVaS.Web.Controllers.Web
             }
         }
 
-        [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> RevokeApiKey(SettingsViewModel viewModel)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RevokeApiKey()
         {
             using (var uow = _unitOfWorkProvider.Create())
             {
                 var user = await _userManager.GetUserAsync(User);
 
+                _memoryCache.Remove(user.ApiKey);
+
                 user.ApiKey = _apiKeyGenerator.Generate();
                 await uow.CommitAsync();
 
-                return View(nameof(Settings), viewModel);
+                var viewModel = new SettingsViewModel()
+                {
+                    Title = "Settings",
+                    ApiKey = user.ApiKey
+                };
+
+                InitializeLayoutModel(viewModel);
+
+                return View("Settings", viewModel);
             }
         }
 

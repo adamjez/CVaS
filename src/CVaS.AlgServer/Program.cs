@@ -1,11 +1,9 @@
 ﻿using System;
 using CVaS.AlgServer.Options;
-using CVaS.AlgServer.Services;
 using CVaS.AlgServer.Services.BrokerReceiver;
 using CVaS.AlgServer.Services.MessageProcessor;
 using CVaS.AlgServer.Services.Server;
 using CVaS.DAL;
-using CVaS.Shared.Core.Registry;
 using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
 using CVaS.Shared.Services.Launch;

@@ -9,7 +9,7 @@ namespace CVaS.BL.Common
 {
     public class AppSignInManager : SignInManager<AppUser>
     {
-        public AppSignInManager(AppUserManager userManager, IHttpContextAccessor contextAccessor, 
+        public AppSignInManager(UserManager<AppUser> userManager, IHttpContextAccessor contextAccessor, 
             IUserClaimsPrincipalFactory<AppUser> claimsFactory, IOptions<IdentityOptions> optionsAccessor, 
             ILogger<AppSignInManager> logger)
             : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger)

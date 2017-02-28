@@ -8,7 +8,7 @@ using RabbitMQ.Client;
 
 namespace CVaS.BL.Services.Broker
 {
-    public class BrokerSender : IBrokerSender
+    public class RabbitMqBrokerSender : IBrokerSender
     {
         private const string QueueName = "algBasicQueue";
 
@@ -16,7 +16,7 @@ namespace CVaS.BL.Services.Broker
         private IConnection _connection;
         private IModel _channel;
 
-        public BrokerSender(IOptions<BrokerOptions> brokerOptions)
+        public RabbitMqBrokerSender(IOptions<BrokerOptions> brokerOptions)
         {
             _brokerOptions = brokerOptions;
 

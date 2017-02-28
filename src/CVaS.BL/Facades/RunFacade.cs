@@ -116,6 +116,8 @@ namespace CVaS.BL.Facades
                 {
                     Id = run.Id,
                     CreatedAt = run.CreatedAt,
+                    FinishedAt = run.FinishedAt,
+
                     FileId = run.FileId,
                     Result = run.Result,
                     StdOut = run.StdOut,

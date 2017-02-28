@@ -10,11 +10,11 @@ namespace CVaS.BL.Common
 {
     public class AppUserManager : UserManager<AppUser>
     {
-        public AppUserManager(IOptions<IdentityOptions> optionsAccessor, AppUserStore appUserStore,
-            IPasswordHasher<AppUser> passwordHasher, IEnumerable<IUserValidator<AppUser>> userValidators, 
+        public AppUserManager(IOptions<IdentityOptions> optionsAccessor, IUserStore<AppUser> appUserStore,
+            IPasswordHasher<AppUser> passwordHasher, IEnumerable<IUserValidator<AppUser>> userValidators,
             IEnumerable<IPasswordValidator<AppUser>> passwordValidators, ILookupNormalizer keyNormalizer,
-            IdentityErrorDescriber errors, IServiceProvider services, ILogger<AppUserManager> logger) 
-            : base(appUserStore, optionsAccessor, passwordHasher, userValidators, passwordValidators, 
+            IdentityErrorDescriber errors, IServiceProvider services, ILogger<AppUserManager> logger)
+            : base(appUserStore, optionsAccessor, passwordHasher, userValidators, passwordValidators,
                 keyNormalizer, errors, services, logger)
         {
         }

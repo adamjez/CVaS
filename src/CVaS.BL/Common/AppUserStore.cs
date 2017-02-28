@@ -6,34 +6,37 @@ using System.Threading;
 using System.Threading.Tasks;
 using CVaS.DAL;
 using CVaS.DAL.Model;
+using CVaS.Shared.Core;
 using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CVaS.BL.Common
 {
     // Reworked official UserStore to support unit of work and repository pattern
     // Source: https://github.com/aspnet/Identity/blob/2d157783465505bd0d36480ebe2e595543faff34/src/Microsoft.AspNetCore.Identity.EntityFrameworkCore/UserStore.cs
-    public class AppUserStore : IUserStore<AppUser>, IUserRoleStore<AppUser>,  IUserPasswordStore<AppUser>, IUserSecurityStampStore<AppUser>, 
-        IUserEmailStore<AppUser>, IQueryableUserStore<AppUser>
+    public class AppUserStore : IUserRoleStore<AppUser>,  IUserPasswordStore<AppUser>, IUserSecurityStampStore<AppUser>, IUserEmailStore<AppUser>, IQueryableUserStore<AppUser>
     {
         private readonly UserRepository _userRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IdentityErrorDescriber _errorDescriber;
         private bool _disposed;
+        private IUnitOfWork _unitOfWork;
 
         public AppUserStore(UserRepository userRepository, IUnitOfWorkProvider unitOfWorkProvider, IdentityErrorDescriber describer = null)
         {
             _userRepository = userRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
             _errorDescriber = describer ?? new IdentityErrorDescriber();
+            
         }
 
         /// <summary>
         /// Gets the database context for this store.
         /// </summary>
-        public AppDbContext Context => _unitOfWorkProvider.GetCurrent().Context;
+        public AppDbContext Context => (_unitOfWorkProvider.GetCurrent() ?? (_unitOfWork = _unitOfWorkProvider.Create())).Context;
 
         /// <summary>
         /// Gets or sets a flag indicating if changes should be persisted after CreateAsync, UpdateAsync and DeleteAsync are called.
@@ -64,6 +67,7 @@ namespace CVaS.BL.Common
         /// </summary>
         public void Dispose()
         {
+            _unitOfWork?.Dispose();
             // We user UnitOfWork and Repository pattern so we don't dispose db context
             _disposed = true;
         }
@@ -274,6 +278,7 @@ namespace CVaS.BL.Common
             {
                 throw new ArgumentNullException(nameof(user));
             }
+
             var userId = user.Id;
             var query = from userRole in UserRoles
                         join role in Roles on userRole.RoleId equals role.Id
@@ -471,7 +476,7 @@ namespace CVaS.BL.Common
         /// <summary>
         /// A navigation property for the user roles the store contains.
         /// </summary>
-        public virtual DbSet<AppUserRole> UserRoles => Context.Set<AppUserRole>();
+        public virtual DbSet<IdentityUserRole<int>> UserRoles => Context.UserRoles;
 
         /// <summary>
         /// Converts the provided <paramref name="id"/> to a strongly typed key object.

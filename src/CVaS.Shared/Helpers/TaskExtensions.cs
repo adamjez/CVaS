@@ -30,12 +30,12 @@ namespace CVaS.Shared.Helpers
         {
             public TaskWithTimeout(T value)
             {
-                Timeouted = false;
+                Completed = true;
                 Value = value;
             }
 
             public T Value { get; private set; }
-            public bool Timeouted { get; private set; }
+            public bool Completed { get; private set; }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

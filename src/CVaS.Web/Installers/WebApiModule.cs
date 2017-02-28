@@ -26,7 +26,7 @@ namespace CVaS.Web.Installers
                 serviceRegistry.Register<IProcessService, BaseProcessService>();
             }
 
-            serviceRegistry.Register<BrokerSender>(new PerContainerLifetime());
+            serviceRegistry.Register<RabbitMqBrokerSender>(new PerContainerLifetime());
             serviceRegistry.Register<IBrokerSender, EasyNetQBrokerSender>(new PerRequestLifeTime());
 
             serviceRegistry.Register<ICurrentUserProvider, CurrentUserProvider>();

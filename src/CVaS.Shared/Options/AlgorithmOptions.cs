@@ -1,4 +1,4 @@
-﻿namespace CVaS.Shared.Services.Process
+namespace CVaS.Shared.Options
 {
     public class AlgorithmOptions
     {

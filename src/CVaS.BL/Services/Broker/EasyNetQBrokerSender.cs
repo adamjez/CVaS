@@ -24,7 +24,7 @@ namespace CVaS.BL.Services.Broker
         {
             var result = await SendAsync(message).WithTimeout(timeout);
 
-            if (result.Timeouted)
+            if (result.Completed)
             {
                 throw new TimeoutException();
             }

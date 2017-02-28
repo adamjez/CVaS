@@ -17,10 +17,8 @@ using MySQL.Data.EntityFrameworkCore.Extensions;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger.Model;
 using LightInject.Microsoft.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Swashbuckle.SwaggerGen.Application;
-using AlgorithmOptions = CVaS.Shared.Services.Process.AlgorithmOptions;
 
 namespace CVaS.Web
 {
@@ -82,6 +80,8 @@ namespace CVaS.Web
                     options.Cookies.ApplicationCookie.AutomaticChallenge = true;
                 })
                 .AddEntityFrameworkStores<AppDbContext, int>()
+                .AddUserManager<AppUserManager>()
+                .AddUserStore<AppUserStore>()
                 .AddDefaultTokenProviders();
 
             // Add framework services.
@@ -92,6 +92,8 @@ namespace CVaS.Web
                     options.SerializerSettings.Converters.Add(new StringEnumConverter(true));
                 })
                 .AddXmlDataContractSerializerFormatters();
+
+            services.AddMemoryCache();
 
             // Inject an implementation of ISwaggerProvider with defaulted settings applied
             services.AddSwaggerGen(SwaggerSetup);
@@ -119,7 +121,6 @@ namespace CVaS.Web
 
             Configuration.GetSection("Mode").Bind(BusinessLayerComposition.ModeOptions);
             Configuration.GetSection("Database").Bind(_databaseOptions);
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

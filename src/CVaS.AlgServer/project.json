@@ -11,18 +11,18 @@
     "Microsoft.Extensions.Configuration": "1.0.1",
     "Microsoft.Extensions.Configuration.Json": "1.0.1",
     "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.1",
-    "LightInject": "4.1.5",
-    "LightInject.Microsoft.DependencyInjection": "1.1.1",
     "RabbitMQ.Client": "4.1.1",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.1",
     "Microsoft.Extensions.Logging": "1.0.1",
     "Microsoft.Extensions.Logging.Console": "1.0.1",
     "Microsoft.Extensions.Logging.Debug": "1.0.1",
     "Microsoft.Extensions.DependencyInjection": "1.0.1",
-    "Microsoft.EntityFrameworkCore.SqlServer": "1.0.1",
+    "Microsoft.EntityFrameworkCore.SqlServer": "1.0.2",
     "CVaS.Shared": "1.0.0-*",
     "EasyNetQ": "2.0.4-netcore1438",
-    "CVaS.DAL": "1.0.0-*"
+    "CVaS.DAL": "1.0.0-*",
+    "LightInject": "4.1.5",
+    "LightInject.Microsoft.DependencyInjection": "1.1.1"
   },
   "frameworks": {
     "netcoreapp1.0": {

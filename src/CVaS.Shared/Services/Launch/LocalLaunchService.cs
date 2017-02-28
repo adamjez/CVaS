@@ -8,7 +8,7 @@ using CVaS.Shared.Core;
 using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Helpers;
 using CVaS.Shared.Models;
-using CVaS.Shared.Providers;
+using CVaS.Shared.Options;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.File;
 using CVaS.Shared.Services.Process;
@@ -50,7 +50,7 @@ namespace CVaS.Shared.Services.Launch
 
 
                 var result = await task.WithTimeout(TimeSpan.FromSeconds(_options.Value.LightTimeout));
-                if (result.Timeouted)
+                if (!result.Completed)
                 {
                     // timeout/cancellation logic
                     task.ContinueWith(async action =>
@@ -75,7 +75,7 @@ namespace CVaS.Shared.Services.Launch
                     StdOut = result.Value.StdOut,
                     StdErr = result.Value.StdError,
                     RunId = run.Id,
-                    Duration = (result.Value.FinishedAt - result.Value.StartedAt).TotalSeconds
+                    Duration = (result.Value.FinishedAt - result.Value.StartedAt).TotalMilliseconds
                 };
             }
         }

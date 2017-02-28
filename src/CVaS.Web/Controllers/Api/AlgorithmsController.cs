@@ -37,7 +37,7 @@ namespace CVaS.Web.Controllers.Api
         /// <param name="codeName">CodeName of the algorithm to be run.</param>
         /// <param name="options">Options are translated to command-line arguments</param>
         [HttpPost("{codeName}")]
-        [Produces(typeof(ProcessResult))]
+        [Produces(typeof(AlgorithmResult))]
         public async Task<IActionResult> Process(string codeName, [FromBody] object options)
         {
             if (!ModelState.IsValid)
@@ -64,11 +64,6 @@ namespace CVaS.Web.Controllers.Api
             }
 
             var result = await _runFacade.RunProcessAsync(codeName, parsedOptions);
-
-            if (result.Result == RunResultType.NotFinished)
-            {
-                return Ok(new { result.RunId, result.Result });
-            }
 
             return Ok(new AlgorithmResult
             {

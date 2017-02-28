@@ -2,12 +2,12 @@
   "version": "1.0.0-*",
   "dependencies": {
     "CVaS.DAL": "1.0.0-*",
-    "NETStandard.Library": "1.6.0",
+    "NETStandard.Library": "1.6.1",
     "Microsoft.Extensions.Configuration": "1.0.1",
     "System.Diagnostics.Process": "4.3.0",
-    "LightInject": "4.1.5",
     "EasyNetQ": "2.0.4-netcore1438",
-    "Microsoft.Extensions.Options": "1.0.1"
+    "Microsoft.Extensions.Options": "1.0.1",
+    "LightInject": "4.1.5"
   },
   "frameworks": {
     "netstandard1.6": {
