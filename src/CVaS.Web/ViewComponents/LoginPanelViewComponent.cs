@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using CVaS.DAL.Model;
 using CVaS.Shared.Providers;
 using CVaS.Web.Models;
 using CVaS.Web.Providers;
@@ -20,7 +21,8 @@ namespace CVaS.Web.ViewComponents
             var login = new LoginPanelViewModel()
             {
                 SignedIn = _currentUserProvider.Exists,
-                CurrentUserName = _currentUserProvider.UserName
+                CurrentUserName = _currentUserProvider.UserName,
+                IsAdmin = _currentUserProvider.IsInRole(Roles.Admin)
             };
         
             return View(login);

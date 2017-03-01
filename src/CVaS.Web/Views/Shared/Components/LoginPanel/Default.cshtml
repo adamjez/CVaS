@@ -3,22 +3,56 @@
 @if (Model.SignedIn)
 {
     <ul class="nav navbar-nav">
-        <li><a asp-area="" asp-controller="Core" asp-action="Algorithms">Algorithms</a></li>
+        <li role="presentation" class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                Algorithms <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a asp-area="" asp-controller="Core" asp-action="Algorithms" asp-route-id="license-plate-recognition">License Plate Recognition</a>
+                </li>
+            </ul>
+        </li>
+
         <li><a asp-area="" asp-controller="Core" asp-action="Upload">Upload Files</a></li>
+        
+        <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+
     </ul>
-    <form asp-area="" asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm" class="navbar-right">
-        <ul class="nav navbar-nav navbar-right">
-            <li>
-                <a asp-controller="Account" asp-action="Settings">Hello @Model.CurrentUserName!</a>
-            </li>
-            <li>
-                <button type="submit" class="btn btn-link navbar-btn navbar-link">Log off</button>
-            </li>
-        </ul>
-    </form>
+
+    <ul class="nav navbar-nav navbar-right">
+        <li role="presentation" class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                Hello @Model.CurrentUserName! <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                @if (Model.IsAdmin)
+                {
+                    <li>
+                        <a asp-controller="Admin" asp-action="Index">Admin Section</a>
+                    </li>
+                }
+                <li>
+                    <a asp-controller="Account" asp-action="Settings">Settings</a>
+                </li>
+                <li role="separator" class="divider"></li>
+                <li>
+                    <form asp-area="" asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm">
+                        <button type="submit" class="btn btn-link btn-logout">Log off</button>
+                    </form>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
 }
 else
 {
+    <ul class="nav navbar-nav">
+        <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+        <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+    </ul>
+
     <ul class="nav navbar-nav navbar-right">
         <li><a asp-area="" asp-controller="Account" asp-action="Register">Register</a></li>
         <li><a asp-area="" asp-controller="Account" asp-action="Login">Log in</a></li>

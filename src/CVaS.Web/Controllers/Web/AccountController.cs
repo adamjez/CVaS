@@ -17,15 +17,15 @@ namespace CVaS.Web.Controllers.Web
     public class AccountController : WebController
     {
         private readonly ILogger<AccountController> _logger;
-        private readonly AppSignInManager _signInManager;
-        private readonly AppUserManager _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly UserManager<AppUser> _userManager;
         private readonly IApiKeyGenerator _apiKeyGenerator;
         private readonly IEmailSender _emailSender;
         private readonly ICurrentUserProvider _currentUserProvider;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly ApiKeyManager _apiKeyManager;
 
-        public AccountController(ILogger<AccountController> logger, AppSignInManager signInManager, AppUserManager userManager,
+        public AccountController(ILogger<AccountController> logger, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager,
             IApiKeyGenerator apiKeyGenerator, IEmailSender emailSender, ICurrentUserProvider currentUserProvider, IUnitOfWorkProvider unitOfWorkProvider,
             ApiKeyManager apiKeyManager)
             : base(currentUserProvider)

@@ -62,3 +62,38 @@ textarea {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+h2 {
+    font-size: 14px;
+    font-weight: 700;
+    /*color: #959595;*/
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    padding-bottom: 9px;
+    margin: 30px 0 20px;
+
+    border-bottom: 1px solid #eee;
+}
+
+/* Button Logout */
+.navbar-inverse .btn-logout {
+  width: 100%;
+  padding: 3px 20px;
+  text-align: left;
+}
+
+.navbar-inverse .in .btn-link:hover, .navbar-inverse .in .btn-link:focus {
+    color: #fff;
+}
+
+.navbar-inverse .btn-logout:hover, .navbar-inverse .btn-logout:focus {
+    color: #23527c;
+    text-decoration: underline;
+    background-color: transparent;
+}
+
+/* Admin Section */
+.admin-tabs .nav-tabs {
+    margin-bottom: 15px;
+}

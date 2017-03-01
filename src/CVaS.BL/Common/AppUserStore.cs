@@ -17,13 +17,13 @@ namespace CVaS.BL.Common
 {
     // Reworked official UserStore to support unit of work and repository pattern
     // Source: https://github.com/aspnet/Identity/blob/2d157783465505bd0d36480ebe2e595543faff34/src/Microsoft.AspNetCore.Identity.EntityFrameworkCore/UserStore.cs
-    public class AppUserStore : IUserRoleStore<AppUser>,  IUserPasswordStore<AppUser>, IUserSecurityStampStore<AppUser>, IUserEmailStore<AppUser>, IQueryableUserStore<AppUser>
+    public class AppUserStore : IUserRoleStore<AppUser>, IUserPasswordStore<AppUser>, IUserSecurityStampStore<AppUser>, IUserEmailStore<AppUser>, IQueryableUserStore<AppUser>
     {
-        private readonly UserRepository _userRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IdentityErrorDescriber _errorDescriber;
         private bool _disposed;
         private IUnitOfWork _unitOfWork;
+        private readonly UserRepository _userRepository;
 
         public AppUserStore(UserRepository userRepository, IUnitOfWorkProvider unitOfWorkProvider, IdentityErrorDescriber describer = null)
         {
@@ -31,6 +31,20 @@ namespace CVaS.BL.Common
             _unitOfWorkProvider = unitOfWorkProvider;
             _errorDescriber = describer ?? new IdentityErrorDescriber();
             
+        }
+
+        protected UserRepository UserRepository
+        {
+            get
+            {
+                // Accessing Context creates it if it not exsists => repository needs it
+                if (Context == null)
+                {
+                    throw new ArgumentNullException(nameof(Context));
+                }
+
+                return _userRepository;
+            }
         }
 
         /// <summary>
@@ -68,6 +82,7 @@ namespace CVaS.BL.Common
         public void Dispose()
         {
             _unitOfWork?.Dispose();
+            _unitOfWork = null;
             // We user UnitOfWork and Repository pattern so we don't dispose db context
             _disposed = true;
         }
@@ -144,8 +159,8 @@ namespace CVaS.BL.Common
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            
-            _userRepository.Insert(user);
+
+            UserRepository.Insert(user);
             await SaveChanges(cancellationToken);
 
             return IdentityResult.Success;
@@ -185,7 +200,7 @@ namespace CVaS.BL.Common
                 throw new ArgumentNullException(nameof(user));
             }
 
-            _userRepository.Delete(user);
+            UserRepository.Delete(user);
             try
             {
                 await SaveChanges(cancellationToken);
@@ -203,7 +218,7 @@ namespace CVaS.BL.Common
             ThrowIfDisposed();
 
             var id = ConvertIdFromString(userId);
-            return _userRepository.GetById(id);
+            return UserRepository.GetById(id);
         }
 
         public Task<AppUser> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
