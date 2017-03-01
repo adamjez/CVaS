@@ -93,7 +93,7 @@ namespace CVaS.Web
                 })
                 .AddXmlDataContractSerializerFormatters();
 
-            services.AddMemoryCache();
+            services.AddMemoryCache(options => options.CompactOnMemoryPressure = true);
 
             // Inject an implementation of ISwaggerProvider with defaulted settings applied
             services.AddSwaggerGen(SwaggerSetup);

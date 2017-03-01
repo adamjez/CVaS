@@ -1,9 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CVaS.BL.Common;
 using CVaS.BL.Services.ApiKey;
 using CVaS.BL.Services.Email;
-using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Providers;
@@ -11,7 +9,6 @@ using CVaS.Web.Models.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CVaS.Web.Controllers.Web
@@ -26,11 +23,11 @@ namespace CVaS.Web.Controllers.Web
         private readonly IEmailSender _emailSender;
         private readonly ICurrentUserProvider _currentUserProvider;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-        private readonly IMemoryCache _memoryCache;
+        private readonly ApiKeyManager _apiKeyManager;
 
         public AccountController(ILogger<AccountController> logger, AppSignInManager signInManager, AppUserManager userManager,
             IApiKeyGenerator apiKeyGenerator, IEmailSender emailSender, ICurrentUserProvider currentUserProvider, IUnitOfWorkProvider unitOfWorkProvider,
-            IMemoryCache memoryCache)
+            ApiKeyManager apiKeyManager)
             : base(currentUserProvider)
         {
             _logger = logger;
@@ -40,7 +37,7 @@ namespace CVaS.Web.Controllers.Web
             _emailSender = emailSender;
             _currentUserProvider = currentUserProvider;
             _unitOfWorkProvider = unitOfWorkProvider;
-            _memoryCache = memoryCache;
+            _apiKeyManager = apiKeyManager;
         }
 
         // GET: /Account/Login
@@ -203,25 +200,15 @@ namespace CVaS.Web.Controllers.Web
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RevokeApiKey()
         {
-            using (var uow = _unitOfWorkProvider.Create())
+            var viewModel = new SettingsViewModel()
             {
-                var user = await _userManager.GetUserAsync(User);
+                Title = "Settings",
+                ApiKey = await _apiKeyManager.RevokeAsync(CurrentUserProvider.Id)
+            };
 
-                _memoryCache.Remove(user.ApiKey);
+            InitializeLayoutModel(viewModel);
 
-                user.ApiKey = _apiKeyGenerator.Generate();
-                await uow.CommitAsync();
-
-                var viewModel = new SettingsViewModel()
-                {
-                    Title = "Settings",
-                    ApiKey = user.ApiKey
-                };
-
-                InitializeLayoutModel(viewModel);
-
-                return View("Settings", viewModel);
-            }
+            return View("Settings", viewModel);
         }
 
 

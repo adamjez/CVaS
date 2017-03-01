@@ -43,6 +43,7 @@
     }
   },
   "buildOptions": {
+    "warningsAsErrors": true,
     "emitEntryPoint": true,
     "preserveCompilationContext": true,
     "debugType": "portable",

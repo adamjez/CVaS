@@ -4,13 +4,10 @@ using CVaS.BL.Services.ApiKey;
 using CVaS.BL.Services.ArgumentTranslator;
 using CVaS.BL.Services.Email;
 using CVaS.BL.Services.Launch;
-using CVaS.DAL.Model;
 using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
 using CVaS.Shared.Services.Launch;
 using LightInject;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 
 namespace CVaS.BL.Installers
 {
@@ -22,6 +19,8 @@ namespace CVaS.BL.Installers
         {
             BasicComposition.IsWebApplication = true;
             serviceRegistry.RegisterFrom<BasicComposition>();
+
+            serviceRegistry.Register<ApiKeyManager>(new PerRequestLifeTime());
 
             serviceRegistry.Register<AppUserStore>(new PerRequestLifeTime());
             serviceRegistry.Register<AppUserManager>(new PerRequestLifeTime());
