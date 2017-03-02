@@ -264,7 +264,7 @@ namespace CVaS.DAL.Migrations
             modelBuilder.Entity("CVaS.DAL.Model.Run", b =>
                 {
                     b.HasOne("CVaS.DAL.Model.Algorithm", "Algorithm")
-                        .WithMany()
+                        .WithMany("Runs")
                         .HasForeignKey("AlgorithmId")
                         .OnDelete(DeleteBehavior.Cascade);
 

@@ -1,10 +1,10 @@
-﻿@{
-}
+﻿@model CVaS.Web.Models.AdminSectionViewModel
+
 
 <h2>@Model.Title</h2>
 
 <div class="admin-tabs">
-    <ul id="mainTab" class="nav nav-tabs nav-justified"">
+    <ul id="mainTab" class="nav nav-tabs nav-justified">
         <li role="presentation" class="active">
             <a href="#users">Users</a>
         </li>
@@ -22,76 +22,53 @@
             <p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor, williamsburg carles vegan helvetica. Reprehenderit butcher retro keffiyeh dreamcatcher synth. Cosby sweater eu banh mi, qui irure terry richardson ex squid. Aliquip placeat salvia cillum iphone. Seitan aliquip quis cardigan american apparel, butcher voluptate nisi qui.</p>
         </div>
         <div class="tab-pane fade" role="tabpanel" id="algorithms" aria-labelledby="algorithms-tab">
-            <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit. Keytar helvetica VHS salvia yr, vero magna velit sapiente labore stumptown. Vegan fanny pack odio cillum wes anderson 8-bit, sustainable jean shorts beard ut DIY ethical culpa terry richardson biodiesel. Art party scenester stumptown, tumblr butcher vero sint qui sapiente accusamus tattooed echo park.</p>
+            <table class="table table-striped">
+                <caption>All Algorithms with their statistics</caption>
+                <thead>
+                    <tr>
+                        <th>CodeName</th>
+                        <th>Description</th>
+
+                        <th>Last Hour</th>
+                        <th>Last Day</th>
+                        <th>All Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var algorithm in Model.Algorithms)
+                    {
+                        <tr>
+                            <td>@algorithm.CodeName</td>
+                            <td>@algorithm.Description</td>
+                            <td>@algorithm.LaunchCountLastHour</td>
+                            <td>@algorithm.LaunchCountLastDay</td>
+                            <td>@algorithm.LaunchCount</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
         <div class="tab-pane fade" role="tabpanel" id="statistics" aria-labelledby="statistics-tab">
             <p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh mi whatever gluten-free, carles pitchfork biodiesel fixie etsy retro mlkshk vice blog. Scenester cred you probably haven't heard of them, vinyl craft beer blog stumptown. Pitchfork sustainable tofu synth chambray yr.</p>
         </div>
     </div>
 </div>
-<div class="row">
-        <div class="col-md-12">
-            <section>
-                @*<div>
-                        <h4>Current API KEY</h4>
-                        <hr />
-                        <div class="container">
-                            <div class="col-md-9">
-                                <pre>@Model.ApiKey</pre>
-                            </div>
-                            <div class="col-md-3">
-                                <form asp-controller="Account" asp-action="RevokeApiKey" method="post" class="form-horizontal">
-                                    <div class="form-group">
-                                        <div class="">
-                                            <button type="submit" class="btn btn-default btn-danger">Reset</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <form asp-controller="Account" asp-action="ChangePassword" method="post" class="form-horizontal">
-                            <h4>Change Password</h4>
-                            <hr />
-                            <div asp-validation-summary="All" class="text-danger"></div>
-                            <div class="form-group">
-                                <label asp-for="OldPassword" class="col-md-2 control-label"></label>
-                                <div class="col-md-10">
-                                    <input asp-for="OldPassword" class="form-control" />
-                                    <span asp-validation-for="OldPassword" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="NewPassword" class="col-md-2 control-label"></label>
-                                <div class="col-md-10">
-                                    <input asp-for="NewPassword" class="form-control" />
-                                    <span asp-validation-for="NewPassword" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="ConfirmPassword" class="col-md-2 control-label"></label>
-                                <div class="col-md-10">
-                                    <input asp-for="ConfirmPassword" class="form-control" />
-                                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-md-offset-2 col-md-10">
-                                    <button type="submit" class="btn btn-default">Change password</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>*@
-            </section>
-        </div>
-    </div>
 
 @section Scripts {
     <script>
         $('#mainTab a').click(function (e) {
             e.preventDefault();
             $(this).tab('show');
-        })
+        });
+
+        // store the currently selected tab in the hash value
+        $("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
+            var id = $(e.target).attr("href").substr(1);
+            window.location.hash = id;
+        });
+
+        // on load of the page: switch to the currently selected tab
+        var hash = window.location.hash;
+        $('#mainTab a[href="' + hash + '"]').tab('show');
     </script>
 }

@@ -1,4 +1,6 @@
-﻿using CVaS.DAL.Model;
+﻿using System.Threading.Tasks;
+using CVaS.BL.Facades;
+using CVaS.DAL.Model;
 using CVaS.Shared.Providers;
 using CVaS.Web.Authentication;
 using CVaS.Web.Models;
@@ -10,19 +12,25 @@ namespace CVaS.Web.Controllers.Web
     [Authorize(Roles = Roles.Admin, ActiveAuthenticationSchemes = AuthenticationScheme.WebCookie)]
     public class AdminController : WebController
     {
-        public AdminController(ICurrentUserProvider currentUserProvider)
+        private readonly AlgoFacade _algoFacade;
+
+        public AdminController(ICurrentUserProvider currentUserProvider, AlgoFacade algoFacade)
             : base(currentUserProvider)
         {
+            _algoFacade = algoFacade;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var layout = new LayoutViewModel
+            var layout = new AdminSectionViewModel
             {
-                Title = "Admin Section"
+                Title = "Admin Section",
+                Algorithms = await _algoFacade.GetAllWithStats()
             };
 
-            return View(InitializeLayoutModel(layout));
+            InitializeLayoutModel(layout);
+
+            return View(layout);
         }
     }
 }

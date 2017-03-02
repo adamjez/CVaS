@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 using CVaS.DAL.Common;
 
 namespace CVaS.DAL.Model
@@ -21,5 +21,7 @@ namespace CVaS.DAL.Model
         public string FilePath { get; set; }
 
         public string Description { get; set; }
+
+        public virtual ICollection<Run> Runs { get; private set; } = new Collection<Run>();
     }
 }
