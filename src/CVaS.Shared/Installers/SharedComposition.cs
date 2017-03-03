@@ -16,7 +16,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CVaS.Shared.Installers
 {
-    public class BasicComposition : ICompositionRoot
+    public class SharedComposition : ICompositionRoot
     {
         public static bool IsWebApplication { get; set; }
 
@@ -39,6 +39,8 @@ namespace CVaS.Shared.Installers
 
             serviceRegistry.Register<BrokerFactory>(new PerContainerLifetime());
             serviceRegistry.Register<IBus>(s => s.GetInstance<BrokerFactory>().Bus, new PerContainerLifetime());
+            serviceRegistry.Register<BrokerStatus>(new PerRequestLifeTime());
+            
 
             serviceRegistry.Register<Func<AppDbContext>>(c =>
             {
@@ -63,6 +65,7 @@ namespace CVaS.Shared.Installers
             serviceRegistry.Register<AlgorithmRepository>();
             serviceRegistry.Register<RunRepository>();
             serviceRegistry.Register<UserRepository>();
+            serviceRegistry.Register<RuleRepository>();
 
             serviceRegistry.Register<AlgorithmFileProvider>();
             serviceRegistry.Register<TemporaryFileProvider>();

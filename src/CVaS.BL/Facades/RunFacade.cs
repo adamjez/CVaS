@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CVaS.BL.Services.ArgumentTranslator;
@@ -54,13 +55,6 @@ namespace CVaS.BL.Facades
                     throw new NotFoundException("Given algorithm codeName doesn't exists");
                 }
 
-                var filePath = _algFileProvider.GetAlgorithmFilePath(codeName, algorithm.FilePath);
-
-                if (!_fileProvider.Exists(filePath))
-                {
-                    throw new NotFoundException("Given algorithm execution file doesn't exists");
-                }
-
                 var args = await _argumentTranslator.ProcessAsync(arguments);
 
                 // Create Run In Db
@@ -74,7 +68,7 @@ namespace CVaS.BL.Facades
                 _runRepository.Insert(run);
                 await uow.CommitAsync();
 
-                return await _launchService.LaunchAsync(filePath, args, run);
+                return await _launchService.LaunchAsync(codeName, algorithm.FilePath, args, run);
             }
         }
 

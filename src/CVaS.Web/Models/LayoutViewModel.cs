@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CVaS.BL.DTO;
+using CVaS.Web.Models.AccountViewModels;
 
 namespace CVaS.Web.Models
 {
@@ -17,6 +18,9 @@ namespace CVaS.Web.Models
     public class AdminSectionViewModel : LayoutViewModel
     {
         public List<AlgorithmStatsListDTO> Algorithms { get; set; }
+        public List<RuleDTO> Rules { get; set; }
+        public RuleViewModel NewRule { get; set; }
+        public StatsDTO Stats { get; set; }
     }
 
     public class LoginPanelViewModel

@@ -25,28 +25,28 @@ textarea {
 
 /* buttons and links extension to use brackets: [ click me ] */
 .btn-bracketed::before {
-    display:inline-block;
+    display: inline-block;
     content: "[";
     padding-right: 0.5em;
 }
+
 .btn-bracketed::after {
-    display:inline-block;
+    display: inline-block;
     content: "]";
     padding-left: 0.5em;
 }
 
 /* Make .svg files in the carousel display properly in older browsers */
-.carousel-inner .item img[src$=".svg"]
-{
+.carousel-inner .item img[src$=".svg"] {
     width: 100%;
 }
 
 /* Hide/rearrange for smaller screens */
 @media screen and (max-width: 767px) {
-  /* Hide captions */
-  .carousel-caption {
-    display: none
-  }
+    /* Hide captions */
+    .carousel-caption {
+        display: none;
+    }
 }
 
 .loader {
@@ -59,8 +59,13 @@ textarea {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 h2 {
@@ -69,18 +74,17 @@ h2 {
     /*color: #959595;*/
     text-transform: uppercase;
     letter-spacing: 1px;
-
     padding-bottom: 9px;
     margin: 30px 0 20px;
-
     border-bottom: 1px solid #eee;
 }
 
 /* Button Logout */
 .navbar-inverse .btn-logout {
-  width: 100%;
-  padding: 3px 20px;
-  text-align: left;
+    width: 100%;
+    padding: 3px 20px;
+    text-align: left;
+    /*color: #000;*/
 }
 
 .navbar-inverse .in .btn-link:hover, .navbar-inverse .in .btn-link:focus {
@@ -96,4 +100,38 @@ h2 {
 /* Admin Section */
 .admin-tabs .nav-tabs {
     margin-bottom: 15px;
+}
+
+.admin-tabs input {
+    max-width: 100%;
+}
+
+.api-key-input {
+    display: block;
+    padding: 9.5px;
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.42857143;
+    color: #333;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+
+    max-width: 100%;
+    white-space: pre;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+img.clippy {
+    width: 13px;
+    margin-top: -2px;
+}
+
+h4 {
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    border: 0;
+    border-bottom: 1px solid #eee;
 }

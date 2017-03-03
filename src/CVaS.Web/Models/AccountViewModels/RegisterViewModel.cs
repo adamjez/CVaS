@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace CVaS.Web.Models.AccountViewModels
 {
@@ -6,7 +7,6 @@ namespace CVaS.Web.Models.AccountViewModels
     {
         [Required]
         [EmailAddress]
-        [RegularExpression(@"(?i).*@(stud\.)?fit\.vutbr\.cz$", ErrorMessage = "Registration is open only to @fit.vutbr.cz or @stud.fit.vutbr.cz email addresses")]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
@@ -20,5 +20,12 @@ namespace CVaS.Web.Models.AccountViewModels
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+    }
+
+    public class RuleViewModel
+    {
+        [Required]
+        [Display(Name = "Regex")]
+        public string Regex { get; set; }
     }
 }

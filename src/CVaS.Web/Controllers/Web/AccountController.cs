@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CVaS.BL.Common;
+using CVaS.BL.Facades;
 using CVaS.BL.Services.ApiKey;
 using CVaS.BL.Services.Email;
 using CVaS.DAL.Model;
@@ -24,10 +25,11 @@ namespace CVaS.Web.Controllers.Web
         private readonly ICurrentUserProvider _currentUserProvider;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly ApiKeyManager _apiKeyManager;
+        private readonly RuleFacade _ruleFacade;
 
         public AccountController(ILogger<AccountController> logger, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager,
             IApiKeyGenerator apiKeyGenerator, IEmailSender emailSender, ICurrentUserProvider currentUserProvider, IUnitOfWorkProvider unitOfWorkProvider,
-            ApiKeyManager apiKeyManager)
+            ApiKeyManager apiKeyManager, RuleFacade ruleFacade)
             : base(currentUserProvider)
         {
             _logger = logger;
@@ -38,6 +40,7 @@ namespace CVaS.Web.Controllers.Web
             _currentUserProvider = currentUserProvider;
             _unitOfWorkProvider = unitOfWorkProvider;
             _apiKeyManager = apiKeyManager;
+            _ruleFacade = ruleFacade;
         }
 
         // GET: /Account/Login
@@ -114,7 +117,7 @@ namespace CVaS.Web.Controllers.Web
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
+            if (ModelState.IsValid &&  await _ruleFacade.Validate(model.Email))
             {
                 using (_unitOfWorkProvider.Create())
                 {
@@ -145,6 +148,8 @@ namespace CVaS.Web.Controllers.Web
                     AddErrors(result);
                 }
             }
+
+            ModelState.AddModelError(nameof(model.Email), "Email Address is not in allowed email address list.");
 
             // If we got this far, something failed, redisplay form
             return View(model);

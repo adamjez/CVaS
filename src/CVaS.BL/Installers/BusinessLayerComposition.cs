@@ -17,8 +17,8 @@ namespace CVaS.BL.Installers
 
         public void Compose(IServiceRegistry serviceRegistry)
         {
-            BasicComposition.IsWebApplication = true;
-            serviceRegistry.RegisterFrom<BasicComposition>();
+            SharedComposition.IsWebApplication = true;
+            serviceRegistry.RegisterFrom<SharedComposition>();
 
             serviceRegistry.Register<ApiKeyManager>(new PerRequestLifeTime());
 
@@ -29,6 +29,8 @@ namespace CVaS.BL.Installers
             serviceRegistry.Register<AlgoFacade>();
             serviceRegistry.Register<FileFacade>();
             serviceRegistry.Register<RunFacade>();
+            serviceRegistry.Register<RuleFacade>();
+            serviceRegistry.Register<StatsFacade>();
 
             serviceRegistry.Register<IApiKeyGenerator, RndApiKeyGenerator>();
             serviceRegistry.Register<IArgumentTranslator, BaseArgumentTranslator>();

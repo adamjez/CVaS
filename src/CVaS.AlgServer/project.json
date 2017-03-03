@@ -1,8 +1,6 @@
 {
   "version": "1.0.0-*",
-  "buildOptions": {
-    "emitEntryPoint": true
-  },
+
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
@@ -29,6 +27,32 @@
       "imports": "dnxcore50"
     }
   },
+
+  "buildOptions": {
+    "emitEntryPoint": true
+  },
+
+  "runtimeOptions": {
+    "configProperties": {
+      "System.GC.Server": true
+    }
+  },
+
   "configurations": {
+  },
+
+  "publishOptions": {
+    "include": [
+      "appsettings.json",
+      "appsettings.*.json",
+      "Dockerfile",
+      ".dockerignore"
+    ]
+  },
+
+  "scripts": {
+    "postpublish": [
+      "docker build -t user/cvas.algserver %publish:OutputPath%"
+    ]
   }
 }

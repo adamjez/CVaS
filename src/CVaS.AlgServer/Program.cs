@@ -7,7 +7,6 @@ using CVaS.DAL;
 using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
 using CVaS.Shared.Services.Launch;
-using CVaS.Shared.Services.Process;
 using LightInject;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,6 +61,14 @@ namespace CVaS.AlgServer
             // We choose what database provider we will use
             // In configuration have to be "MySQL" or "MSSQL" 
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
+
+            if (connectionString == null)
+            {
+                Console.WriteLine("ERROR: Connection string is empty");
+                Console.WriteLine("Most common cause is missing environment variable with (e.g. NETCORE_ENVIRONMENT=Development)");
+                throw new ArgumentNullException(nameof(connectionString));
+            }
+
             if (databaseConfiguration.Provider == "MySQL")
             {
                 services.AddDbContext<AppDbContext>(options =>
@@ -76,7 +83,7 @@ namespace CVaS.AlgServer
             var container = new LightInject.ServiceContainer();
             container.CreateServiceProvider(services);
 
-            container.RegisterFrom<BasicComposition>();
+            container.RegisterFrom<SharedComposition>();
             container.RegisterInstance(Configuration);
             // Just hack to not to try dispose container bcs of StackOverflow Exception (container calling dispose on container ..)
             container.Register<IServiceFactory>(factory => factory);

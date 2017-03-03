@@ -51,7 +51,8 @@ namespace CVaS.BL.Common
                     {
                         UserName = username,
                         Email = email,
-                        ApiKey = _apiKeyGenerator.Generate()
+                        ApiKey = _apiKeyGenerator.Generate(),
+                        EmailConfirmed = true
                     };
                     var userManager = _userManagerFactory();
 

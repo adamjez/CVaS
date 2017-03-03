@@ -8,9 +8,10 @@ using CVaS.DAL;
 namespace CVaS.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170303163818_AddedRuleEntity")]
+    partial class AddedRuleEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.2")
@@ -73,8 +74,6 @@ namespace CVaS.DAL.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
-
-                    b.Property<DateTime>("CreatedAt");
 
                     b.Property<string>("Email")
                         .HasAnnotation("MaxLength", 256);
@@ -186,7 +185,7 @@ namespace CVaS.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Runs");
+                    b.ToTable("Run");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<int>", b =>

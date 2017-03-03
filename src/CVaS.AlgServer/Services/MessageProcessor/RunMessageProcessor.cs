@@ -34,9 +34,9 @@ namespace CVaS.AlgServer.Services.MessageProcessor
             {
                 using (_unitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
                 {
-                    var run = await _runRepository.GetById(request.RunId);
+                    var run = await _runRepository.GetByIdSafely(request.RunId, (r) => r.Algorithm);
 
-                    var result = await _launchService.LaunchAsync(request.FilePath, request.Arguments, run);
+                    var result = await _launchService.LaunchAsync(run.Algorithm.CodeName, run.Algorithm.FilePath, request.Arguments, run);
 
                     return new AlgorithmResultMessage()
                     {

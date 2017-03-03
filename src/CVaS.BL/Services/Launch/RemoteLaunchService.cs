@@ -21,12 +21,11 @@ namespace CVaS.BL.Services.Launch
             _logger = logger;
         }
 
-        public async Task<RunResult> LaunchAsync(string filePath, List<string> args, Run run)
+        public async Task<RunResult> LaunchAsync(string codeName, string filePath, List<string> args, Run run)
         {
             var message = new CreateAlgorithmMessage()
             {
                 Arguments = args,
-                FilePath = filePath,
                 RunId = run.Id
             };
 

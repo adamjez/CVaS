@@ -15,5 +15,8 @@ namespace CVaS.DAL.Model
 
         [Required, StringLength(44)]
         public string ApiKey { get; set; }
+
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+
     }
 }

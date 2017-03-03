@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CVaS.Shared.Services.File;
 using CVaS.Shared.Services.Time;
+using Microsoft.Extensions.Logging;
 
 namespace CVaS.Shared.Services.Process
 {
@@ -17,11 +18,13 @@ namespace CVaS.Shared.Services.Process
     {
         private readonly FileProvider _fileProvider;
         private readonly ICurrentTimeProvider _currentTimeProvider;
+        private readonly ILogger<BaseProcessService> _logger;
 
-        public BaseProcessService(FileProvider fileProvider, ICurrentTimeProvider currentTimeProvider)
+        public BaseProcessService(FileProvider fileProvider, ICurrentTimeProvider currentTimeProvider, ILogger<BaseProcessService> logger)
         {
             _fileProvider = fileProvider;
             _currentTimeProvider = currentTimeProvider;
+            _logger = logger;
         }
 
         public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments,  CancellationToken cancellationToken)
@@ -85,6 +88,7 @@ namespace CVaS.Shared.Services.Process
                 cancellationToken.ThrowIfCancellationRequested();
 
                 result.StartedAt = _currentTimeProvider.Now();
+                _logger.LogInformation("Launching process: " + process.StartInfo.FileName + " workind directory: " + process.StartInfo.WorkingDirectory);
                 if (process.Start() == false)
                 {
                     tcs.TrySetException(new InvalidOperationException("Failed to start process"));

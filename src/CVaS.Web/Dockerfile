@@ -1,4 +1,4 @@
-FROM microsoft/aspnetcore:1.0.1
+FROM microsoft/aspnetcore:1.0.3
 ENTRYPOINT ["dotnet", "CVaS.Web.dll"]
 ARG source=.
 WORKDIR /app

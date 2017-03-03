@@ -33,9 +33,18 @@ namespace CVaS.AlgServer.Services.BrokerReceiver
             _bus.RespondAsync<CreateAlgorithmMessage, AlgorithmResultMessage>(async (request) =>
             {
                 _logger.LogInformation("Received request!");
-                var result = await messageProcessor.ProcessAsync(request);
-                _logger.LogInformation("Sending respond!");
-                return result;
+
+                try
+                {
+                    var result = await messageProcessor.ProcessAsync(request);
+                    _logger.LogInformation("Sending respond!");
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogCritical(ex.ToString());
+                    throw;
+                }
             });
         }
     }

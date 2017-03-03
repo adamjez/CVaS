@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core;
 using CVaS.Shared.Core.Provider;
+using CVaS.Shared.Exceptions;
 using CVaS.Shared.Helpers;
 using CVaS.Shared.Models;
 using CVaS.Shared.Options;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.File;
 using CVaS.Shared.Services.Process;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CVaS.Shared.Services.Launch
@@ -25,9 +27,10 @@ namespace CVaS.Shared.Services.Launch
         private readonly RunRepository _runRepository;
         private readonly TemporaryFileProvider _fileSystemProvider;
         private readonly FileProvider _fileProvider;
+        private readonly AlgorithmFileProvider _algFileProvider;
 
         public LocalLaunchService(IOptions<AlgorithmOptions> options, IProcessService processService, IUnitOfWorkProvider unitOfWorkProvider,
-            RunRepository runRepository, TemporaryFileProvider fileSystemProvider, FileProvider fileProvider)
+            RunRepository runRepository, TemporaryFileProvider fileSystemProvider, FileProvider fileProvider, AlgorithmFileProvider algFileProvider)
         {
             _options = options;
             _processService = processService;
@@ -35,10 +38,18 @@ namespace CVaS.Shared.Services.Launch
             _runRepository = runRepository;
             _fileSystemProvider = fileSystemProvider;
             _fileProvider = fileProvider;
+            _algFileProvider = algFileProvider;
         }
 
-        public async Task<RunResult> LaunchAsync(string filePath, List<string> args, Run run)
+        public async Task<RunResult> LaunchAsync(string codeName, string pathFile, List<string> args, Run run)
         {
+            var filePath = _algFileProvider.GetAlgorithmFilePath(codeName, pathFile);
+
+            if (!_fileProvider.Exists(filePath))
+            {
+                throw new NotFoundException("Given algorithm execution file doesn't exists");
+            }
+
             using (var uow = _unitOfWorkProvider.Create())
             {
                 var runFolder = _fileSystemProvider.CreateTemporaryFolder();
@@ -47,7 +58,6 @@ namespace CVaS.Shared.Services.Launch
                 var tokenSource = new CancellationTokenSource(_options.Value.HardTimeout * 1000);
 
                 var task = _processService.RunAsync(filePath, args, tokenSource.Token);
-
 
                 var result = await task.WithTimeout(TimeSpan.FromSeconds(_options.Value.LightTimeout));
                 if (!result.Completed)

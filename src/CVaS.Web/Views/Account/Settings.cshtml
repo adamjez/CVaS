@@ -1,51 +1,71 @@
 ﻿@using CVaS.Web.Models.AccountViewModels
 @model SettingsViewModel
 
+@section header {
+
+}
+
+
+
+
 <h2>@Model.Title</h2>
 <div class="row">
     <div class="col-md-12">
         <section>
             <div>
                 <h4>Current API KEY</h4>
-                <hr />
                 <div class="container">
-                    <div class="col-md-9">
-                        <pre>@Model.ApiKey</pre>
-                    </div>
-                    <div class="col-md-3">
-                        <form asp-controller="Account" asp-action="RevokeApiKey" method="post" class="form-horizontal">
-                            <div class="form-group">
-                                <div class="">
-                                    <button type="submit" class="btn btn-default btn-danger">Reset</button>
+                    <div class="row">
+                        <div class="col-md-9">
+                            <form>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control api-key-input" readonly value="@Model.ApiKey" id="api-key-field">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button" id="api-key-clipboard-btn" data-clipboard-target="#api-key-field"
+                                                    data-placement="button" title="Copy to Clipboard">
+                                                <img src="~/images/clippy.svg" class="clippy" alt="Copy to clipboard">
+                                            </button>
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
+
+                        <div class="col-md-3">
+                            <form asp-controller="Account" asp-action="RevokeApiKey" method="post" class="form-horizontal">
+                                <div class="form-group">
+                                    <div class="">
+                                        <button type="submit" class="btn btn-default btn-danger">Reset</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
             <div>
                 <form asp-controller="Account" asp-action="ChangePassword" method="post" class="form-horizontal">
                     <h4>Change Password</h4>
-                    <hr/>
                     <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="form-group">
                         <label asp-for="OldPassword" class="col-md-2 control-label"></label>
                         <div class="col-md-10">
-                            <input asp-for="OldPassword" class="form-control"/>
+                            <input asp-for="OldPassword" class="form-control" />
                             <span asp-validation-for="OldPassword" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label asp-for="NewPassword" class="col-md-2 control-label"></label>
                         <div class="col-md-10">
-                            <input asp-for="NewPassword" class="form-control"/>
+                            <input asp-for="NewPassword" class="form-control" />
                             <span asp-validation-for="NewPassword" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label asp-for="ConfirmPassword" class="col-md-2 control-label"></label>
                         <div class="col-md-10">
-                            <input asp-for="ConfirmPassword" class="form-control"/>
+                            <input asp-for="ConfirmPassword" class="form-control" />
                             <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                         </div>
                     </div>
@@ -59,3 +79,47 @@
         </section>
     </div>
 </div>
+
+@section Scripts {
+    <environment names="Development">
+        <script src="~/lib/clipboard/dist/clipboard.js"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/lib/clipboard/dist/clipboard.min.js"></script>
+    </environment>
+
+    <script>
+        var buttonId = '#api-key-clipboard-btn';
+
+        $(buttonId).tooltip({
+            trigger: 'manual',
+            placement: 'bottom'
+        });
+
+        function setTooltip(btn, message) {
+            $(btn)
+              .attr('data-original-title', message)
+              .tooltip('show');
+        }
+
+        function hideTooltip(btn) {
+            setTimeout(function () {
+                $(btn)
+                  .tooltip('hide');
+            }, 1000);
+        }
+
+        // Clipboard
+        var clipboard = new Clipboard(buttonId);
+
+        clipboard.on('success', function (e) {
+            setTooltip(e.trigger, 'Copied!');
+            hideTooltip(e.trigger);
+        });
+
+        clipboard.on('error', function (e) {
+            setTooltip(e.trigger, 'Failed!');
+            hideTooltip(e.trigger);
+        });
+    </script>
+}
