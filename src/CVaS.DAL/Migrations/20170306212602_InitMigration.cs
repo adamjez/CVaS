@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace CVaS.DAL.Migrations
 {
-    public partial class InitializeDb : Migration
+    public partial class InitMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -16,6 +16,7 @@ namespace CVaS.DAL.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     CodeName = table.Column<string>(maxLength: 64, nullable: false),
+                    Description = table.Column<string>(nullable: true),
                     FilePath = table.Column<string>(maxLength: 256, nullable: false),
                     Title = table.Column<string>(nullable: true)
                 },
@@ -46,7 +47,9 @@ namespace CVaS.DAL.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     AccessFailedCount = table.Column<int>(nullable: false),
+                    ApiKey = table.Column<string>(maxLength: 44, nullable: false),
                     ConcurrencyStamp = table.Column<string>(nullable: true),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
                     Email = table.Column<string>(maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(nullable: false),
                     LockoutEnabled = table.Column<bool>(nullable: false),
@@ -63,6 +66,21 @@ namespace CVaS.DAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rules",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    IsEnabled = table.Column<bool>(nullable: false),
+                    Regex = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rules", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -188,6 +206,44 @@ namespace CVaS.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Run",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    AlgorithmId = table.Column<int>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    FileId = table.Column<int>(nullable: true),
+                    FinishedAt = table.Column<DateTime>(nullable: true),
+                    Result = table.Column<int>(nullable: false),
+                    StdErr = table.Column<string>(nullable: true),
+                    StdOut = table.Column<string>(nullable: true),
+                    UserId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Run", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Run_Algorithms_AlgorithmId",
+                        column: x => x.AlgorithmId,
+                        principalTable: "Algorithms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Run_Files_FileId",
+                        column: x => x.FileId,
+                        principalTable: "Files",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Run_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
@@ -207,6 +263,21 @@ namespace CVaS.DAL.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Files_UserId",
                 table: "Files",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Run_AlgorithmId",
+                table: "Run",
+                column: "AlgorithmId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Run_FileId",
+                table: "Run",
+                column: "FileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Run_UserId",
+                table: "Run",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -238,10 +309,10 @@ namespace CVaS.DAL.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Algorithms");
+                name: "Rules");
 
             migrationBuilder.DropTable(
-                name: "Files");
+                name: "Run");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
@@ -257,6 +328,12 @@ namespace CVaS.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Algorithms");
+
+            migrationBuilder.DropTable(
+                name: "Files");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

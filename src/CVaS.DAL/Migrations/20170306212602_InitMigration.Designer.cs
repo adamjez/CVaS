@@ -8,13 +8,13 @@ using CVaS.DAL;
 namespace CVaS.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20161206005202_AddedResultType")]
-    partial class AddedResultType
+    [Migration("20170306212602_InitMigration")]
+    partial class InitMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.0.1")
+                .HasAnnotation("ProductVersion", "1.0.2")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("CVaS.DAL.Model.Algorithm", b =>
@@ -68,10 +68,14 @@ namespace CVaS.DAL.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
-                    b.Property<Guid?>("ApiKey");
+                    b.Property<string>("ApiKey")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 44);
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
+
+                    b.Property<DateTime>("CreatedAt");
 
                     b.Property<string>("Email")
                         .HasAnnotation("MaxLength", 256);
@@ -137,6 +141,23 @@ namespace CVaS.DAL.Migrations
                     b.ToTable("Files");
                 });
 
+            modelBuilder.Entity("CVaS.DAL.Model.Rule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreatedAt");
+
+                    b.Property<bool>("IsEnabled");
+
+                    b.Property<string>("Regex")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rules");
+                });
+
             modelBuilder.Entity("CVaS.DAL.Model.Run", b =>
                 {
                     b.Property<int>("Id")
@@ -146,8 +167,9 @@ namespace CVaS.DAL.Migrations
 
                     b.Property<DateTime>("CreatedAt");
 
-                    b.Property<string>("Path")
-                        .HasAnnotation("MaxLength", 256);
+                    b.Property<int?>("FileId");
+
+                    b.Property<DateTime?>("FinishedAt");
 
                     b.Property<int>("Result");
 
@@ -160,6 +182,8 @@ namespace CVaS.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AlgorithmId");
+
+                    b.HasIndex("FileId");
 
                     b.HasIndex("UserId");
 
@@ -260,9 +284,13 @@ namespace CVaS.DAL.Migrations
             modelBuilder.Entity("CVaS.DAL.Model.Run", b =>
                 {
                     b.HasOne("CVaS.DAL.Model.Algorithm", "Algorithm")
-                        .WithMany()
+                        .WithMany("Runs")
                         .HasForeignKey("AlgorithmId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("CVaS.DAL.Model.File", "File")
+                        .WithMany()
+                        .HasForeignKey("FileId");
 
                     b.HasOne("CVaS.DAL.Model.AppUser", "User")
                         .WithMany("Runs")

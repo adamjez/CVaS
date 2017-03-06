@@ -124,7 +124,7 @@ namespace CVaS.BL.Common
             user.UserName = userName;
             return Task.FromResult(0);
         }
-
+        
         public Task<string> GetNormalizedUserNameAsync(AppUser user, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -160,7 +160,7 @@ namespace CVaS.BL.Common
                 throw new ArgumentNullException(nameof(user));
             }
 
-            UserRepository.Insert(user);
+            Context.Add(user);
             await SaveChanges(cancellationToken);
 
             return IdentityResult.Success;

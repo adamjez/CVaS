@@ -4,16 +4,19 @@ using CVaS.BL.Services.ApiKey;
 using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using DbContextOptions = CVaS.Shared.Core.DbContextOptions;
 
 namespace CVaS.BL.Common
 {
     public class DbInitializer
     {
-        private readonly AppUserManager _userManager;
+        private readonly UserManager<AppUser> _userManager;
         private readonly IApiKeyGenerator _apiKeyGenerator;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
-        public DbInitializer(AppUserManager userManager, IApiKeyGenerator apiKeyGenerator, IUnitOfWorkProvider unitOfWorkProvider)
+        public DbInitializer(UserManager<AppUser> userManager, IApiKeyGenerator apiKeyGenerator, IUnitOfWorkProvider unitOfWorkProvider)
         {
             _userManager = userManager;
             _apiKeyGenerator = apiKeyGenerator;
@@ -22,9 +25,9 @@ namespace CVaS.BL.Common
 
         public void Init(string username = null, string email = null, string password = null)
         {
-            using (var uow = _unitOfWorkProvider.Create())
+            using (var uow = _unitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
             {
-                uow.Context.Database.EnsureCreated();
+                uow.Context.Database.Migrate();
 
                 if (!uow.Context.Roles.Any())
                 {

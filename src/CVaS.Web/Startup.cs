@@ -83,7 +83,7 @@ namespace CVaS.Web
                     options.Cookies.ApplicationCookie.AutomaticChallenge = true;
                 })
                 .AddEntityFrameworkStores<AppDbContext, int>()
-                .AddUserManager<AppUserManager>()
+                //.AddUserManager<AppUserManager>()
                 .AddUserStore<AppUserStore>()
                 .AddDefaultTokenProviders();
 

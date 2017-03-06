@@ -22,9 +22,9 @@ namespace CVaS.BL.Installers
 
             serviceRegistry.Register<ApiKeyManager>(new PerRequestLifeTime());
 
-            serviceRegistry.Register<AppUserStore>(new PerRequestLifeTime());
-            serviceRegistry.Register<AppUserManager>(new PerRequestLifeTime());
-            serviceRegistry.Register<AppSignInManager>(new PerRequestLifeTime());
+            //serviceRegistry.Register<AppUserStore>(new PerRequestLifeTime());
+            //serviceRegistry.Register<AppUserManager>(new PerRequestLifeTime());
+            //serviceRegistry.Register<AppSignInManager>(new PerRequestLifeTime());
 
             serviceRegistry.Register<AlgoFacade>();
             serviceRegistry.Register<FileFacade>();

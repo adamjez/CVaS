@@ -186,7 +186,7 @@ namespace CVaS.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Runs");
+                    b.ToTable("Run");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<int>", b =>

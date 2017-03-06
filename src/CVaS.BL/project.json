@@ -3,8 +3,8 @@
   "dependencies": {
     "CVaS.DAL": "1.0.0-*",
     "CVaS.Shared": "1.0.0-*",
-    "Microsoft.AspNetCore.Identity": "1.0.1",
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.1",
+    "Microsoft.AspNetCore.Identity": "1.0.2",
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.2",
     "NETStandard.Library": "1.6.1",
     "RabbitMQ.Client": "4.1.1",
     "EasyNetQ": "2.0.4-netcore1438",
