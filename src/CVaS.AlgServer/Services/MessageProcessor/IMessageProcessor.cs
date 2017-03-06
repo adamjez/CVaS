@@ -5,6 +5,6 @@ namespace CVaS.AlgServer.Services.MessageProcessor
 {
     public interface IMessageProcessor
     {
-        Task<AlgorithmResultMessage> ProcessAsync(CreateAlgorithmMessage request);
+        Task<RunResultMessage> ProcessAsync(CreateAlgorithmMessage request);
     }
 }

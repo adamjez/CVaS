@@ -46,7 +46,5 @@ namespace CVaS.Shared.Services.File.Providers
 
             return new FileResult(memStream, result.Filename, (string)result.Metadata[ContentType]);
         }
-
-    
     }
 }

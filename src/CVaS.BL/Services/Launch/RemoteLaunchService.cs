@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CVaS.BL.Services.Broker;
 using CVaS.DAL.Model;
+using CVaS.Shared.Exceptions;
 using CVaS.Shared.Messages;
 using CVaS.Shared.Models;
 using CVaS.Shared.Services.Argument;
@@ -32,18 +33,19 @@ namespace CVaS.BL.Services.Launch
 
             try
             {
-                return await _brokerSender.SendAsync(message);
+                var result = await _brokerSender.SendAsync(message);
+                if (result?.Exception != null)
+                {
+                    var innerExc = (ApiException)Activator.CreateInstance(result.Exception);
+                    throw new RemoteException(innerExc);
+                }
+                return result;
             }
             catch (TimeoutException)
             {
                 _logger.LogWarning("Timeouted when sending message to broker");
             }
-            catch (Exception exc)
-            {
-                _logger.LogCritical(exc.ToString());
-            }
-
-
+            
             return new RunResult()
             {
                 Result = RunResultType.NotFinished,

@@ -6,8 +6,8 @@ namespace CVaS.BL.Services.Broker
 {
     public interface IBrokerSender
     {
-        Task<AlgorithmResultMessage> SendAsync(CreateAlgorithmMessage message);
-        Task<AlgorithmResultMessage> SendAsync(CreateAlgorithmMessage message, TimeSpan timeout);
+        Task<RunResultMessage> SendAsync(CreateAlgorithmMessage message);
+        Task<RunResultMessage> SendAsync(CreateAlgorithmMessage message, TimeSpan timeout);
 
     }
 }

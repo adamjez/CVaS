@@ -250,7 +250,7 @@ namespace CVaS.BL.Common
                 throw new InvalidOperationException("Role doesn't exists: " + normalizedRoleName);
             }
 
-            var userRole =  new AppUserRole
+            var userRole =  new IdentityUserRole<int>
             {
                 UserId = user.Id,
                 RoleId = roleEntity.Id
@@ -491,7 +491,7 @@ namespace CVaS.BL.Common
         /// <summary>
         /// A navigation property for the user roles the store contains.
         /// </summary>
-        public virtual DbSet<IdentityUserRole<int>> UserRoles => Context.UserRoles;
+        public virtual DbSet<IdentityUserRole<int>> UserRoles => Context.Set<IdentityUserRole<int>>();
 
         /// <summary>
         /// Converts the provided <paramref name="id"/> to a strongly typed key object.

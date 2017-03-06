@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
@@ -15,6 +16,7 @@ using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.File;
 using CVaS.Shared.Services.File.Providers;
 using CVaS.Shared.Services.Process;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CVaS.Shared.Services.Launch
@@ -32,10 +34,11 @@ namespace CVaS.Shared.Services.Launch
         private readonly IFileProvider _fileProvider;
         private readonly FileRepository _fileRepository;
         private readonly IAlgorithmFileProvider _algorithmFileProvider;
+        private readonly ILogger<LocalLaunchService> _logger;
 
         public LocalLaunchService(IOptions<AlgorithmOptions> options, IProcessService processService, IUnitOfWorkProvider unitOfWorkProvider,
             RunRepository runRepository, TemporaryFileProvider fileSystemProvider, FileHelper fileHelper, AlgorithmFileProvider algFileProvider,
-            IFileProvider fileProvider, FileRepository fileRepository, IAlgorithmFileProvider algorithmFileProvider)
+            IFileProvider fileProvider, FileRepository fileRepository, IAlgorithmFileProvider algorithmFileProvider, ILogger<LocalLaunchService> logger)
         {
             _options = options;
             _processService = processService;
@@ -47,6 +50,7 @@ namespace CVaS.Shared.Services.Launch
             _fileProvider = fileProvider;
             _fileRepository = fileRepository;
             _algorithmFileProvider = algorithmFileProvider;
+            _logger = logger;
         }
 
 
@@ -150,6 +154,7 @@ namespace CVaS.Shared.Services.Launch
                 _runRepository.Update(run);
 
                 await uow.CommitAsync();
+
                 return zipFile;
             }
         }

@@ -9,13 +9,13 @@ namespace CVaS.BL.Common
 {
     public class DbInitializer
     {
-        private readonly Func<AppUserManager> _userManagerFactory;
+        private readonly AppUserManager _userManager;
         private readonly IApiKeyGenerator _apiKeyGenerator;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
-        public DbInitializer(Func<AppUserManager> userManagerFactory, IApiKeyGenerator apiKeyGenerator, IUnitOfWorkProvider unitOfWorkProvider)
+        public DbInitializer(AppUserManager userManager, IApiKeyGenerator apiKeyGenerator, IUnitOfWorkProvider unitOfWorkProvider)
         {
-            _userManagerFactory = userManagerFactory;
+            _userManager = userManager;
             _apiKeyGenerator = apiKeyGenerator;
             _unitOfWorkProvider = unitOfWorkProvider;
         }
@@ -54,11 +54,10 @@ namespace CVaS.BL.Common
                         ApiKey = _apiKeyGenerator.Generate(),
                         EmailConfirmed = true
                     };
-                    var userManager = _userManagerFactory();
 
-                    userManager.CreateAsync(user, password).Wait();
+                    _userManager.CreateAsync(user, password).Wait();
 
-                    userManager.AddToRoleAsync(user, Roles.Admin).Wait();
+                    _userManager.AddToRoleAsync(user, Roles.Admin).Wait();
                 }
 
                 if (!uow.Context.Algorithms.Any())

@@ -32,7 +32,7 @@ namespace CVaS.BL.Services.Broker
                                      arguments: null);
         }
 
-        public Task<AlgorithmResultMessage> SendAsync(CreateAlgorithmMessage msg)
+        public Task<RunResultMessage> SendAsync(CreateAlgorithmMessage msg)
         {
             var message = "Hello World";
             var body = Encoding.UTF8.GetBytes(message);
@@ -49,7 +49,7 @@ namespace CVaS.BL.Services.Broker
             return null;
         }
 
-        public Task<AlgorithmResultMessage> SendAsync(CreateAlgorithmMessage message, TimeSpan timeout)
+        public Task<RunResultMessage> SendAsync(CreateAlgorithmMessage message, TimeSpan timeout)
         {
             throw new NotImplementedException();
         }

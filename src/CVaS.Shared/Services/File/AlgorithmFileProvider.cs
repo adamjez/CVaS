@@ -15,7 +15,6 @@ namespace CVaS.Shared.Services.File
 {
     public class AlgorithmFileProvider : IAlgorithmFileProvider
     {
-        private const string LocalFilePrefix = "local://";
         private readonly IConfigurationRoot configuration;
         private readonly ILogger<AlgorithmFileProvider> _logger;
         private readonly FileRepository _fileRepository;
@@ -49,6 +48,9 @@ namespace CVaS.Shared.Services.File
             using (_unitOfWorkProvider.Create())
             {
                 var files = arguments.OfType<FileArgument>().ToList();
+                if (!files.Any())
+                    return;
+
                 var filesEntities = await _fileRepository.GetByIds(files.Select(f => f.FileId));
 
                 // We didn't get all files => some files are missing
@@ -66,7 +68,7 @@ namespace CVaS.Shared.Services.File
                     }
                     var localId = dbFile.Id;
                     var resultTask = _fileProvider.Get(dbFile.Path)
-                        .ContinueWith(async t => await SaveFileLocally(await t, localId), TaskContinuationOptions.OnlyOnRanToCompletion)
+                        .ContinueWith(async t => await SaveFileLocally(await t, localId))
                         .Unwrap();
 
                     tasks.Add(resultTask);
