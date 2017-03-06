@@ -69,7 +69,9 @@ namespace CVaS.Shared.Installers
 
             serviceRegistry.Register<AlgorithmFileProvider>();
             serviceRegistry.Register<TemporaryFileProvider>();
-            serviceRegistry.Register<FileProvider>();
+            serviceRegistry.Register<FileHelper>();
+            serviceRegistry.Register<IAlgorithmFileProvider, AlgorithmFileProvider>();
+
 
             serviceRegistry.Register<ICurrentTimeProvider, UtcNowTimeProvider>(new PerContainerLifetime());
 

@@ -6,6 +6,7 @@ using CVaS.AlgServer.Services.Server;
 using CVaS.DAL;
 using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
+using CVaS.Shared.Services.File.Providers;
 using CVaS.Shared.Services.Launch;
 using LightInject;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,7 @@ using LightInject.Microsoft.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MySQL.Data.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 
 namespace CVaS.AlgServer
 {
@@ -87,6 +89,11 @@ namespace CVaS.AlgServer
             container.RegisterInstance(Configuration);
             // Just hack to not to try dispose container bcs of StackOverflow Exception (container calling dispose on container ..)
             container.Register<IServiceFactory>(factory => factory);
+            container.Register<IMongoDatabase>(
+                (sf) => new MongoClient(Configuration.GetConnectionString("MongoDb")).GetDatabase("fileDb"),
+                new PerContainerLifetime());
+            container.Register<IFileProvider, DbFileProvider>();
+
 
             return container;
         }

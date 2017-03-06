@@ -16,7 +16,7 @@ namespace CVaS.Web.Helpers
                 contentType.IndexOf("multipart/", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-        public static string GetExtension(string contentDisposation)
+        public static string GetFileName(string contentDisposation)
         {
             // ContentDisposation= form-data; name="file"; filename="us-1.jpg"
 
@@ -30,7 +30,7 @@ namespace CVaS.Web.Helpers
                     .First()
                     .Replace("\"", "");
 
-                return Path.GetExtension(fileName);
+                return fileName;
             }
 
             return string.Empty;

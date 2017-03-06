@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace CVaS.Shared.Services.File
 {
-    public class FileProvider
+    public class FileHelper
     {
         public bool Exists(string path)
         {

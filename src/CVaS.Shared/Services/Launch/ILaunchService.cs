@@ -7,6 +7,6 @@ namespace CVaS.Shared.Services.Launch
 {
     public interface ILaunchService
     {
-        Task<RunResult> LaunchAsync(string codeName, string pathFile, List<string> args, Run run);
+        Task<RunResult> LaunchAsync(string codeName, string pathFile, List<Argument.Argument> args, Run run);
     }
 }

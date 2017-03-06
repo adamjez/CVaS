@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+using CVaS.Shared.Services.Argument;
 
 namespace CVaS.BL.Services.ArgumentTranslator
 {
     public interface IArgumentTranslator
     {
-        Task<List<string>> ProcessAsync(IEnumerable<object> arg);
+        List<Argument> Process(IEnumerable<object> arg);
     }
 }

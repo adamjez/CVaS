@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CVaS.Shared.Services.Argument;
 
 namespace CVaS.Shared.Messages
 {
@@ -6,6 +7,6 @@ namespace CVaS.Shared.Messages
     {
         public int AlgorithmId { get; set; }
         public int RunId { get; set; }
-        public List<string> Arguments { get; set; }
+        public List<Argument> Arguments { get; set; }
     }
 }

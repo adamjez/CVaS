@@ -18,7 +18,7 @@ namespace CVaS.Web.Filters
         {
             if (context.Exception is ApiException)
             {
-                var ex = context.Exception as ApiException;
+                var ex = (ApiException) context.Exception;
                 var apiError = new ApiError(ex.Message);
 
                 context.ExceptionHandled = true;

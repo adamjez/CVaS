@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Compression;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CVaS.DAL.Model;
@@ -12,8 +13,8 @@ using CVaS.Shared.Models;
 using CVaS.Shared.Options;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.File;
+using CVaS.Shared.Services.File.Providers;
 using CVaS.Shared.Services.Process;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CVaS.Shared.Services.Launch
@@ -26,38 +27,51 @@ namespace CVaS.Shared.Services.Launch
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly RunRepository _runRepository;
         private readonly TemporaryFileProvider _fileSystemProvider;
-        private readonly FileProvider _fileProvider;
+        private readonly FileHelper _fileHelper;
         private readonly AlgorithmFileProvider _algFileProvider;
+        private readonly IFileProvider _fileProvider;
+        private readonly FileRepository _fileRepository;
+        private readonly IAlgorithmFileProvider _algorithmFileProvider;
 
         public LocalLaunchService(IOptions<AlgorithmOptions> options, IProcessService processService, IUnitOfWorkProvider unitOfWorkProvider,
-            RunRepository runRepository, TemporaryFileProvider fileSystemProvider, FileProvider fileProvider, AlgorithmFileProvider algFileProvider)
+            RunRepository runRepository, TemporaryFileProvider fileSystemProvider, FileHelper fileHelper, AlgorithmFileProvider algFileProvider,
+            IFileProvider fileProvider, FileRepository fileRepository, IAlgorithmFileProvider algorithmFileProvider)
         {
             _options = options;
             _processService = processService;
             _unitOfWorkProvider = unitOfWorkProvider;
             _runRepository = runRepository;
             _fileSystemProvider = fileSystemProvider;
-            _fileProvider = fileProvider;
+            _fileHelper = fileHelper;
             _algFileProvider = algFileProvider;
+            _fileProvider = fileProvider;
+            _fileRepository = fileRepository;
+            _algorithmFileProvider = algorithmFileProvider;
         }
 
-        public async Task<RunResult> LaunchAsync(string codeName, string pathFile, List<string> args, Run run)
+
+        public async Task<RunResult> LaunchAsync(string codeName, string pathFile, List<Argument.Argument> args, Run run)
         {
             var filePath = _algFileProvider.GetAlgorithmFilePath(codeName, pathFile);
 
-            if (!_fileProvider.Exists(filePath))
+            if (!_fileHelper.Exists(filePath))
             {
                 throw new NotFoundException("Given algorithm execution file doesn't exists");
             }
 
             using (var uow = _unitOfWorkProvider.Create())
             {
+                // Download and Transform file arguments
+                await _algorithmFileProvider.DownloadFiles(args, run.UserId);
+
+                var stringArguments = args.Select(arg => arg.ToString()).ToList();
+
                 var runFolder = _fileSystemProvider.CreateTemporaryFolder();
-                args.Insert(0, runFolder);
+                stringArguments.Insert(0, runFolder);
 
                 var tokenSource = new CancellationTokenSource(_options.Value.HardTimeout * 1000);
 
-                var task = _processService.RunAsync(filePath, args, tokenSource.Token);
+                var task = _processService.RunAsync(filePath, stringArguments, tokenSource.Token);
 
                 var result = await task.WithTimeout(TimeSpan.FromSeconds(_options.Value.LightTimeout));
                 if (!result.Completed)
@@ -114,14 +128,14 @@ namespace CVaS.Shared.Services.Launch
             using (var uow = _unitOfWorkProvider.Create())
             {
                 var zipFile = new BasicFileInfo();
-                if (!_fileProvider.IsEmpty(runFolder))
+                if (!_fileHelper.IsEmpty(runFolder))
                 {
                     zipFile = _fileSystemProvider.GetTemporaryFile();
                     ZipFile.CreateFromDirectory(runFolder, zipFile.FullPath, CompressionLevel.Fastest, false);
 
                     run.File = new DAL.Model.File()
                     {
-                        Path = zipFile.FullPath,
+                        Path = await _fileProvider.Save(zipFile.FullPath, "application/zip"),
                         Type = FileType.Result,
                         UserId = run.UserId
                     };

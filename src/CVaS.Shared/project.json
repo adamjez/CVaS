@@ -7,7 +7,9 @@
     "System.Diagnostics.Process": "4.3.0",
     "EasyNetQ": "2.0.4-netcore1438",
     "Microsoft.Extensions.Options": "1.0.1",
-    "LightInject": "4.1.5"
+    "LightInject": "4.1.5",
+    "MongoDB.Driver": "2.4.2",
+    "MongoDB.Driver.GridFS": "2.4.2"
   },
   "frameworks": {
     "netstandard1.6": {

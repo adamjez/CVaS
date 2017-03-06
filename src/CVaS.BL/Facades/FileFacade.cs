@@ -67,7 +67,7 @@ namespace CVaS.BL.Facades
                     throw new UnauthorizedAccessException();
                 }
 
-                return _temporaryFileProvider.ResolveTemporaryFilePath(file.Path);
+                return file.Path;
             }
         }
     }

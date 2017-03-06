@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using CVaS.BL.Services.ArgumentTranslator;
 using CVaS.DAL.Model;
 using CVaS.BL.DTO;
+using CVaS.BL.Services.ArgumentTranslator;
 using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Exceptions;
 using CVaS.Shared.Models;
@@ -22,7 +22,7 @@ namespace CVaS.BL.Facades
         private readonly AlgorithmRepository _algorithmRepository;
         private readonly RunRepository _runRepository;
 
-        private readonly FileProvider _fileProvider;
+        private readonly FileHelper _fileHelper;
         private readonly AlgorithmFileProvider _algFileProvider;
 
         private readonly IProcessService _processService;
@@ -30,14 +30,14 @@ namespace CVaS.BL.Facades
         private readonly ILaunchService _launchService;
 
         public RunFacade(IUnitOfWorkProvider unitOfWorkProvider, ICurrentUserProvider currentUserProvider,
-            AlgorithmRepository algorithmRepository, IProcessService processService, FileProvider fileProvider, 
+            AlgorithmRepository algorithmRepository, IProcessService processService, FileHelper fileHelper, 
             AlgorithmFileProvider algFileProvider, RunRepository runRepository, IArgumentTranslator argumentTranslator, 
             ILaunchService launchService)
             : base(unitOfWorkProvider, currentUserProvider)
         {
             _algorithmRepository = algorithmRepository;
             _processService = processService;
-            _fileProvider = fileProvider;
+            _fileHelper = fileHelper;
             _algFileProvider = algFileProvider;
             _runRepository = runRepository;
             _argumentTranslator = argumentTranslator;
@@ -55,7 +55,7 @@ namespace CVaS.BL.Facades
                     throw new NotFoundException("Given algorithm codeName doesn't exists");
                 }
 
-                var args = await _argumentTranslator.ProcessAsync(arguments);
+                var args = _argumentTranslator.Process(arguments);
 
                 // Create Run In Db
                 var run = new Run()
@@ -85,7 +85,7 @@ namespace CVaS.BL.Facades
 
                 var filePath = _algFileProvider.GetAlgorithmFilePath(codeName, algorithm.FilePath);
 
-                if (!_fileProvider.Exists(filePath))
+                if (!_fileHelper.Exists(filePath))
                 {
                     throw new NotFoundException("Given algorithm execution file doesn't exists");
                 }

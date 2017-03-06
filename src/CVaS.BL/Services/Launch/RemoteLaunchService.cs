@@ -5,6 +5,7 @@ using CVaS.BL.Services.Broker;
 using CVaS.DAL.Model;
 using CVaS.Shared.Messages;
 using CVaS.Shared.Models;
+using CVaS.Shared.Services.Argument;
 using CVaS.Shared.Services.Launch;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +22,7 @@ namespace CVaS.BL.Services.Launch
             _logger = logger;
         }
 
-        public async Task<RunResult> LaunchAsync(string codeName, string filePath, List<string> args, Run run)
+        public async Task<RunResult> LaunchAsync(string codeName, string filePath, List<Argument> args, Run run)
         {
             var message = new CreateAlgorithmMessage()
             {

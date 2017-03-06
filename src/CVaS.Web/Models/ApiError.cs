@@ -1,17 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CVaS.Web.Models
 {
+    [DataContract]
     public class ApiError
     {
+        [DataMember]
         public string Message { get; set; }
+        [DataMember]
         public bool IsError { get; set; }
+        [DataMember]
         public string Detail { get; set; }
+        [DataMember]
         public List<ModelError> Errors { get; set; }
+
         public ApiError(string message)
         {
             this.Message = message;

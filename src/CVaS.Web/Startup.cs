@@ -4,9 +4,11 @@ using CVaS.BL.Installers;
 using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Shared.Options;
+using CVaS.Shared.Services.File.Providers;
 using CVaS.Web.Authentication;
 using CVaS.Web.Filters;
 using CVaS.Web.Installers;
+using LightInject;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +19,7 @@ using MySQL.Data.EntityFrameworkCore.Extensions;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger.Model;
 using LightInject.Microsoft.DependencyInjection;
+using MongoDB.Driver;
 using Newtonsoft.Json;
 using Swashbuckle.SwaggerGen.Application;
 
@@ -98,7 +101,7 @@ namespace CVaS.Web
             // Inject an implementation of ISwaggerProvider with defaulted settings applied
             services.AddSwaggerGen(SwaggerSetup);
 
-            var container = new LightInject.ServiceContainer();
+            var container = new ServiceContainer();
 
             var physicalProvider = hostingEnvironment.ContentRootFileProvider;
             container.RegisterInstance(physicalProvider);
@@ -107,6 +110,12 @@ namespace CVaS.Web
 
             container.RegisterFrom<WebApiComposition>();
             container.RegisterFrom<BusinessLayerComposition>();
+
+            // One Client Per Application: Source http://mongodb.github.io/mongo-csharp-driver/2.2/getting_started/quick_tour/
+            container.Register<IMongoDatabase>(
+                (sf) => new MongoClient(Configuration.GetConnectionString("MongoDb")).GetDatabase("fileDb"),
+                new PerContainerLifetime());
+            container.Register<IFileProvider, DbFileProvider>();
 
             return container.CreateServiceProvider(services);
         }

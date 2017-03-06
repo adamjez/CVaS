@@ -9,14 +9,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using CVaS.Shared.Exceptions;
 using CVaS.Shared.Providers;
-using CVaS.Shared.Services.File;
+using CVaS.Shared.Services.File.Providers;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
+using IFileProvider = CVaS.Shared.Services.File.Providers.IFileProvider;
 
 namespace CVaS.Web.Controllers.Api
 {
@@ -24,17 +25,17 @@ namespace CVaS.Web.Controllers.Api
     public class FilesController : ApiController
     {
         private readonly ILogger<FilesController> _logger;
-        private readonly TemporaryFileProvider _fileProvider;
         private readonly FileFacade _fileFacade;
         private readonly ICurrentUserProvider _currentUserProvider;
+        private readonly IFileProvider _fileProvider;
 
-        public FilesController(ILogger<FilesController> logger, TemporaryFileProvider fileProvider, FileFacade fileFacade,
-            ICurrentUserProvider currentUserProvider, RunFacade runFacade)
+        public FilesController(ILogger<FilesController> logger, FileFacade fileFacade,
+            ICurrentUserProvider currentUserProvider, RunFacade runFacade, IFileProvider fileProvider)
         {
             _logger = logger;
-            _fileProvider = fileProvider;
             _fileFacade = fileFacade;
             _currentUserProvider = currentUserProvider;
+            _fileProvider = fileProvider;
         }
 
         /// <summary>
@@ -53,24 +54,20 @@ namespace CVaS.Web.Controllers.Api
             var boundary = MultipartFormHelpers.GetBoundary(HttpContext.Request.ContentType);
             var reader = new MultipartReader(boundary, HttpContext.Request.Body);
 
-            var pathFiles = new List<string>();
+            var fileIds = new List<string>();
             MultipartSection section;
             while ((section = await reader.ReadNextSectionAsync()) != null)
             {
-                var fileExtension = MultipartFormHelpers.GetExtension(section.ContentDisposition);
-                if (string.IsNullOrEmpty(fileExtension))
+                var fileName = MultipartFormHelpers.GetFileName(section.ContentDisposition);
+                if (string.IsNullOrEmpty(fileName))
                     continue;
 
-                string filePath;
-                using (var stream = _fileProvider.CreateTemporaryFile(fileExtension, out filePath))
-                {
-                    await section.Body.CopyToAsync(stream);
-                }
+                var id = await _fileProvider.Save(section.Body, fileName, GetContentType(fileName));
 
-                pathFiles.Add(filePath);
+                fileIds.Add(id);
             }
 
-            var files = await _fileFacade.AddUploadedAsync(pathFiles, _currentUserProvider.Id);
+            var files = await _fileFacade.AddUploadedAsync(fileIds, _currentUserProvider.Id);
 
             return Ok(new UploadFilesResult { Ids = files.Select(file => file.Id) });
         }
@@ -80,39 +77,41 @@ namespace CVaS.Web.Controllers.Api
         /// </summary>
         /// <param name="fileId">Identifier of file</param>
         [HttpGet, Route("{fileId}", Name = nameof(GetFile))]
-        public async Task GetFile(int fileId)
+        public async Task<FileStreamResult> GetFile(int fileId)
         {
             if (!ModelState.IsValid)
             {
                 throw new BadRequestException("File Id has to  be specified");
             }
 
-            var pathToFile = await _fileFacade.GetSafelyAsync(fileId);
+            var remoteFileId = await _fileFacade.GetSafelyAsync(fileId);
 
-            IFileInfo fileInfo = new PhysicalFileInfo(new FileInfo(pathToFile));
-
-
-            string contentType;
-            if (new FileExtensionContentTypeProvider()
-                .TryGetContentType(fileInfo.Name, out contentType))
+            if (_fileProvider is SystemFileProvider)
             {
-                HttpContext.Response.ContentType = contentType;
+                IFileInfo fileInfo = new PhysicalFileInfo(new FileInfo(remoteFileId));
+
+                HttpContext.Response.ContentType = GetContentType(fileInfo.Name);
+
+                var service = HttpContext.Features.Get<IHttpSendFileFeature>();
+                if (service != null)
+                {
+                    await service.SendFileAsync(remoteFileId, 0, fileInfo.Length, CancellationToken.None);
+                }
+                else
+                {
+                    await HttpContext.Response.SendFileAsync(fileInfo);
+
+                }
             }
             else
             {
-                HttpContext.Response.ContentType = "application/octet-stream";
+                var result = await _fileProvider.Get(remoteFileId);
+                {
+                    return new FileStreamResult(result.Content, GetContentType(result.FileName));
+                }
             }
 
-            var service = HttpContext.Features.Get<IHttpSendFileFeature>();
-            if (service != null)
-            {
-                await service.SendFileAsync(pathToFile, 0, fileInfo.Length, CancellationToken.None);
-            }
-            else
-            {
-                await HttpContext.Response.SendFileAsync(fileInfo);
-
-            }
+            return null;
         }
 
         /// <summary>
@@ -124,11 +123,18 @@ namespace CVaS.Web.Controllers.Api
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest("File Id has to  be specified");
             }
 
             await _fileFacade.DeleteAsync(fileId, _currentUserProvider.Id);
             return Ok();
+        }
+
+        private string GetContentType(string fileName)
+        {
+            string contentType;
+            return new FileExtensionContentTypeProvider()
+                .TryGetContentType(fileName, out contentType) ? contentType : "application/octet-stream";
         }
     }
 }

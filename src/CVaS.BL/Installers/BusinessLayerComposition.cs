@@ -33,7 +33,7 @@ namespace CVaS.BL.Installers
             serviceRegistry.Register<StatsFacade>();
 
             serviceRegistry.Register<IApiKeyGenerator, RndApiKeyGenerator>();
-            serviceRegistry.Register<IArgumentTranslator, BaseArgumentTranslator>();
+            serviceRegistry.Register<IArgumentTranslator, BasicArgumentTranslator>();
             serviceRegistry.Register<IEmailSender, MockMessageSender>();
 
             if (ModeOptions.IsLocal)
