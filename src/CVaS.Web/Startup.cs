@@ -83,7 +83,6 @@ namespace CVaS.Web
                     options.Cookies.ApplicationCookie.AutomaticChallenge = true;
                 })
                 .AddEntityFrameworkStores<AppDbContext, int>()
-                //.AddUserManager<AppUserManager>()
                 .AddUserStore<AppUserStore>()
                 .AddDefaultTokenProviders();
 
@@ -106,7 +105,7 @@ namespace CVaS.Web
             var physicalProvider = hostingEnvironment.ContentRootFileProvider;
             container.RegisterInstance(physicalProvider);
             container.RegisterInstance(Configuration);
-            container.Register<DbInitializer>();
+            container.Register<AppContextSeed>();
 
             container.RegisterFrom<WebApiComposition>();
             container.RegisterFrom<BusinessLayerComposition>();
@@ -133,12 +132,8 @@ namespace CVaS.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DbInitializer initializer)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, AppContextSeed contextSeed)
         {
-            initializer.Init(_databaseOptions.DefaultUsername, 
-                _databaseOptions.DefaultEmail, 
-                _databaseOptions.DefaultPassword);
-
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
@@ -168,6 +163,11 @@ namespace CVaS.Web
 
             // Enable middleware to serve swagger-ui assets (HTML, JS, CSS etc.)
             app.UseSwaggerUi();
+
+            contextSeed.SeedAsync(_databaseOptions.DefaultUsername,
+                _databaseOptions.DefaultEmail,
+                _databaseOptions.DefaultPassword)
+                .Wait();
         }
 
         private void SwaggerSetup(SwaggerGenOptions options)

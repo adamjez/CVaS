@@ -10,5 +10,7 @@ namespace CVaS.Shared.Services.File.Providers
         Task<string> Save(Stream stream, string fileName, string contentType);
 
         Task<FileResult> Get(string id);
+
+        Task DeleteAsync(string id);
     }
 }

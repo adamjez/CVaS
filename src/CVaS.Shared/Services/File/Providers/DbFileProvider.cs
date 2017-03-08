@@ -18,6 +18,8 @@ namespace CVaS.Shared.Services.File.Providers
 
         public override async Task<string> Save(Stream stream, string fileName, string contentType)
         {
+           
+
             var uploadOptions = new GridFSUploadOptions()
             {
                 Metadata = new BsonDocument
@@ -45,6 +47,13 @@ namespace CVaS.Shared.Services.File.Providers
             memStream.Seek(0, SeekOrigin.Begin);
 
             return new FileResult(memStream, result.Filename, (string)result.Metadata[ContentType]);
+        }
+
+        public override async Task DeleteAsync(string id)
+        {
+            ObjectId oid = new ObjectId(id);
+
+            await _bucket.DeleteAsync(oid);
         }
     }
 }

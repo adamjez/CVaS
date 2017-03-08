@@ -7,19 +7,20 @@ using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Providers;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.File;
+using CVaS.Shared.Services.File.Providers;
 
 namespace CVaS.BL.Facades
 {
     public class FileFacade : AppFacadeBase
     {
         private readonly FileRepository _fileRepository;
-        private readonly TemporaryFileProvider _temporaryFileProvider;
+        private readonly IFileProvider _fileProvider;
         public FileFacade(IUnitOfWorkProvider unitOfWorkProvider, ICurrentUserProvider currentUserProvider, 
-            FileRepository fileRepository, TemporaryFileProvider temporaryFileProvider) 
+            FileRepository fileRepository, IFileProvider fileProvider) 
             : base(unitOfWorkProvider, currentUserProvider)
         {
             _fileRepository = fileRepository;
-            _temporaryFileProvider = temporaryFileProvider;
+            _fileProvider = fileProvider;
         }
 
         public async Task DeleteAsync(int fileId, int userId)
@@ -33,7 +34,7 @@ namespace CVaS.BL.Facades
                     throw new UnauthorizedAccessException();
                 }
 
-                _temporaryFileProvider.Delete(file.Path);
+                await _fileProvider.DeleteAsync(file.Path);
             }
         }
 

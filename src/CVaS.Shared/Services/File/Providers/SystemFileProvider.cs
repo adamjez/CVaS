@@ -27,5 +27,13 @@ namespace CVaS.Shared.Services.File.Providers
             var path = _tmpFileProvider.ResolveTemporaryFilePath(id);
             return Task.FromResult(new FileResult(System.IO.File.OpenRead(path), Path.GetFileName(path)));
         }
+
+        public override Task DeleteAsync(string id)
+        {
+            var path = _tmpFileProvider.ResolveTemporaryFilePath(id);
+            System.IO.File.Delete(path);
+
+            return Task.FromResult(0);
+        }
     }
 }

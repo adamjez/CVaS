@@ -1,29 +1,28 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using CVaS.BL.Services.ApiKey;
-using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DbContextOptions = CVaS.Shared.Core.DbContextOptions;
+using System.Threading.Tasks;
 
 namespace CVaS.BL.Common
 {
-    public class DbInitializer
+    public class AppContextSeed
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IApiKeyGenerator _apiKeyGenerator;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
-        public DbInitializer(UserManager<AppUser> userManager, IApiKeyGenerator apiKeyGenerator, IUnitOfWorkProvider unitOfWorkProvider)
+        public AppContextSeed(UserManager<AppUser> userManager, IApiKeyGenerator apiKeyGenerator, IUnitOfWorkProvider unitOfWorkProvider)
         {
             _userManager = userManager;
             _apiKeyGenerator = apiKeyGenerator;
             _unitOfWorkProvider = unitOfWorkProvider;
         }
 
-        public void Init(string username = null, string email = null, string password = null)
+        public async Task SeedAsync(string username = null, string email = null, string password = null)
         {
             using (var uow = _unitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
             {
@@ -58,9 +57,9 @@ namespace CVaS.BL.Common
                         EmailConfirmed = true
                     };
 
-                    _userManager.CreateAsync(user, password).Wait();
+                    await _userManager.CreateAsync(user, password);
 
-                    _userManager.AddToRoleAsync(user, Roles.Admin).Wait();
+                    await _userManager.AddToRoleAsync(user, Roles.Admin);
                 }
 
                 if (!uow.Context.Algorithms.Any())
