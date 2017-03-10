@@ -19,6 +19,7 @@ namespace CVaS.DAL.Model
 
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
+        [MaxLength(16)]
         public byte[] Hash { get; set; }
 
         public string ContentType { get; set; }

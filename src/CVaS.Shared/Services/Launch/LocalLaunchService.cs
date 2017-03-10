@@ -153,13 +153,15 @@ namespace CVaS.Shared.Services.Launch
         {
             _logger.LogInformation("Creating zip file from result folder");
 
-            var zipFile = _temporaryFileProvider.CreateTemporaryFilePath(".zip");
-            ZipFile.CreateFromDirectory(runFolder, zipFile.FullPath, CompressionLevel.Fastest, false); 
+            var zipFile = _temporaryFileProvider.CreateTemporaryFilePath(ZipHelpers.Extension);
+            ZipFile.CreateFromDirectory(runFolder, zipFile.FullPath, CompressionLevel.Fastest, false);
 
             return new DAL.Model.File()
             {
-                Path = await _userFileProvider.SaveAsync(zipFile.FullPath, "application/zip"),
+                Path = await _userFileProvider.SaveAsync(zipFile.FullPath, ZipHelpers.ContentType),
                 Type = FileType.Result,
+                ContentType = ZipHelpers.ContentType,
+                Extension = ZipHelpers.Extension,
                 UserId = userId
             };
         }
