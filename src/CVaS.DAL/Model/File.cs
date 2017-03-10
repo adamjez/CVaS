@@ -18,5 +18,11 @@ namespace CVaS.DAL.Model
         public virtual AppUser User { get; set; }
 
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+
+        public byte[] Hash { get; set; }
+
+        public string ContentType { get; set; }
+
+        public string Extension { get; set; }
     }
 }

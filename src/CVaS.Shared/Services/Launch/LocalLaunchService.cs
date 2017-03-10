@@ -14,7 +14,9 @@ using CVaS.Shared.Models;
 using CVaS.Shared.Options;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.File;
+using CVaS.Shared.Services.File.Algorithm;
 using CVaS.Shared.Services.File.Providers;
+using CVaS.Shared.Services.File.Temporary;
 using CVaS.Shared.Services.Process;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -28,37 +30,35 @@ namespace CVaS.Shared.Services.Launch
         private readonly IProcessService _processService;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly RunRepository _runRepository;
-        private readonly TemporaryFileProvider _fileSystemProvider;
-        private readonly FileHelper _fileHelper;
-        private readonly AlgorithmFileProvider _algFileProvider;
-        private readonly IFileProvider _fileProvider;
-        private readonly FileRepository _fileRepository;
+        private readonly ITemporaryFileProvider _temporaryFileProvider;
+        private readonly IUserFileProvider _userFileProvider;
         private readonly IAlgorithmFileProvider _algorithmFileProvider;
         private readonly ILogger<LocalLaunchService> _logger;
+        private readonly FileSystemWrapper _fileSystemWrapper;
 
         public LocalLaunchService(IOptions<AlgorithmOptions> options, IProcessService processService, IUnitOfWorkProvider unitOfWorkProvider,
-            RunRepository runRepository, TemporaryFileProvider fileSystemProvider, FileHelper fileHelper, AlgorithmFileProvider algFileProvider,
-            IFileProvider fileProvider, FileRepository fileRepository, IAlgorithmFileProvider algorithmFileProvider, ILogger<LocalLaunchService> logger)
+            RunRepository runRepository, ITemporaryFileProvider temporaryFileProvider, IUserFileProvider userFileProvider, IAlgorithmFileProvider algorithmFileProvider, 
+            ILogger<LocalLaunchService> logger, 
+            FileSystemWrapper fileSystemWrapper)
         {
             _options = options;
             _processService = processService;
             _unitOfWorkProvider = unitOfWorkProvider;
             _runRepository = runRepository;
-            _fileSystemProvider = fileSystemProvider;
-            _fileHelper = fileHelper;
-            _algFileProvider = algFileProvider;
-            _fileProvider = fileProvider;
-            _fileRepository = fileRepository;
+
+            _temporaryFileProvider = temporaryFileProvider;
+            _userFileProvider = userFileProvider;
             _algorithmFileProvider = algorithmFileProvider;
             _logger = logger;
+            _fileSystemWrapper = fileSystemWrapper;
         }
 
 
         public async Task<RunResult> LaunchAsync(string codeName, string pathFile, List<Argument.Argument> args, Run run)
         {
-            var filePath = _algFileProvider.GetAlgorithmFilePath(codeName, pathFile);
+            var filePath = _algorithmFileProvider.GetAlgorithmFilePath(codeName, pathFile);
 
-            if (!_fileHelper.Exists(filePath))
+            if (!_fileSystemWrapper.Exists(filePath))
             {
                 throw new NotFoundException("Given algorithm execution file doesn't exists");
             }
@@ -70,7 +70,7 @@ namespace CVaS.Shared.Services.Launch
 
                 var stringArguments = args.Select(arg => arg.ToString()).ToList();
 
-                var runFolder = _fileSystemProvider.CreateTemporaryFolder();
+                var runFolder = _temporaryFileProvider.CreateTemporaryFolder();
                 stringArguments.Insert(0, runFolder);
 
                 var tokenSource = new CancellationTokenSource(_options.Value.HardTimeout * 1000);
@@ -93,13 +93,13 @@ namespace CVaS.Shared.Services.Launch
                     };
                 }
 
-                var zipFile = await SaveSuccessRun(runFolder, run, result.Value);
+                var savedRun = await SaveSuccessRun(runFolder, run, result.Value);
 
                 await uow.CommitAsync();
 
                 return new RunResult()
                 {
-                    FileName = zipFile.FileName,
+                    FileId = savedRun.FileId,
                     StdOut = result.Value.StdOut,
                     StdErr = result.Value.StdError,
                     RunId = run.Id,
@@ -127,22 +127,13 @@ namespace CVaS.Shared.Services.Launch
             }
         }
 
-        private async Task<BasicFileInfo> SaveSuccessRun(string runFolder, Run run, ProcessResult result)
+        private async Task<Run> SaveSuccessRun(string runFolder, Run run, ProcessResult result)
         {
             using (var uow = _unitOfWorkProvider.Create())
             {
-                var zipFile = new BasicFileInfo();
-                if (!_fileHelper.IsEmpty(runFolder))
+                if (!_fileSystemWrapper.IsEmpty(runFolder))
                 {
-                    zipFile = _fileSystemProvider.GetTemporaryFile();
-                    ZipFile.CreateFromDirectory(runFolder, zipFile.FullPath, CompressionLevel.Fastest, false);
-
-                    run.File = new DAL.Model.File()
-                    {
-                        Path = await _fileProvider.Save(zipFile.FullPath, "application/zip"),
-                        Type = FileType.Result,
-                        UserId = run.UserId
-                    };
+                    run.File = await CreateZipPackage(runFolder, run.UserId);
                 }
 
                 run.FinishedAt = result.FinishedAt;
@@ -154,9 +145,23 @@ namespace CVaS.Shared.Services.Launch
                 _runRepository.Update(run);
 
                 await uow.CommitAsync();
-
-                return zipFile;
+                return run;
             }
+        }
+
+        private async Task<DAL.Model.File> CreateZipPackage(string runFolder, int userId)
+        {
+            _logger.LogInformation("Creating zip file from result folder");
+
+            var zipFile = _temporaryFileProvider.CreateTemporaryFilePath(".zip");
+            ZipFile.CreateFromDirectory(runFolder, zipFile.FullPath, CompressionLevel.Fastest, false); 
+
+            return new DAL.Model.File()
+            {
+                Path = await _userFileProvider.SaveAsync(zipFile.FullPath, "application/zip"),
+                Type = FileType.Result,
+                UserId = userId
+            };
         }
     }
 }

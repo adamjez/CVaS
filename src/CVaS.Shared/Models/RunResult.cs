@@ -4,7 +4,7 @@ namespace CVaS.Shared.Models
 {
     public class RunResult
     {
-        public string FileName { get; set; }
+        public int? FileId { get; set; }
         public string StdOut { get; set; }
         public string StdErr { get; set; }
         public int RunId { get; set; }

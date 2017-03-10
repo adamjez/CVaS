@@ -17,14 +17,14 @@ namespace CVaS.Shared.Services.Process
     {
         private readonly IProcessService _processService;
         private readonly IInterpreterResolver _interpreterResolver;
-        private readonly FileHelper _fileHelper;
+        private readonly FileSystemWrapper _fileSystemWrapper;
 
 
-        public WindowsDecoratorProcessService(IProcessService processService, IInterpreterResolver interpreterResolver, FileHelper fileHelper)
+        public WindowsDecoratorProcessService(IProcessService processService, IInterpreterResolver interpreterResolver, FileSystemWrapper fileSystemWrapper)
         {
             _processService = processService;
             _interpreterResolver = interpreterResolver;
-            _fileHelper = fileHelper;
+            _fileSystemWrapper = fileSystemWrapper;
         }
 
         public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments, string workingDirectory, CancellationToken cancellationToken)
@@ -35,7 +35,7 @@ namespace CVaS.Shared.Services.Process
         public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments, CancellationToken cancellationToken)
         {
             var fileExt = Path.GetExtension(filePath);
-            var workingDirectory = _fileHelper.GetDirectoryFromFile(filePath);
+            var workingDirectory = _fileSystemWrapper.GetDirectoryFromFile(filePath);
 
             var interpreter = _interpreterResolver.Resolve(fileExt);
 

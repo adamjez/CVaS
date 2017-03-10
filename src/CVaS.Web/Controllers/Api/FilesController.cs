@@ -10,14 +10,12 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 using CVaS.Shared.Exceptions;
 using CVaS.Shared.Providers;
 using CVaS.Shared.Services.File.Providers;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
-using IFileProvider = CVaS.Shared.Services.File.Providers.IFileProvider;
 
 namespace CVaS.Web.Controllers.Api
 {
@@ -26,16 +24,13 @@ namespace CVaS.Web.Controllers.Api
     {
         private readonly ILogger<FilesController> _logger;
         private readonly FileFacade _fileFacade;
-        private readonly ICurrentUserProvider _currentUserProvider;
-        private readonly IFileProvider _fileProvider;
+        private readonly IUserFileProvider _userFileProvider;
 
-        public FilesController(ILogger<FilesController> logger, FileFacade fileFacade,
-            ICurrentUserProvider currentUserProvider, RunFacade runFacade, IFileProvider fileProvider)
+        public FilesController(ILogger<FilesController> logger, FileFacade fileFacade, RunFacade runFacade, IUserFileProvider userFileProvider)
         {
             _logger = logger;
             _fileFacade = fileFacade;
-            _currentUserProvider = currentUserProvider;
-            _fileProvider = fileProvider;
+            _userFileProvider = userFileProvider;
         }
 
         /// <summary>
@@ -54,7 +49,7 @@ namespace CVaS.Web.Controllers.Api
             var boundary = MultipartFormHelpers.GetBoundary(HttpContext.Request.ContentType);
             var reader = new MultipartReader(boundary, HttpContext.Request.Body);
 
-            var fileIds = new List<string>();
+            var fileIds = new List<int>();
             MultipartSection section;
             while ((section = await reader.ReadNextSectionAsync()) != null)
             {
@@ -62,14 +57,12 @@ namespace CVaS.Web.Controllers.Api
                 if (string.IsNullOrEmpty(fileName))
                     continue;
 
-                var id = await _fileProvider.Save(section.Body, fileName, GetContentType(fileName));
+                var id = await _fileFacade.AddFileAsync(section.Body, fileName, GetContentType(fileName));
 
                 fileIds.Add(id);
             }
 
-            var files = await _fileFacade.AddUploadedAsync(fileIds, _currentUserProvider.Id);
-
-            return Ok(new UploadFilesResult { Ids = files.Select(file => file.Id) });
+            return Ok(new UploadFilesResult { Ids = fileIds });
         }
 
         /// <summary>
@@ -86,7 +79,7 @@ namespace CVaS.Web.Controllers.Api
 
             var remoteFileId = await _fileFacade.GetSafelyAsync(fileId);
 
-            if (_fileProvider is SystemFileProvider)
+            if (_userFileProvider is UserSystemFileProvider)
             {
                 IFileInfo fileInfo = new PhysicalFileInfo(new FileInfo(remoteFileId));
 
@@ -105,7 +98,7 @@ namespace CVaS.Web.Controllers.Api
             }
             else
             {
-                var result = await _fileProvider.Get(remoteFileId);
+                var result = await _userFileProvider.Get(remoteFileId);
                 {
                     return new FileStreamResult(result.Content, result.ContentType);
                 }
@@ -126,7 +119,7 @@ namespace CVaS.Web.Controllers.Api
                 return BadRequest("File Id has to  be specified");
             }
 
-            await _fileFacade.DeleteAsync(fileId, _currentUserProvider.Id);
+            await _fileFacade.DeleteAsync(fileId);
             return Ok();
         }
 

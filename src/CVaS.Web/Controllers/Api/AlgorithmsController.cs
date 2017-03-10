@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using CVaS.BL.DTO;
 using CVaS.BL.Facades;
-using CVaS.DAL.Model;
 using CVaS.Shared.Services.Process;
 using CVaS.Web.Models;
 using CVaS.Web.Providers;
@@ -63,14 +62,14 @@ namespace CVaS.Web.Controllers.Api
                 return BadRequest(ModelState);
             }
 
-            var result = await _runFacade.RunProcessAsync(codeName, parsedOptions);
+            var result = await _runFacade.RunAlgorithmAsync(codeName, parsedOptions);
 
             return Ok(new AlgorithmResult
             {
                 RunId = result.RunId,
                 StdOut = result.StdOut,
                 StdError = result.StdErr,
-                Zip = result.FileName != null ? Url.Link(nameof(FilesController.GetFile), new { zipName = result.FileName }) : null,
+                Zip = result.FileId != null ? Url.Link(nameof(FilesController.GetFile), new { zipName = result.FileId }) : null,
                 Result = result.Result,
                 Duration = result.Duration
             });

@@ -6,20 +6,18 @@ using MongoDB.Driver.GridFS;
 
 namespace CVaS.Shared.Services.File.Providers
 {
-    public class DbFileProvider : FileProvider
+    public class DbUserFileProvider : UserFileProvider
     {
         private const string ContentType = "contentType";
         private readonly GridFSBucket _bucket;
 
-        public DbFileProvider(IMongoDatabase database)
+        public DbUserFileProvider(IMongoDatabase database)
         {
             _bucket = new GridFSBucket(database);
         }
 
-        public override async Task<string> Save(Stream stream, string fileName, string contentType)
+        public override async Task<string> SaveAsync(Stream stream, string fileName, string contentType)
         {
-           
-
             var uploadOptions = new GridFSUploadOptions()
             {
                 Metadata = new BsonDocument

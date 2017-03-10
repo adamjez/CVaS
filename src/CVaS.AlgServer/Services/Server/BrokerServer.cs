@@ -6,13 +6,13 @@ using Microsoft.Extensions.Logging;
 
 namespace CVaS.AlgServer.Services.Server
 {
-    public class Server
+    public class BrokerServer
     {
         private readonly IBrokerReceiver _brokerReceiver;
-        private readonly ILogger<Server> _logger;
+        private readonly ILogger<BrokerServer> _logger;
         private readonly IMessageProcessor _messageProcessor;
 
-        public Server(IBrokerReceiver brokerReceiver, ILogger<Server> logger, IMessageProcessor messageProcessor)
+        public BrokerServer(IBrokerReceiver brokerReceiver, ILogger<BrokerServer> logger, IMessageProcessor messageProcessor)
         {
             _brokerReceiver = brokerReceiver;
             _logger = logger;

@@ -47,44 +47,8 @@ namespace CVaS.Web
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             ConfigureOptions(services);
-
-            // We choose what database provider we will use
-            // In configuration have to be "MySQL" or "MSSQL" 
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            if (_databaseOptions.Provider == "MySQL")
-            {
-                services.AddDbContext<AppDbContext>(options =>
-                    options.UseMySQL(connectionString));
-            }
-            else
-            {
-                services.AddDbContext<AppDbContext>(options =>
-                    options.UseSqlServer(connectionString));
-            }
-
-            // Set ASP.NET Identity and cooie authentication
-            services.AddIdentity<AppUser, AppRole>(options =>
-                {
-                    // Password settings
-                    options.Password.RequireDigit = false;
-                    options.Password.RequiredLength = 8;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequireLowercase = false;
-
-                    // User settings
-                    options.User.RequireUniqueEmail = true;
-
-                    options.Cookies.ApplicationCookie.ExpireTimeSpan = TimeSpan.FromDays(150);
-                    options.Cookies.ApplicationCookie.LoginPath = "/Account/Login/";
-                    options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOff";
-                    options.Cookies.ApplicationCookie.AuthenticationScheme = AuthenticationScheme.WebCookie;
-                    options.Cookies.ApplicationCookie.AutomaticAuthenticate = true;
-                    options.Cookies.ApplicationCookie.AutomaticChallenge = true;
-                })
-                .AddEntityFrameworkStores<AppDbContext, int>()
-                .AddUserStore<AppUserStore>()
-                .AddDefaultTokenProviders();
+            ConfigureDatabase(services);
+            ConfigureIdentity(services);
 
             // Add framework services.
             services.AddMvc(options => { options.Filters.Add(typeof(HttpExceptionFilterAttribute)); })
@@ -114,9 +78,53 @@ namespace CVaS.Web
             container.Register<IMongoDatabase>(
                 (sf) => new MongoClient(Configuration.GetConnectionString("MongoDb")).GetDatabase("fileDb"),
                 new PerContainerLifetime());
-            container.Register<IFileProvider, DbFileProvider>();
+            container.Register<IUserFileProvider, DbUserFileProvider>();
 
             return container.CreateServiceProvider(services);
+        }
+
+        private static void ConfigureIdentity(IServiceCollection services)
+        {
+            // Set ASP.NET Identity and cooie authentication
+            services.AddIdentity<AppUser, AppRole>(options =>
+                {
+                    // Password settings
+                    options.Password.RequireDigit = false;
+                    options.Password.RequiredLength = 8;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireLowercase = false;
+
+                    // User settings
+                    options.User.RequireUniqueEmail = true;
+
+                    options.Cookies.ApplicationCookie.ExpireTimeSpan = TimeSpan.FromDays(150);
+                    options.Cookies.ApplicationCookie.LoginPath = "/Account/Login/";
+                    options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOff";
+                    options.Cookies.ApplicationCookie.AuthenticationScheme = AuthenticationScheme.WebCookie;
+                    options.Cookies.ApplicationCookie.AutomaticAuthenticate = true;
+                    options.Cookies.ApplicationCookie.AutomaticChallenge = true;
+                })
+                .AddEntityFrameworkStores<AppDbContext, int>()
+                .AddUserStore<AppUserStore>()
+                .AddDefaultTokenProviders();
+        }
+
+        private void ConfigureDatabase(IServiceCollection services)
+        {
+            // We choose what database provider we will use
+            // In configuration have to be "MySQL" or "MSSQL" 
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            if (_databaseOptions.Provider == "MySQL")
+            {
+                services.AddDbContext<AppDbContext>(options =>
+                    options.UseMySQL(connectionString));
+            }
+            else
+            {
+                services.AddDbContext<AppDbContext>(options =>
+                    options.UseSqlServer(connectionString));
+            }
         }
 
         private void ConfigureOptions(IServiceCollection services)
@@ -126,6 +134,7 @@ namespace CVaS.Web
             services.Configure<BrokerOptions>(Configuration.GetSection("Broker"));
             services.Configure<AlgorithmOptions>(Configuration.GetSection("Algorithm"));
             services.Configure<ModeOptions>(Configuration.GetSection("Mode"));
+            services.Configure<DirectoryPathOptions>(Configuration.GetSection("DirectoryPaths"));
 
             Configuration.GetSection("Mode").Bind(BusinessLayerComposition.ModeOptions);
             Configuration.GetSection("Database").Bind(_databaseOptions);

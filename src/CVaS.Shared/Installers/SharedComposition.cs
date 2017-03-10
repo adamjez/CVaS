@@ -7,6 +7,8 @@ using CVaS.Shared.Core.Registry;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.Broker;
 using CVaS.Shared.Services.File;
+using CVaS.Shared.Services.File.Algorithm;
+using CVaS.Shared.Services.File.Temporary;
 using CVaS.Shared.Services.Interpreter;
 using CVaS.Shared.Services.Process;
 using CVaS.Shared.Services.Time;
@@ -67,9 +69,8 @@ namespace CVaS.Shared.Installers
             serviceRegistry.Register<UserRepository>();
             serviceRegistry.Register<RuleRepository>();
 
-            serviceRegistry.Register<AlgorithmFileProvider>();
-            serviceRegistry.Register<TemporaryFileProvider>();
-            serviceRegistry.Register<FileHelper>();
+            serviceRegistry.Register<ITemporaryFileProvider, TemporaryFileProvider>();
+            serviceRegistry.Register<FileSystemWrapper>();
             serviceRegistry.Register<IAlgorithmFileProvider, AlgorithmFileProvider>();
 
 

@@ -16,20 +16,20 @@ namespace CVaS.Shared.Services.Process
     /// </summary>
     public class BaseProcessService : IProcessService
     {
-        private readonly FileHelper _fileHelper;
+        private readonly FileSystemWrapper _fileSystemWrapper;
         private readonly ICurrentTimeProvider _currentTimeProvider;
         private readonly ILogger<BaseProcessService> _logger;
 
-        public BaseProcessService(FileHelper fileHelper, ICurrentTimeProvider currentTimeProvider, ILogger<BaseProcessService> logger)
+        public BaseProcessService(FileSystemWrapper fileSystemWrapper, ICurrentTimeProvider currentTimeProvider, ILogger<BaseProcessService> logger)
         {
-            _fileHelper = fileHelper;
+            _fileSystemWrapper = fileSystemWrapper;
             _currentTimeProvider = currentTimeProvider;
             _logger = logger;
         }
 
         public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments,  CancellationToken cancellationToken)
         {
-            return await RunAsync(filePath, arguments, _fileHelper.GetDirectoryFromFile(filePath), cancellationToken);
+            return await RunAsync(filePath, arguments, _fileSystemWrapper.GetDirectoryFromFile(filePath), cancellationToken);
         }
 
         public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments, string workingDirectory, CancellationToken cancellationToken)

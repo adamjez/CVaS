@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 
 namespace CVaS.Shared.Services.File.Providers
 {
-    public interface IFileProvider
+    public interface IUserFileProvider
     {
-        Task<string> Save(string filePath, string contentType);
+        Task<string> SaveAsync(string filePath, string contentType);
 
-        Task<string> Save(Stream stream, string fileName, string contentType);
+        Task<string> SaveAsync(Stream stream, string fileName, string contentType);
 
         Task<FileResult> Get(string id);
 
