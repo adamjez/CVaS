@@ -41,6 +41,11 @@ namespace CVaS.Shared.Services.File.Temporary
             };
         }
 
+        public string ResolveTemporaryPath()
+        {
+            return temporaryDirectory;
+        }
+
         public string ResolveTemporaryPath(string file)
         {
             return Path.Combine(temporaryDirectory, file);

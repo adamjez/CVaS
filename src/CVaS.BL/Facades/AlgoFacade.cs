@@ -29,7 +29,7 @@ namespace CVaS.BL.Facades
 
         public async Task<List<AlgorithmListDTO>> GetAll()
         {
-            return await GetAll<AlgorithmListDTO>(entity => new AlgorithmListDTO()
+            return await GetAll(entity => new AlgorithmListDTO()
             {
                 Description = entity.Description,
                 CodeName = entity.CodeName
@@ -40,7 +40,8 @@ namespace CVaS.BL.Facades
         {
             var now = _currentTimeProvider.Now();
 
-            return await GetAll<AlgorithmStatsListDTO>(entity => new AlgorithmStatsListDTO()
+            // Todo: Issue https://github.com/aspnet/EntityFramework/issues/7714
+            return await GetAll(entity => new AlgorithmStatsListDTO
             {
                 Description = entity.Description,
                 CodeName = entity.CodeName,

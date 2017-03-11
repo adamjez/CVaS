@@ -9,8 +9,8 @@ using CVaS.DAL.Model;
 namespace CVaS.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20170311002653_AddedPropertiesToFileEntity")]
-    partial class AddedPropertiesToFileEntity
+    [Migration("20170311104600_InitMigration")]
+    partial class InitMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

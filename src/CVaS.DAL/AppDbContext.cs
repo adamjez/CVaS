@@ -1,4 +1,5 @@
-﻿using CVaS.DAL.Model;
+﻿using System;
+using CVaS.DAL.Model;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

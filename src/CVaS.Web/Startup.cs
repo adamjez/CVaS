@@ -67,7 +67,9 @@ namespace CVaS.Web
             var container = new ServiceContainer();
 
             var physicalProvider = hostingEnvironment.ContentRootFileProvider;
-            container.RegisterInstance(physicalProvider);
+            // It's null when using ef migrations tools so we need to check first to not to throw exc
+            if (physicalProvider != null) container.RegisterInstance(physicalProvider);
+
             container.RegisterInstance(Configuration);
             container.Register<AppContextSeed>();
 

@@ -124,7 +124,10 @@ namespace CVaS.DAL.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ContentType = table.Column<string>(nullable: true),
                     CreatedAt = table.Column<DateTime>(nullable: false),
+                    Extension = table.Column<string>(nullable: true),
+                    Hash = table.Column<byte[]>(maxLength: 16, nullable: true),
                     Path = table.Column<string>(maxLength: 256, nullable: false),
                     Type = table.Column<int>(nullable: false),
                     UserId = table.Column<int>(nullable: false)
@@ -247,7 +250,8 @@ namespace CVaS.DAL.Migrations
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
-                column: "NormalizedName");
+                column: "NormalizedName",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
@@ -299,11 +303,6 @@ namespace CVaS.DAL.Migrations
                 name: "IX_AspNetUserRoles_RoleId",
                 table: "AspNetUserRoles",
                 column: "RoleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserRoles_UserId",
-                table: "AspNetUserRoles",
-                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
