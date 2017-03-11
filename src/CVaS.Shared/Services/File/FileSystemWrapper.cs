@@ -13,6 +13,11 @@ namespace CVaS.Shared.Services.File
                 await stream.CopyToAsync(file);
         }
 
+        public void CreateDirectory(string directoryPath)
+        {
+            System.IO.Directory.CreateDirectory(directoryPath);
+        }
+
         public void DeleteDirectory(string directoryPath)
         {
             System.IO.Directory.Delete(directoryPath, true);
@@ -23,9 +28,14 @@ namespace CVaS.Shared.Services.File
             System.IO.File.Delete(filePath);
         }
 
-        public bool Exists(string path)
+        public bool ExistsFile(string path)
         {
             return System.IO.File.Exists(path);
+        }
+
+        public bool ExistsDirectory(string path)
+        {
+            return System.IO.Directory.Exists(path);
         }
 
         public bool IsEmpty(string directory)

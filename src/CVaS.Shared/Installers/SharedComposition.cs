@@ -71,6 +71,7 @@ namespace CVaS.Shared.Installers
 
             serviceRegistry.Register<ITemporaryFileProvider, TemporaryFileProvider>();
             serviceRegistry.Register<FileSystemWrapper>();
+            serviceRegistry.Register<UserLocalFileProvider>();
             serviceRegistry.Register<IAlgorithmFileProvider, AlgorithmFileProvider>();
 
 

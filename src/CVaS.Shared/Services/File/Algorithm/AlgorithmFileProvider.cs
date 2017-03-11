@@ -84,7 +84,7 @@ namespace CVaS.Shared.Services.File.Algorithm
             }
 
             // future Local File Path
-            var localPath = _userLocalFileProvider.CreatePath(userId, dbFile.Hash.ToString(), dbFile.Extension);
+            var localPath = _userLocalFileProvider.CreatePath(userId, dbFile.Hash, dbFile.Extension);
 
             // Check if file exists locally
             if (System.IO.File.Exists(localPath))
@@ -94,9 +94,9 @@ namespace CVaS.Shared.Services.File.Algorithm
 
             var localFile = dbFile;
             var resultTask = _userFileProvider.Get(dbFile.Path)
-                .ContinueWith(async t =>
+                .ContinueWith(async task =>
                 {
-                    await _fileSystem.SaveAsync((await t).Content, localPath);
+                    await _fileSystem.SaveAsync((await task).Content, localPath);
                     return new LocalFileResult(localPath, localFile.Id);
                 })
                 .Unwrap();

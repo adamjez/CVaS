@@ -11,8 +11,6 @@ namespace CVaS.AlgServer.Services.FilesCleaning
         {
             // Schedule an IJob to run at an interval
             Schedule<FilesScanningAndCleaningJob>().ToRunNow().AndEvery(options.Value.PeriodInMinutes).Minutes();
-            JobManager.AddJob(() => Console.WriteLine("Late job!"), s => s.ToRunNow());
-
         }
     }
 }

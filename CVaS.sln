@@ -1,24 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8C75A8AC-CDA2-4006-9E9B-1742E6B1E959}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6922CD4A-06FB-4364-86B3-233BD38F670C}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CVaS.Web", "src\CVaS.Web\CVaS.Web.csproj", "{4D4D25A9-1C00-49EE-A0A2-438909DF60D0}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CVaS.Web", "src\CVaS.Web\CVaS.Web.xproj", "{4D4D25A9-1C00-49EE-A0A2-438909DF60D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CVaS.BL", "src\CVaS.BL\CVaS.BL.csproj", "{148ED1CE-F837-4DB2-9D0A-50FD6C1CA02E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CVaS.BL", "src\CVaS.BL\CVaS.BL.xproj", "{148ED1CE-F837-4DB2-9D0A-50FD6C1CA02E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CVaS.DAL", "src\CVaS.DAL\CVaS.DAL.csproj", "{71989561-ABFD-4F39-8B7D-3980BC6E7F06}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CVaS.DAL", "src\CVaS.DAL\CVaS.DAL.xproj", "{71989561-ABFD-4F39-8B7D-3980BC6E7F06}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CVaS.AlgServer", "src\CVaS.AlgServer\CVaS.AlgServer.csproj", "{BD440D3F-9E6E-4AE5-B8A2-A61F8C3A5B6D}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CVaS.AlgServer", "src\CVaS.AlgServer\CVaS.AlgServer.xproj", "{BD440D3F-9E6E-4AE5-B8A2-A61F8C3A5B6D}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CVaS.Shared", "src\CVaS.Shared\CVaS.Shared.xproj", "{6CD8254C-4805-469C-B316-4CA969EF1744}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CVaS.Shared", "src\CVaS.Shared\CVaS.Shared.csproj", "{6CD8254C-4805-469C-B316-4CA969EF1744}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

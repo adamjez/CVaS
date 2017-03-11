@@ -36,7 +36,7 @@ namespace CVaS.BL.Facades
 
         public async Task<RunResult> RunAlgorithmAsync(string codeName, IEnumerable<object> arguments)
         {
-            using (UnitOfWorkProvider.Create())
+            using (UnitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
             {
                 var algorithm = await _algorithmRepository.GetByCodeNameWithArgs(codeName);
 
@@ -60,7 +60,7 @@ namespace CVaS.BL.Facades
 
         private async Task<RunResult> CreateRunAndLaunch(Algorithm algorithm, List<Argument> args)
         {
-            using (var uow = UnitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
+            using (var uow = UnitOfWorkProvider.Create())
             {
                 var run = new Run()
                 {

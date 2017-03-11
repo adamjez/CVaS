@@ -10,11 +10,11 @@ namespace CVaS.AlgServer
             var env = EnviromentOptions.GetEnviromentOptions();
             var startup = new Startup(env);
 
-            using (var provider = startup.ConfigureServices())
+            using (var provider = startup.ConfigureServices()) 
             {
                 startup.Configure(provider);
 
-                var server = provider.GetInstance<BrokerServer>();
+                var server = (BrokerServer)provider.GetInstance(typeof(BrokerServer));
                 server.Start();
             }
         }

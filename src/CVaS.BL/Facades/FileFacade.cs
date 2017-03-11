@@ -26,7 +26,7 @@ namespace CVaS.BL.Facades
 
         public async Task DeleteAsync(int fileId)
         {
-            using (UnitOfWorkProvider.Create())
+            using (var uow = UnitOfWorkProvider.Create())
             {
                 var file = await _fileRepository.GetByIdSafely(fileId);
 
@@ -36,6 +36,9 @@ namespace CVaS.BL.Facades
                 }
 
                 await _userFileProvider.DeleteAsync(file.Path);
+
+                _fileRepository.Delete(file);
+                await uow.CommitAsync();
             }
         }
 
@@ -43,34 +46,42 @@ namespace CVaS.BL.Facades
         {
             using (var uow = UnitOfWorkProvider.Create())
             {
-                using (var md5Hash = System.Security.Cryptography.MD5.Create())
+                // ToDo: find better solution, we need to intruduce new stream, bcs old stream is not seekable
+                // and we need to read it once more
+                using (var memStream = new MemoryStream())
                 {
-                    var hash = md5Hash.ComputeHash(fileStream);
+                    await fileStream.CopyToAsync(memStream);
+                    memStream.Seek(0, SeekOrigin.Begin);
 
-                    var fileWithSameHash = await _fileRepository.GetByHashAsync(hash, CurrentUserProvider.Id);
-
-                    if (fileWithSameHash != null)
-                        return fileWithSameHash.Id;
-
-                    var path = await _userFileProvider.SaveAsync(fileStream, fileName, contentType);
-
-                    var fileEntity = new File()
+                    using (var md5Hash = System.Security.Cryptography.MD5.Create())
                     {
-                        Path = path,
-                        UserId = CurrentUserProvider.Id,
-                        Type = FileType.Upload,
-                        Hash = hash,
-                        Extension = Path.GetExtension(fileName),
-                        ContentType = contentType
-                    };
+                        var hash = md5Hash.ComputeHash(memStream);
+                        memStream.Seek(0, SeekOrigin.Begin);
 
-                    uow.Context.Files.Add(fileEntity);
+                        var fileWithSameHash = await _fileRepository.GetByHashAsync(hash, CurrentUserProvider.Id);
 
-                    await uow.CommitAsync();
+                        if (fileWithSameHash != null)
+                            return fileWithSameHash.Id;
 
-                    return fileEntity.Id;
+                        var path = await _userFileProvider.SaveAsync(memStream, fileName, contentType);
+
+                        var fileEntity = new File()
+                        {
+                            Path = path,
+                            UserId = CurrentUserProvider.Id,
+                            Type = FileType.Upload,
+                            Hash = hash,
+                            Extension = Path.GetExtension(fileName),
+                            ContentType = contentType
+                        };
+
+                        uow.Context.Files.Add(fileEntity);
+
+                        await uow.CommitAsync();
+
+                        return fileEntity.Id;
+                    }
                 }
-
             }
         }
 

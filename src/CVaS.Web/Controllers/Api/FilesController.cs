@@ -99,9 +99,8 @@ namespace CVaS.Web.Controllers.Api
             else
             {
                 var result = await _userFileProvider.Get(remoteFileId);
-                {
-                    return new FileStreamResult(result.Content, result.ContentType);
-                }
+
+                return new FileStreamResult(result.Content, result.ContentType);
             }
 
             return null;

@@ -44,6 +44,11 @@ namespace CVaS.Shared.Services.File.Providers
             await _bucket.DownloadToStreamAsync(oid, memStream);
             memStream.Seek(0, SeekOrigin.Begin);
 
+
+            //var stream = await _bucket.OpenDownloadStreamAsync(oid);
+
+            //return new FileResult(stream, stream.FileInfo.Filename, (string)stream.FileInfo.Metadata[ContentType]);
+
             return new FileResult(memStream, result.Filename, (string)result.Metadata[ContentType]);
         }
 

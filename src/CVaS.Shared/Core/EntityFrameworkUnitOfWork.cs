@@ -12,6 +12,7 @@ namespace CVaS.Shared.Core
     public class EntityFrameworkUnitOfWork : UnitOfWorkBase
     {
         private readonly bool canCommit;
+        private readonly bool ownContext;
 
         /// <summary>
         /// Gets the <see cref="Microsoft.EntityFrameworkCore.DbContext"/>.
@@ -49,6 +50,7 @@ namespace CVaS.Shared.Core
             }
 
             this.Context = dbContextFactory();
+            ownContext = true;
             canCommit = true;
         }
 
@@ -78,7 +80,7 @@ namespace CVaS.Shared.Core
         /// </summary>
         protected override void DisposeCore()
         {
-            if (canCommit)
+            if (ownContext)
             {
                 Context.Dispose();
             }

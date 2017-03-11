@@ -18,7 +18,7 @@ namespace CVaS.Shared.Services.Broker
         }
 
 
-        public async Task<int> GetConnectedClients()
+        public async Task<int?> GetConnectedClients()
         {
             var handler = new HttpClientHandler
             {
@@ -28,6 +28,7 @@ namespace CVaS.Shared.Services.Broker
             using (var client = new HttpClient(handler))
             {
                 var uri = new Uri("https://" + _brokerOptions.Value.Hostname + "/api/queues/" + _brokerOptions.Value.Vhost);
+
                 var result = await client.GetAsync(uri);
 
                 if (result.IsSuccessStatusCode)
@@ -37,7 +38,8 @@ namespace CVaS.Shared.Services.Broker
                     return jObject[0]["consumers"].ToObject<int>();
                 }
 
-                throw new HttpRequestException();
+                return null;
+
             }
         }
     }

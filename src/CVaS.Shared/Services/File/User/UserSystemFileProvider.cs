@@ -12,6 +12,7 @@ namespace CVaS.Shared.Services.File.Providers
         public UserSystemFileProvider(ITemporaryFileProvider tmpFileProvider, FileSystemWrapper fileSystemWrapper)
         {
             _tmpFileProvider = tmpFileProvider;
+            _fileSystemWrapper = fileSystemWrapper;
         }
 
         public override async Task<string> SaveAsync(Stream stream, string fileName, string contentType)

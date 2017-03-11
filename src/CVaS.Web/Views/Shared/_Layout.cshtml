@@ -1,4 +1,5 @@
-﻿@model CVaS.Web.Models.LayoutViewModel
+﻿@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
+@model CVaS.Web.Models.LayoutViewModel
 
 <!DOCTYPE html>
 <html>
@@ -18,6 +19,7 @@
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
     @RenderSection("header", required: false)
+    @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
 <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">

@@ -58,7 +58,7 @@ namespace CVaS.Shared.Services.Launch
         {
             var filePath = _algorithmFileProvider.GetAlgorithmFilePath(codeName, pathFile);
 
-            if (!_fileSystemWrapper.Exists(filePath))
+            if (!_fileSystemWrapper.ExistsFile(filePath))
             {
                 throw new NotFoundException("Given algorithm execution file doesn't exists");
             }
