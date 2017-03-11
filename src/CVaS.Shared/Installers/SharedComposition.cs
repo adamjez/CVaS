@@ -54,7 +54,7 @@ namespace CVaS.Shared.Installers
 
             if (IsWebApplication)
             {
-                serviceRegistry.Register<UnitOfWorkRegistryBase, ThreadLocalUnitOfWorkRegistry>();
+                serviceRegistry.Register<UnitOfWorkRegistryBase, AsyncLocalUnitOfWorkRegistry>();
                 serviceRegistry.Register<IUnitOfWorkRegistry, HttpContextUnitOfWorkRegistry>();
             }
             else

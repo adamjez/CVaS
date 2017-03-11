@@ -24,7 +24,7 @@ namespace CVaS.BL.Common
 
         public async Task SeedAsync(string username = null, string email = null, string password = null)
         {
-            using (var uow = _unitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
+            using (var uow = _unitOfWorkProvider.Create())
             {
                 uow.Context.Database.Migrate();
 
