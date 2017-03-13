@@ -6,6 +6,8 @@ namespace CVaS.Shared.Services.File.Temporary
     {
         string CreateTemporaryFolder();
 
+        string ResolveTemporaryPath();
+
         string ResolveTemporaryPath(string file);
 
         FileStream CreateTemporaryFile(string extension, out string filePath);
