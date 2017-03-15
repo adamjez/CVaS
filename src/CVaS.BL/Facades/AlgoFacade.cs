@@ -41,14 +41,23 @@ namespace CVaS.BL.Facades
             var now = _currentTimeProvider.Now();
 
             // Todo: Issue https://github.com/aspnet/EntityFramework/issues/7714
-            return await GetAll(entity => new AlgorithmStatsListDTO
+            return (await GetAll(entity => new
             {
                 Description = entity.Description,
                 CodeName = entity.CodeName,
                 LaunchCount = entity.Runs.Count(),
                 LaunchCountLastHour = entity.Runs.Count(r => r.CreatedAt > now.AddHours(-1)),
                 LaunchCountLastDay = entity.Runs.Count(r => r.CreatedAt > now.AddDays(-1))
-            });
+            }))
+            .Select(entity => new AlgorithmStatsListDTO
+            {
+                Description = entity.Description,
+                CodeName = entity.CodeName,
+                LaunchCount = entity.LaunchCount,
+                LaunchCountLastHour = entity.LaunchCountLastHour,
+                LaunchCountLastDay = entity.LaunchCountLastDay
+            })
+            .ToList();
         }
 
         private async Task<List<TOut>> GetAll<TOut>(Expression<Func<Algorithm, TOut>> projection)
