@@ -39,7 +39,9 @@ namespace CVaS.Web.Helpers
         public static string GetBoundary(string contentType)
         {
             var elements = contentType.Split(' ');
-            var element = elements.First(entry => entry.StartsWith("boundary="));
+            var element = elements.FirstOrDefault(entry => entry.StartsWith("boundary="));
+            if (element == null)
+                return null;
             var boundary = element.Substring("boundary=".Length);
             // Remove quotes
             if (boundary.Length >= 2 && boundary[0] == '"' &&

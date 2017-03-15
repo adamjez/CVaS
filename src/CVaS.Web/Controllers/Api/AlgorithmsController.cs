@@ -68,7 +68,7 @@ namespace CVaS.Web.Controllers.Api
             {
                 RunId = result.RunId,
                 StdOut = result.StdOut,
-                StdError = result.StdErr,
+                StdErr = result.StdErr,
                 Zip = result.FileId != null ? Url.Link(nameof(FilesController.GetFile), new { zipName = result.FileId }) : null,
                 Result = result.Result,
                 Duration = result.Duration

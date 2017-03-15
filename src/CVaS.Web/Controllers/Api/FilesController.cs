@@ -47,6 +47,10 @@ namespace CVaS.Web.Controllers.Api
             }
 
             var boundary = MultipartFormHelpers.GetBoundary(HttpContext.Request.ContentType);
+            if (boundary == null)
+            {
+                return BadRequest("Missing Boundary");
+            }
             var reader = new MultipartReader(boundary, HttpContext.Request.Body);
 
             var fileIds = new List<int>();

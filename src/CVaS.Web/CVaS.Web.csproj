@@ -69,8 +69,6 @@
     <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 
-  <Target Name="PostpublishScript" AfterTargets="Publish">
-    <Exec Command="docker build -t user/cvas.algserver $(TargetDir)" />
-  </Target>
+
   
 </Project>
