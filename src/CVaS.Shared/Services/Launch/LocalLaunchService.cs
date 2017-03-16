@@ -73,11 +73,11 @@ namespace CVaS.Shared.Services.Launch
                 var runFolder = _temporaryFileProvider.CreateTemporaryFolder();
                 stringArguments.Insert(0, runFolder);
 
-                var tokenSource = new CancellationTokenSource(_options.Value.HardTimeout * 1000);
+                var tokenSource = new CancellationTokenSource(_options.Value.HardTimeoutInSeconds * 1000);
 
                 var task = _processService.RunAsync(filePath, stringArguments, tokenSource.Token);
 
-                var result = await task.WithTimeout(TimeSpan.FromSeconds(_options.Value.LightTimeout));
+                var result = await task.WithTimeout(TimeSpan.FromSeconds(_options.Value.LightTimeoutInSeconds));
                 if (!result.Completed)
                 {
                     // timeout/cancellation logic

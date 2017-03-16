@@ -32,24 +32,13 @@ namespace CVaS.Shared.Services.File.Providers
             return newId.ToString();
         }
 
-        public override async Task<FileResult> Get(string id)
+        public override async Task<FileResult> GetAsync(string id)
         {
             ObjectId oid = new ObjectId(id);
 
-            var filter = Builders<GridFSFileInfo>.Filter.Eq("_id", oid);
+            var stream = await _bucket.OpenDownloadStreamAsync(oid);
 
-            var result = (await _bucket.FindAsync(filter)).Single();
-
-            var memStream = new MemoryStream();
-            await _bucket.DownloadToStreamAsync(oid, memStream);
-            memStream.Seek(0, SeekOrigin.Begin);
-
-
-            //var stream = await _bucket.OpenDownloadStreamAsync(oid);
-
-            //return new FileResult(stream, stream.FileInfo.Filename, (string)stream.FileInfo.Metadata[ContentType]);
-
-            return new FileResult(memStream, result.Filename, (string)result.Metadata[ContentType]);
+            return new FileResult(stream, (string)stream.FileInfo.Metadata[ContentType]);
         }
 
         public override async Task DeleteAsync(string id)

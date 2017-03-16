@@ -93,7 +93,7 @@ namespace CVaS.Shared.Services.File.Algorithm
             }
 
             var localFile = dbFile;
-            var resultTask = _userFileProvider.Get(dbFile.Path)
+            var resultTask = _userFileProvider.GetAsync(dbFile.Path)
                 .ContinueWith(async task =>
                 {
                     await _fileSystem.SaveAsync((await task).Content, localPath);

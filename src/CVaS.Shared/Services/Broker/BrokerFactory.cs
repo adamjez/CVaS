@@ -19,7 +19,7 @@ namespace CVaS.Shared.Services.Broker
             $"host={_brokerOptions.Value.Hostname};" +
             $"username={_brokerOptions.Value.Username ?? "guest"};" +
             $"password={_brokerOptions.Value.Password ?? "guest"};" +
-            $"timeout={_algorithmOptions.Value.HardTimeout};" +
+            $"timeout={_algorithmOptions.Value.HardTimeoutInSeconds};" +
             $"virtualHost={_brokerOptions.Value.Vhost}");
     }
 }

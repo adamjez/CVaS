@@ -26,10 +26,11 @@ namespace CVaS.Shared.Services.File.Providers
             return filePath;
         }
 
-        public override Task<FileResult> Get(string id)
+        public override Task<FileResult> GetAsync(string id)
         {
             var path = _tmpFileProvider.ResolveTemporaryPath(id);
-            return Task.FromResult(new FileResult(System.IO.File.OpenRead(path), Path.GetFileName(path)));
+            // Todo: resolve content type properly
+            return Task.FromResult(new FileResult(System.IO.File.OpenRead(path)));
         }
 
         public override Task DeleteAsync(string id)

@@ -22,6 +22,12 @@ using LightInject.Microsoft.DependencyInjection;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Swashbuckle.SwaggerGen.Application;
+using EasyNetQ;
+using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
+using EasyNetQ.ConnectionString;
+using System.Linq;
 
 namespace CVaS.Web
 {
@@ -44,11 +50,13 @@ namespace CVaS.Web
         public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public System.IServiceProvider ConfigureServices(IServiceCollection services)
         {
             ConfigureOptions(services);
             ConfigureDatabase(services);
             ConfigureIdentity(services);
+            ConfigureBroker(services);
+            ConfigureFileStorage(services);
 
             // Add framework services.
             services.AddMvc(options => { options.Filters.Add(typeof(HttpExceptionFilterAttribute)); })
@@ -76,12 +84,6 @@ namespace CVaS.Web
             container.RegisterFrom<WebApiComposition>();
             container.RegisterFrom<BusinessLayerComposition>();
 
-            // One Client Per Application: Source http://mongodb.github.io/mongo-csharp-driver/2.2/getting_started/quick_tour/
-            container.Register<IMongoDatabase>(
-                (sf) => new MongoClient(Configuration.GetConnectionString("MongoDb")).GetDatabase("fileDb"),
-                new PerContainerLifetime());
-            container.Register<IUserFileProvider, DbUserFileProvider>();
-
             return container.CreateServiceProvider(services);
         }
 
@@ -103,7 +105,7 @@ namespace CVaS.Web
                     options.Cookies.ApplicationCookie.ExpireTimeSpan = TimeSpan.FromDays(150);
                     options.Cookies.ApplicationCookie.LoginPath = "/Account/Login/";
                     options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOff";
-                    options.Cookies.ApplicationCookie.AuthenticationScheme = AuthenticationScheme.WebCookie;
+                    options.Cookies.ApplicationCookie.AuthenticationScheme = Authentication.AuthenticationScheme.WebCookie;
                     options.Cookies.ApplicationCookie.AutomaticAuthenticate = true;
                     options.Cookies.ApplicationCookie.AutomaticChallenge = true;
                 })
@@ -129,11 +131,49 @@ namespace CVaS.Web
             }
         }
 
+        private void ConfigureBroker(IServiceCollection services)
+        {
+            var connectionString = Configuration.GetConnectionString("RabbitMq");
+            var connectionStringParser = new ConnectionStringParser();
+
+            var connectionConfiguration = connectionStringParser.Parse(connectionString);
+            services.Configure<BrokerOptions>((option) => { 
+                option.Hostname = connectionConfiguration.Hosts.First().Host;
+                option.Username = connectionConfiguration.UserName;
+                option.Password = connectionConfiguration.Password;
+                option.Vhost = connectionConfiguration.VirtualHost;
+            });
+            services.AddSingleton(RabbitHutch.CreateBus(connectionString));
+        }
+
+        private void ConfigureFileStorage(IServiceCollection container)
+        {
+            var mongoDbConnectionString = Configuration.GetConnectionString("MongoDb");
+            var azureStorageConnectionString = Configuration.GetConnectionString("AzureStorage");
+            if (mongoDbConnectionString != null)
+            {
+                // One Client Per Application: Source http://mongodb.github.io/mongo-csharp-driver/2.2/getting_started/quick_tour/
+                container.AddSingleton((sf) => new MongoClient(Configuration.GetConnectionString("MongoDb")).GetDatabase("fileDb"));
+                container.AddTransient<IUserFileProvider, DbUserFileProvider>();
+            }
+            else if (azureStorageConnectionString != null)
+            {
+                // Retrieve storage account from connection string.
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(azureStorageConnectionString);
+
+                container.AddSingleton(storageAccount);
+                container.AddTransient<IUserFileProvider, AzureStorageProvider>();
+            }
+            else
+            {
+                container.AddTransient<IUserFileProvider, UserSystemFileProvider>();
+            }
+        }
+
         private void ConfigureOptions(IServiceCollection services)
         {
             services.AddOptions();
 
-            services.Configure<BrokerOptions>(Configuration.GetSection("Broker"));
             services.Configure<AlgorithmOptions>(Configuration.GetSection("Algorithm"));
             services.Configure<ModeOptions>(Configuration.GetSection("Mode"));
             services.Configure<DirectoryPathOptions>(Configuration.GetSection("DirectoryPaths"));
@@ -157,7 +197,7 @@ namespace CVaS.Web
 
             app.UseApiAuthentication(new ApiAuthenticationOptions()
             {
-                AuthenticationScheme = AuthenticationScheme.ApiKey,
+                AuthenticationScheme = Authentication.AuthenticationScheme.ApiKey,
                 HeaderScheme = "Simple"
             });
             app.UseIdentity();
@@ -197,15 +237,10 @@ namespace CVaS.Web
                 Description = "Api Key Authentication",
                 Type = "apiKey"
             });
-            options.IncludeXmlComments(ResolvePathToXmlCommentFile());
-        }
 
-        private string ResolvePathToXmlCommentFile()
-        {
-            var location = System.Reflection.Assembly.GetEntryAssembly().Location;
-            var directory = System.IO.Path.GetDirectoryName(location);
-            var pathToDoc = System.IO.Path.Combine(directory, Configuration["Swagger:XmlCommentFile"]);
-            return pathToDoc;
+            var basePath = PlatformServices.Default.Application.ApplicationBasePath;
+            var pathToDoc = System.IO.Path.Combine(basePath, "CVaS.Web.xml");
+            options.IncludeXmlComments(pathToDoc);
         }
     }
 }

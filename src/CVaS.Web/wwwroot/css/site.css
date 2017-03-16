@@ -135,3 +135,18 @@ h4 {
     border: 0;
     border-bottom: 1px solid #eee;
 }
+
+/* Core Section */
+#message {
+    position: fixed;
+    top: 60px;
+    left: 10px;
+    width: 100%;
+    z-index: 4;
+}
+
+#request-message {
+    float:left;
+    /*margin: 0 auto;
+    display: inline-block;*/
+}

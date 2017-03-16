@@ -102,7 +102,7 @@ namespace CVaS.Web.Controllers.Api
             }
             else
             {
-                var result = await _userFileProvider.Get(remoteFileId);
+                var result = await _userFileProvider.GetAsync(remoteFileId);
 
                 return new FileStreamResult(result.Content, result.ContentType);
             }

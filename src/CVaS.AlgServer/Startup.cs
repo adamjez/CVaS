@@ -18,6 +18,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MySQL.Data.EntityFrameworkCore.Extensions;
+using EasyNetQ;
+using Microsoft.WindowsAzure.Storage;
 
 namespace CVaS.AlgServer
 {
@@ -49,6 +51,7 @@ namespace CVaS.AlgServer
             ConfigureBrokerServices(services);
             ConfigureJobsServices(services);
             ConfigureDatabaseServices(services);
+            ConfigureStorage(services);
 
             var container = new LightInject.ServiceContainer();
             container.CreateServiceProvider(services);
@@ -57,12 +60,32 @@ namespace CVaS.AlgServer
             container.RegisterInstance(Configuration);
             // Just hack to not to try dispose container bcs of StackOverflow Exception (container calling dispose on container ..)
             container.Register<IServiceFactory>(factory => factory);
-            container.Register<IMongoDatabase>(
-                (sf) => new MongoClient(Configuration.GetConnectionString("MongoDb")).GetDatabase("fileDb"),
-                new PerContainerLifetime());
-            container.Register<IUserFileProvider, DbUserFileProvider>();
 
             return container;
+        }
+
+        private void ConfigureStorage(IServiceCollection container)
+        {
+            var mongoDbConnectionString = Configuration.GetConnectionString("MongoDb");
+            var azureStorageConnectionString = Configuration.GetConnectionString("AzureStorage");
+            if (mongoDbConnectionString != null)
+            {
+                // One Client Per Application: Source http://mongodb.github.io/mongo-csharp-driver/2.2/getting_started/quick_tour/
+                container.AddSingleton((sf) => new MongoClient(Configuration.GetConnectionString("MongoDb")).GetDatabase("fileDb"));
+                container.AddTransient<IUserFileProvider, DbUserFileProvider>();
+            }
+            else if (azureStorageConnectionString != null)
+            {
+                // Retrieve storage account from connection string.
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(azureStorageConnectionString);
+
+                container.AddSingleton(storageAccount);
+                container.AddTransient<IUserFileProvider, AzureStorageProvider>();
+            }
+            else
+            {
+                container.AddTransient<IUserFileProvider, UserSystemFileProvider>();
+            }
         }
 
         private void ConfigureDatabaseServices(IServiceCollection services)
@@ -101,7 +124,7 @@ namespace CVaS.AlgServer
 
         private void ConfigureBrokerServices(IServiceCollection services)
         {
-            services.Configure<BrokerOptions>(Configuration.GetSection("Broker"));
+            services.AddSingleton(RabbitHutch.CreateBus(Configuration.GetConnectionString("RabbitMq")));
             services.AddTransient<IBrokerReceiver, EasyNetQReceiver>();
             services.AddTransient<IMessageProcessor, RunMessageProcessor>();
             services.AddTransient<BrokerServer>();

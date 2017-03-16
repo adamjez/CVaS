@@ -1,46 +1,33 @@
-using System;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using CVaS.Shared.Options;
+using EasyNetQ.Management.Client;
+using System.Linq;
+using EasyNetQ;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 
 namespace CVaS.Shared.Services.Broker
 {
     public class BrokerStatus
     {
         private readonly IOptions<BrokerOptions> _brokerOptions;
+        private readonly IBus _bus;
 
-        public BrokerStatus(IOptions<BrokerOptions> brokerOptions)
+        public BrokerStatus(IOptions<BrokerOptions> brokerOptions, IBus bus)
         {
+            _bus = bus;
             _brokerOptions = brokerOptions;
         }
 
-
-        public async Task<int?> GetConnectedClients()
+        public Task<int?> GetConnectedClients()
         {
-            var handler = new HttpClientHandler
+            if (!_bus.IsConnected)
             {
-                Credentials = new NetworkCredential(_brokerOptions.Value.Username, _brokerOptions.Value.Password)
-            };
-
-            using (var client = new HttpClient(handler))
-            {
-                var uri = new Uri("https://" + _brokerOptions.Value.Hostname + "/api/queues/" + _brokerOptions.Value.Vhost);
-
-                var result = await client.GetAsync(uri);
-
-                if (result.IsSuccessStatusCode)
-                {
-                    var jObject = JArray.Parse(await result.Content.ReadAsStringAsync());
-
-                    return jObject[0]["consumers"].ToObject<int>();
-                }
-
                 return null;
-
             }
+
+            var client = new ManagementClient("https://"+_brokerOptions.Value.Hostname, _brokerOptions.Value.Username, _brokerOptions.Value.Password, 443);
+
+            return Task.FromResult<int?>(client.GetConnections().Count());
         }
     }
 }
