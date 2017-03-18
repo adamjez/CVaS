@@ -10,12 +10,15 @@
     "inputFiles": [
       "wwwroot/js/site.js"
     ],
-    // Optionally specify minification options
     "minify": {
       "enabled": true,
       "renameLocals": true
-    },
-    // Optinally generate .map file
-    "sourceMap": false
+    }
+  },
+  {
+    "outputFileName": "wwwroot/js/algorithm-client.min.js",
+    "inputFiles": [
+      "wwwroot/js/algorithm-client.js"
+    ]
   }
 ]

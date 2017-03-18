@@ -43,7 +43,7 @@ namespace CVaS.BL.Services.Launch
             }
             catch (TimeoutException)
             {
-                _logger.LogWarning("Timeouted when sending message to broker");
+                _logger.LogError("Timeouted when sending message to broker (Alg Server is failing or not any is connected)");
             }
             
             return new RunResult()
