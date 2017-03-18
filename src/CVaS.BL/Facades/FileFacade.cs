@@ -104,7 +104,7 @@ namespace CVaS.BL.Facades
             }
         }
 
-        public async Task<string> GetSafelyAsync(int fileId)
+        public async Task<File> GetSafelyAsync(int fileId)
         {
             using (UnitOfWorkProvider.Create())
             {
@@ -115,7 +115,7 @@ namespace CVaS.BL.Facades
                     throw new UnauthorizedAccessException();
                 }
 
-                return file.Path;
+                return file;
             }
         }
     }

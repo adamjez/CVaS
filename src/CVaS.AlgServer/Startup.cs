@@ -1,25 +1,19 @@
-﻿using System;
-using CVaS.AlgServer.Options;
+﻿using CVaS.AlgServer.Options;
 using CVaS.AlgServer.Services.BrokerReceiver;
 using CVaS.AlgServer.Services.FilesCleaning;
 using CVaS.AlgServer.Services.MessageProcessor;
 using CVaS.AlgServer.Services.Server;
-using CVaS.DAL;
 using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
-using CVaS.Shared.Services.File.Providers;
 using CVaS.Shared.Services.Launch;
 using FluentScheduler;
 using LightInject;
 using LightInject.Microsoft.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
-using MySQL.Data.EntityFrameworkCore.Extensions;
 using EasyNetQ;
-using Microsoft.WindowsAzure.Storage;
+using CVaS.Shared.Helpers;
 
 namespace CVaS.AlgServer
 {
@@ -39,7 +33,7 @@ namespace CVaS.AlgServer
         public IConfigurationRoot Configuration { get; }
 
 
-        public ServiceContainer ConfigureServices()
+        public IServiceContainer ConfigureServices()
         {
             var services = new ServiceCollection();
 
@@ -50,70 +44,18 @@ namespace CVaS.AlgServer
             ConfigureAlgorithmServices(services);
             ConfigureBrokerServices(services);
             ConfigureJobsServices(services);
-            ConfigureDatabaseServices(services);
-            ConfigureStorage(services);
+            services.AddDatabaseServices(Configuration);
+            services.AddStorageServices(Configuration);
 
-            var container = new LightInject.ServiceContainer();
-            container.CreateServiceProvider(services);
+            var container = new ServiceContainer();
 
             container.RegisterFrom<SharedComposition>();
             container.RegisterInstance(Configuration);
             // Just hack to not to try dispose container bcs of StackOverflow Exception (container calling dispose on container ..)
             container.Register<IServiceFactory>(factory => factory);
 
+            container.CreateServiceProvider(services);
             return container;
-        }
-
-        private void ConfigureStorage(IServiceCollection container)
-        {
-            var mongoDbConnectionString = Configuration.GetConnectionString("MongoDb");
-            var azureStorageConnectionString = Configuration.GetConnectionString("AzureStorage");
-            if (mongoDbConnectionString != null)
-            {
-                // One Client Per Application: Source http://mongodb.github.io/mongo-csharp-driver/2.2/getting_started/quick_tour/
-                container.AddSingleton((sf) => new MongoClient(Configuration.GetConnectionString("MongoDb")).GetDatabase("fileDb"));
-                container.AddTransient<IUserFileProvider, DbUserFileProvider>();
-            }
-            else if (azureStorageConnectionString != null)
-            {
-                // Retrieve storage account from connection string.
-                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(azureStorageConnectionString);
-
-                container.AddSingleton(storageAccount);
-                container.AddTransient<IUserFileProvider, AzureStorageProvider>();
-            }
-            else
-            {
-                container.AddTransient<IUserFileProvider, UserSystemFileProvider>();
-            }
-        }
-
-        private void ConfigureDatabaseServices(IServiceCollection services)
-        {
-            var databaseConfiguration = new DatabaseOptions();
-            Configuration.GetSection("Database").Bind(databaseConfiguration);
-            // We choose what database provider we will use
-            // In configuration have to be "MySQL" or "MSSQL" 
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
-
-            if (connectionString == null)
-            {
-                Console.WriteLine("ERROR: Connection string is empty");
-                Console.WriteLine(
-                    "Most common cause is missing environment variable with (e.g. NETCORE_ENVIRONMENT=Development)");
-                throw new ArgumentNullException(nameof(connectionString));
-            }
-
-            if (databaseConfiguration.Provider == "MySQL")
-            {
-                services.AddDbContext<AppDbContext>(options =>
-                    options.UseMySQL(connectionString));
-            }
-            else
-            {
-                services.AddDbContext<AppDbContext>(options =>
-                    options.UseSqlServer(connectionString));
-            }
         }
 
         private void ConfigureAlgorithmServices(IServiceCollection services)
@@ -124,7 +66,7 @@ namespace CVaS.AlgServer
 
         private void ConfigureBrokerServices(IServiceCollection services)
         {
-            services.AddSingleton(RabbitHutch.CreateBus(Configuration.GetConnectionString("RabbitMq")));
+            services.AddSingleton((s) => RabbitHutch.CreateBus(Configuration.GetConnectionString("RabbitMq")));
             services.AddTransient<IBrokerReceiver, EasyNetQReceiver>();
             services.AddTransient<IMessageProcessor, RunMessageProcessor>();
             services.AddTransient<BrokerServer>();
@@ -137,7 +79,7 @@ namespace CVaS.AlgServer
             services.AddTransient<FilesScanningAndCleaningJob>();
         }
 
-        public void Configure(ServiceContainer container)
+        public void Configure(IServiceContainer container)
         {
             var loggerFactory = container.GetInstance<ILoggerFactory>();
 

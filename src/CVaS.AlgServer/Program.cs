@@ -15,9 +15,8 @@ namespace CVaS.AlgServer
                 startup.Configure(provider);
 
                 var server = (BrokerServer)provider.GetInstance(typeof(BrokerServer));
-                server.Start();
+                server.StartAndWait();
             }
         }
     }
-
 }

@@ -70,7 +70,7 @@ namespace CVaS.Web.Controllers.Api
                 StdOut = result.StdOut,
                 StdErr = result.StdErr,
                 Zip = result.FileId != null ? Url.Link(nameof(FilesController.GetFile), new { fileId = result.FileId }) : null,
-                Result = result.Result,
+                Status = result.Result,
                 Duration = result.Duration
             });
         }

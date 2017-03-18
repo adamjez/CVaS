@@ -146,7 +146,14 @@ h4 {
 }
 
 #request-message {
-    float:left;
-    /*margin: 0 auto;
-    display: inline-block;*/
+    display: inline-block;
+}
+
+#body-request-message {
+    display: inline-block;
+}
+
+img.result-preview {
+    max-height: 120px;
+    float: right;
 }

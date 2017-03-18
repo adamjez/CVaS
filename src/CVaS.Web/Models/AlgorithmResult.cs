@@ -15,7 +15,7 @@ namespace CVaS.Web.Models
 
         public int RunId { get; set; }
 
-        public RunResultType Result { get; set; }
+        public RunResultType Status { get; set; }
 
         public double? Duration { get; set; }
     }

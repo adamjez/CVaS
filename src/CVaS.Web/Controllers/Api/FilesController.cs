@@ -81,7 +81,7 @@ namespace CVaS.Web.Controllers.Api
                 throw new BadRequestException("File Id has to  be specified");
             }
 
-            var remoteFileId = await _fileFacade.GetSafelyAsync(fileId);
+            var remoteFileId = (await _fileFacade.GetSafelyAsync(fileId)).Path;
 
             if (_userFileProvider is UserSystemFileProvider)
             {
@@ -126,11 +126,30 @@ namespace CVaS.Web.Controllers.Api
             return Ok();
         }
 
+        /// <summary>
+        /// Retrieve meta information about file with given file Id.
+        /// Currently returns only Content-Type of file
+        /// </summary>
+        /// <param name="fileId">File Identifier</param>
+        [HttpHead, Route("{fileId}")]
+        public async Task<IActionResult> HeadUserFile(int fileId)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new BadRequestException("File Id has to  be specified");
+            }
+
+            var file = await _fileFacade.GetSafelyAsync(fileId);
+
+            HttpContext.Response.Headers.Add("Content-Type", file.ContentType);
+
+            return Ok();
+        }
+
         private string GetContentType(string fileName)
         {
-            string contentType;
             return new FileExtensionContentTypeProvider()
-                .TryGetContentType(fileName, out contentType) ? contentType : "application/octet-stream";
+                .TryGetContentType(fileName, out string contentType) ? contentType : "application/octet-stream";
         }
     }
 }

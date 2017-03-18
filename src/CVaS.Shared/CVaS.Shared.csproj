@@ -18,6 +18,7 @@
   <ItemGroup>
     <PackageReference Include="EasyNetQ.Management.Client" Version="2.0.0-netcore0001" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.1.1" />
     <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
     <PackageReference Include="EasyNetQ" Version="2.0.4-netcore1438" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="1.1.1" />

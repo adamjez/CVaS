@@ -4,18 +4,16 @@ using CVaS.BL.Installers;
 using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Shared.Options;
-using CVaS.Shared.Services.File.Providers;
+using CVaS.Shared.Helpers;
 using CVaS.Web.Authentication;
 using CVaS.Web.Filters;
 using CVaS.Web.Installers;
 using LightInject;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MySQL.Data.EntityFrameworkCore.Extensions;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger.Model;
 using LightInject.Microsoft.DependencyInjection;
@@ -24,8 +22,6 @@ using Newtonsoft.Json;
 using Swashbuckle.SwaggerGen.Application;
 using EasyNetQ;
 using Microsoft.Extensions.PlatformAbstractions;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 using EasyNetQ.ConnectionString;
 using System.Linq;
 
@@ -53,10 +49,10 @@ namespace CVaS.Web
         public System.IServiceProvider ConfigureServices(IServiceCollection services)
         {
             ConfigureOptions(services);
-            ConfigureDatabase(services);
             ConfigureIdentity(services);
             ConfigureBroker(services);
-            ConfigureFileStorage(services);
+            services.AddDatabaseServices(Configuration);
+            services.AddStorageServices(Configuration);
 
             // Add framework services.
             services.AddMvc(options => { options.Filters.Add(typeof(HttpExceptionFilterAttribute)); })
@@ -107,28 +103,11 @@ namespace CVaS.Web
                     options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOff";
                     options.Cookies.ApplicationCookie.AuthenticationScheme = Authentication.AuthenticationScheme.WebCookie;
                     options.Cookies.ApplicationCookie.AutomaticAuthenticate = true;
-                    options.Cookies.ApplicationCookie.AutomaticChallenge = true;
+                    options.Cookies.ApplicationCookie.AutomaticChallenge = false;
                 })
                 .AddEntityFrameworkStores<AppDbContext, int>()
                 .AddUserStore<AppUserStore>()
                 .AddDefaultTokenProviders();
-        }
-
-        private void ConfigureDatabase(IServiceCollection services)
-        {
-            // We choose what database provider we will use
-            // In configuration have to be "MySQL" or "MSSQL" 
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            if (_databaseOptions.Provider == "MySQL")
-            {
-                services.AddDbContext<AppDbContext>(options =>
-                    options.UseMySQL(connectionString));
-            }
-            else
-            {
-                services.AddDbContext<AppDbContext>(options =>
-                    options.UseSqlServer(connectionString));
-            }
         }
 
         private void ConfigureBroker(IServiceCollection services)
@@ -143,31 +122,7 @@ namespace CVaS.Web
                 option.Password = connectionConfiguration.Password;
                 option.Vhost = connectionConfiguration.VirtualHost;
             });
-            services.AddSingleton(RabbitHutch.CreateBus(connectionString));
-        }
-
-        private void ConfigureFileStorage(IServiceCollection container)
-        {
-            var mongoDbConnectionString = Configuration.GetConnectionString("MongoDb");
-            var azureStorageConnectionString = Configuration.GetConnectionString("AzureStorage");
-            if (mongoDbConnectionString != null)
-            {
-                // One Client Per Application: Source http://mongodb.github.io/mongo-csharp-driver/2.2/getting_started/quick_tour/
-                container.AddSingleton((sf) => new MongoClient(Configuration.GetConnectionString("MongoDb")).GetDatabase("fileDb"));
-                container.AddTransient<IUserFileProvider, DbUserFileProvider>();
-            }
-            else if (azureStorageConnectionString != null)
-            {
-                // Retrieve storage account from connection string.
-                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(azureStorageConnectionString);
-
-                container.AddSingleton(storageAccount);
-                container.AddTransient<IUserFileProvider, AzureStorageProvider>();
-            }
-            else
-            {
-                container.AddTransient<IUserFileProvider, UserSystemFileProvider>();
-            }
+            services.AddSingleton((s) => RabbitHutch.CreateBus(Configuration.GetConnectionString("RabbitMq")));
         }
 
         private void ConfigureOptions(IServiceCollection services)

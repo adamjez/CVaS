@@ -40,7 +40,6 @@ namespace CVaS.Shared.Installers
 
 
             serviceRegistry.Register<BrokerFactory>(new PerContainerLifetime());
-            serviceRegistry.Register<IBus>(s => s.GetInstance<BrokerFactory>().Bus, new PerContainerLifetime());
             serviceRegistry.Register<BrokerStatus>(new PerRequestLifeTime());
             
 

@@ -29,7 +29,7 @@ namespace CVaS.AlgServer.Services.BrokerReceiver
             {
                 _logger.LogInformation("Connected to RabbitMq server and setting respond");
             }
-            
+
             _bus.RespondAsync<CreateAlgorithmMessage, RunResultMessage>(async (request) =>
             {
                 _logger.LogInformation("Received request!");

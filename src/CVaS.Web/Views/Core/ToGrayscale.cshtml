@@ -27,7 +27,7 @@
             <ul class="qq-upload-list-selector qq-upload-list" role="region" aria-live="polite" aria-relevant="additions removals">
                 <li>
                     <div class="row" style="margin-left:0px;margin-right:0px">
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
                             <div class="qq-progress-bar-container-selector qq-progress-bar-container">
                                 <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
@@ -60,9 +60,9 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-10">
                             <div class="loader" style="display:none"></div>
-                            <p class="result"></p>
+                            <div class="result"></div>
                         </div>
                     </div>
                 </li>
@@ -96,21 +96,17 @@
 }
 
 <div id="message">
-    <div style="padding: 5px;">
-        <div id="request-message" class="alert alert-info alert-dismissible" style="display:none;" role="alert">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <div id="body-request-message">
-            </div>
-
+    <div id="request-message" class="alert alert-info alert-dismissible" style="display:none;" role="alert">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <div id="body-request-message">
         </div>
+
     </div>
 </div>
 
 
 <h2>@Model.Title</h2>
 <div class="row col-md-12">
-    <img id="ItemPreview" src="" />
-
     <dl>
         <dt>Description</dt>
         <dd>Algorithm for converting to grayscale in images by <a href="http://opencv.org/">opencv</a> with python.</dd>
@@ -118,7 +114,7 @@
 </div>
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-12">
         <div id="fine-uploader-gallery"></div>
     </div>
 </div>
@@ -139,25 +135,44 @@
         zip.workerScriptsPath = "/lib/zipjs/WebContent/";
 
         var showMessage = function (method, location, body) {
-            $("#body-request-message").html("<p>" + method + " " + location + "</p><p>" + body + "</p>");
+            $("#body-request-message").html("<p>" + method + " " + location + "</p><p>BODY: " + body + "</p>");
             $("#request-message").show();
             $("#request-message").alert();
             $("#request-message").delay(4000).slideUp(500, 0);
         };
 
-        var showResult = function (result, element) {
-            result = $.trim(result).length === 0 ? '&lt;empty output&gt;' : result;
-            element.append(result);
+        var showResult = function (runId, status, stdOut, stdErr, zipFile, element) {
+            element.append('<p>RunId: ' + runId + '</p>');
+            element.append('<p>Status: ' + status + '</p>');
 
-            zip.createReader(new zip.HttpReader(result), function (zipReader) {
+            if (status === "notFinished") {
+                // ToDo: add button to check for run again
+                return;
+            }
+
+            if (stdOut !== undefined && stdOut.trim() !== '') {
+                element.append('<p>stdOut: ' + stdOut + '</p>');
+            }
+
+            if (stdErr !== undefined && stdErr.trim() !== '') {
+                element.append('<p>stdErr: ' + stdErr + '</p>');
+            }
+
+            if (zipFile === undefined) { 
+                return;
+            }
+
+            element.append('<p>Zip: <a href= "' + zipFile + '"> ' + zipFile + '</a></p>');
+
+            zip.createReader(new zip.HttpReader(zipFile), function (zipReader) {
                 zipReader.getEntries(function (entries) {
                     // get data from the first file
                     var entry = entries[0];
                     entry.getData(new zip.BlobWriter("image/jpg"), function (data) {
                         // close the reader and calls callback function with uncompressed data as parameter
                         zipReader.close();
-                       
-                        document.getElementById("ItemPreview").src = URL.createObjectURL(data);
+
+                        element.prepend('<img class="result-preview" src="' + URL.createObjectURL(data) + '"/>');
                     });
                 });
             }, onerror);
@@ -170,7 +185,7 @@
 
             var url = '/algorithms/to-grayscale';
 
-            var requestBody = [ "local://" + id ];
+            var requestBody = "local://" + id;
 
             var jsonBody = JSON.stringify(requestBody);
             showMessage("POST", url, jsonBody);
@@ -186,7 +201,7 @@
                 contentType: 'application/json',
                 success: function (data) {
                     loader.hide();
-                    showResult(data.zip, result.find('p.result'));
+                    showResult(data.runId, data.status, data.stdOut, data.stdErr, data.zip, result.find('div.result'));
                 }
             });
         };
