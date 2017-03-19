@@ -20,6 +20,12 @@ namespace CVaS.Shared.Services.File
 
         public string CreatePath(int userId, byte[] fileHash, string fileExtension)
         {
+            var fileHashPathFriendly = BitConverter.ToString(fileHash).Replace("-", "").ToLower();
+            return CreatePath(userId, fileHashPathFriendly, fileExtension);
+        }
+
+        public string CreatePath(int userId, string fileId, string fileExtension)
+        {
             var pathToUserDirectory = Path.Combine(userFilesDirectory, userId.ToString());
 
             if (!_fileSystemWrapper.ExistsDirectory(pathToUserDirectory))
@@ -27,9 +33,7 @@ namespace CVaS.Shared.Services.File
                 _fileSystemWrapper.CreateDirectory(pathToUserDirectory);
             }
 
-            var fileHashPathFriendly = BitConverter.ToString(fileHash).Replace("-", "").ToLower();
-
-            return Path.Combine(pathToUserDirectory, fileHashPathFriendly + fileExtension);
+            return Path.Combine(pathToUserDirectory, fileId + fileExtension);
         }
     }
 }

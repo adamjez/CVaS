@@ -1,0 +1,109 @@
+﻿@model CVaS.Web.Models.LayoutViewModel
+@{
+    Layout = "_AlgorithmLayout";
+}
+
+<div class="row col-md-12">
+    <dl>
+        <dt>Description</dt>
+        <dd>Algorithm for text recognitionin images is provided by <a href="https://github.com/tesseract-ocr/tesseract">Tesseract OCR</a>.</dd>
+    </dl>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <form id="algorithm-run">
+            <fieldset class="form-group">
+                <legend>Specify language</legend>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="optionscheckboxes" id="engcheckboxOption" value="eng" checked>
+                        ENG
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="optionscheckboxes" id="cescheckboxOption" value="ces">
+                        CES
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="optionscheckboxes" id="deucheckboxOption" value="deu">
+                        DEU
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-group">
+                <legend>Page segmentation modes</legend>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="3" checked>
+                        Fully automatic page segmentation, but no OSD. (Default)
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="4">
+                        Assume a single column of text of variable sizes.
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="5">
+                        Assume a single uniform block of vertically aligned text.
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="6">
+                        Assume a single uniform block of text.
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="7">
+                        Treat the image as a single text line.
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="8">
+                        Treat the image as a single word.
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="9">
+                        Treat the image as a single word in a circle.
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="10">
+                        Treat the image as a single character.
+                    </label>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var callback = function (fileId) {
+            var form = $('#algorithm-run');
+            return [
+                "local://" + fileId,
+                "stdout",
+                {
+                    l: form.find('input[type=checkbox]:checked').map(function () { return $(this).val(); }).get().join('+'),
+                    psm: form.find('input[type=radio]:checked').val()
+                }
+            ];
+        }
+
+        var client = new AlgorithmClient('/algorithms/text-recognition', callback);
+    </script>
+}

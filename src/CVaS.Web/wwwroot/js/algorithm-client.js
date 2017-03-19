@@ -94,7 +94,7 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
                 }
             },
             validation: {
-                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png']
+                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png', 'bmp']
             },
             callbacks: {
                 onComplete: function (qqId, name, responseJson) {

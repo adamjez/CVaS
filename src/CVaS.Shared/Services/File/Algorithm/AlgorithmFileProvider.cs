@@ -83,8 +83,10 @@ namespace CVaS.Shared.Services.File.Algorithm
                 throw new UnauthorizedAccessException();
             }
 
-            // future Local File Path
-            var localPath = _userLocalFileProvider.CreatePath(userId, dbFile.Hash, dbFile.Extension);
+            // future Local File Path - sometimes Hash doesn't exist - only when zip result is used
+            var localPath = dbFile.Hash != null 
+                ? _userLocalFileProvider.CreatePath(userId, dbFile.Hash, dbFile.Extension)
+                : _userLocalFileProvider.CreatePath(userId, dbFile.Path, dbFile.Extension);
 
             // Check if file exists locally
             if (System.IO.File.Exists(localPath))

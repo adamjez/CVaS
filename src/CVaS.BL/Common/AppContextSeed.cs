@@ -144,6 +144,16 @@ namespace CVaS.BL.Common
 
                     uow.Context.Algorithms.Add(algorithm8);
 
+                    var algorithm9 = new Algorithm()
+                    {
+                        CodeName = "text-recognition",
+                        FilePath = "run.ps1",
+                        Title = "Text Recognition",
+                        Description = "Text recognition using Tesseract OCR"
+                    };
+
+                    uow.Context.Algorithms.Add(algorithm9);
+
                     uow.Context.SaveChanges();
 
                 }
