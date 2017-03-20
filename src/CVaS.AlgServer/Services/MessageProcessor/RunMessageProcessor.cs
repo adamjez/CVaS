@@ -54,7 +54,8 @@ namespace CVaS.AlgServer.Services.MessageProcessor
         {
             _logger.LogInformation("Processing message - Run Id: " + request.RunId);
 
-            using (_serviceFactory.BeginScope())
+            // ToDo: check, concurency
+            //using (_serviceFactory.BeginScope())
             {
                 using (_unitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
                 {

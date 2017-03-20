@@ -94,7 +94,7 @@ namespace CVaS.BL.Facades
                     FinishedAt = run.FinishedAt,
 
                     FileId = run.FileId,
-                    Result = run.Result,
+                    Status = run.Result,
                     StdOut = run.StdOut,
                     StdErr = run.StdErr,
                     AlgorithmCode = run.Algorithm.CodeName

@@ -1,0 +1,33 @@
+﻿@model CVaS.Web.Models.LayoutViewModel
+@{
+    Layout = "_AlgorithmLayout";
+}
+
+<div class="row col-md-12">
+    <dl>
+        <dt>Description</dt>
+        <dd>Long Running for testing purpose require upload some image but doesnt do anything with that.</dd>
+    </dl>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <form id="algorithm-run">
+            <div class="form-group">
+                <label for="inputPlatesCount">Script delay count in seconds</label>
+                <input type="number" class="form-control" id="inputDelayCount" placeholder="Enter delay count" min="1" max="120" value="1">
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var callback = function (fileId) {
+            var form = $('#algorithm-run');
+            return form.find('#inputDelayCount').val();
+        }
+
+        var client = new AlgorithmClient('/algorithms/long-running', callback);
+    </script>
+}

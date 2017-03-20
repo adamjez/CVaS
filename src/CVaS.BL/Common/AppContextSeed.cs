@@ -154,6 +154,16 @@ namespace CVaS.BL.Common
 
                     uow.Context.Algorithms.Add(algorithm9);
 
+                    var algorithm10 = new Algorithm()
+                    {
+                        CodeName = "colorization",
+                        FilePath = "run.ps1",
+                        Title = "Colorization",
+                        Description = "Colorful Image Colorization"
+                    };
+
+                    uow.Context.Algorithms.Add(algorithm10);
+
                     uow.Context.SaveChanges();
 
                 }

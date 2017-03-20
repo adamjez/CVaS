@@ -49,7 +49,8 @@ namespace CVaS.BL.Facades
 
                     BrokerStatus = _bus.IsConnected ? "Connected" : "Disconnected",
 
-                    BrokerClients = await _brokerStatus.GetConnectedClients()
+                    // 2 connected clients are for web app => these we dont want to include
+                    BrokerClients = await _brokerStatus.GetConnectedClients() - 2
                 };
 
                 return result;

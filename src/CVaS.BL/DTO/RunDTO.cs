@@ -17,10 +17,12 @@ namespace CVaS.BL.DTO
 
         public string StdErr { get; set; }
 
-        public RunResultType Result { get; set; }
+        public RunResultType Status { get; set; }
 
         public DateTime? FinishedAt { get; set; }
 
         public int? Duration => FinishedAt.HasValue ? (int?)(FinishedAt.Value - CreatedAt).TotalMilliseconds : null;
+
+        public string Zip { get; set; }
     }
 }

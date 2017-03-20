@@ -149,6 +149,10 @@ img.result-preview {
     animation: spin 1s ease infinite;
 }
 
+.qq-upload-file {
+    width: 150px !important;
+}
+
 @keyframes spin {
     0% {
         transform: rotate(0deg);

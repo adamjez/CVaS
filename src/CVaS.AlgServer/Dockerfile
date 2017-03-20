@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:1.0.3-runtime
+FROM microsoft/dotnet:1.1.1-runtime
 ENTRYPOINT ["dotnet", "CVaS.AlgServer.dll"]
 ARG source=.
 WORKDIR /app

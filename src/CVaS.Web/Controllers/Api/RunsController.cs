@@ -32,7 +32,10 @@ namespace CVaS.Web.Controllers.Api
                 return BadRequest();
             }
 
-            return Ok(await _runFacade.GetSafelyAsync(runId));
+            var result = await _runFacade.GetSafelyAsync(runId);
+            result.Zip = result.FileId != null ? Url.Link(nameof(FilesController.GetFile), new { fileId = result.FileId }) : null;
+
+            return Ok(result);
         }
     }
 }

@@ -41,7 +41,7 @@
   </ItemGroup>
 
   <Target Name="PostpublishScript" AfterTargets="Publish">
-    <Exec Command="docker build -t user/cvas.algserver $(TargetDir)" />
+    <Exec Command="docker build -t adamjez1/cvas.algserver $(TargetDir)\publish" />
   </Target>
 
 </Project>
