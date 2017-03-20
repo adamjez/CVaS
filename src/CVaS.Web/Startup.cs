@@ -24,6 +24,10 @@ using EasyNetQ.ConnectionString;
 using System.Linq;
 using DryIoc;
 using DryIoc.Microsoft.DependencyInjection;
+using StackExchange.Profiling.Mvc;
+using StackExchange.Profiling;
+using StackExchange.Profiling.Storage;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace CVaS.Web
 {
@@ -62,11 +66,13 @@ namespace CVaS.Web
                     options.SerializerSettings.Converters.Add(new StringEnumConverter(true));
                 })
                 .AddXmlDataContractSerializerFormatters();
+            services.AddRouting(options => options.LowercaseUrls = true);
 
             services.AddMemoryCache(options => options.CompactOnMemoryPressure = true);
 
             // Inject an implementation of ISwaggerProvider with defaulted settings applied
             services.AddSwaggerGen(SwaggerSetup);
+            services.AddMiniProfiler();
 
             services.AddTransient<AppContextSeed>();
             services.AddSingleton(Configuration);
@@ -138,7 +144,7 @@ namespace CVaS.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, AppContextSeed contextSeed)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, AppContextSeed contextSeed, IMemoryCache cache)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -156,6 +162,14 @@ namespace CVaS.Web
                 HeaderScheme = "Simple"
             });
             app.UseIdentity();
+
+            app.UseMiniProfiler(new MiniProfilerOptions
+            {
+                RouteBasePath = "~/profiler",
+                SqlFormatter = new StackExchange.Profiling.SqlFormatters.InlineFormatter(),
+                Storage = new MemoryCacheStorage(cache, TimeSpan.FromMinutes(60))
+
+            });
 
             app.UseMvc(routes =>
             {
