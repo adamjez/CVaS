@@ -4,7 +4,6 @@ using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using DbContextOptions = CVaS.Shared.Core.DbContextOptions;
 using System.Threading.Tasks;
 
 namespace CVaS.BL.Common

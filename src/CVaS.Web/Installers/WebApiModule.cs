@@ -1,42 +1,27 @@
-﻿using System.Runtime.InteropServices;
-using CVaS.BL.Services.Broker;
+﻿using CVaS.BL.Services.Broker;
 using CVaS.Shared.Providers;
-using CVaS.Shared.Services.Interpreter;
-using CVaS.Shared.Services.Process;
 using CVaS.Web.Providers;
-using LightInject;
+using DryIoc;
+using CVaS.Shared.Options;
+using CVaS.BL.Installers;
+using Microsoft.Extensions.Options;
 
 namespace CVaS.Web.Installers
 {
-    public class WebApiComposition : ICompositionRoot
+    public class CompositionRoot
     {
-        public void Compose(IServiceRegistry serviceRegistry)
+        public CompositionRoot(IRegistrator registrator, IOptions<ModeOptions> options)
         {
-            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            BusinessLayerComposition.ModeOptions = options.Value;
+            var blComposition = new BusinessLayerComposition(registrator);
 
-            if (isWindows)
-            {
-                serviceRegistry.Register<IInterpreterResolver, ConfigInterpreterResolver>();
+            registrator.Register<RabbitMqBrokerSender>(Reuse.Singleton);
+            registrator.Register<IBrokerSender, EasyNetQBrokerSender>(Reuse.InCurrentScope);
 
-                serviceRegistry.Register<IProcessService, BaseProcessService>();
-                serviceRegistry.Decorate<IProcessService, WindowsDecoratorProcessService>();
-            }
-            else
-            {
-                serviceRegistry.Register<IProcessService, BaseProcessService>();
-            }
+            registrator.Register<ICurrentUserProvider, CurrentUserProvider>(Reuse.InCurrentScope);
 
-            serviceRegistry.Register<RabbitMqBrokerSender>(new PerContainerLifetime());
-            serviceRegistry.Register<IBrokerSender, EasyNetQBrokerSender>(new PerRequestLifeTime());
-
-            serviceRegistry.Register<ICurrentUserProvider, CurrentUserProvider>();
-
-            // LightInject: to register multiple classy for 1 interface, 
-            // different service name have to be giben
-            serviceRegistry.Register<IArgumentParserProvider, JsonArgumentParserProvider>(
-                nameof(JsonArgumentParserProvider));
-            serviceRegistry.Register<IArgumentParserProvider, PrimitiveArgumentParserProvider>(
-                nameof(PrimitiveArgumentParserProvider));
+            registrator.Register<IArgumentParserProvider, JsonArgumentParserProvider>();
+            registrator.Register<IArgumentParserProvider, PrimitiveArgumentParserProvider>();
         }
     }
 }

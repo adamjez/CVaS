@@ -7,44 +7,41 @@ using CVaS.BL.Services.Launch;
 using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
 using CVaS.Shared.Services.Launch;
-using LightInject;
+using DryIoc;
 
 namespace CVaS.BL.Installers
-{
-    public class BusinessLayerComposition : ICompositionRoot
+{ 
+    public class BusinessLayerComposition
     {
         public static ModeOptions ModeOptions { get; set; } = new ModeOptions();
 
-        public void Compose(IServiceRegistry serviceRegistry)
+        public BusinessLayerComposition(IRegistrator registrator)
         {
             SharedComposition.IsWebApplication = true;
-            serviceRegistry.RegisterFrom<SharedComposition>();
+            var sharedComposition = new SharedComposition(registrator);
 
-            serviceRegistry.Register<ApiKeyManager>(new PerRequestLifeTime());
+            registrator.Register<ApiKeyManager>();
 
-            //serviceRegistry.Register<AppUserStore>(new PerRequestLifeTime());
-            //serviceRegistry.Register<AppUserManager>(new PerRequestLifeTime());
-            //serviceRegistry.Register<AppSignInManager>(new PerRequestLifeTime());
+            registrator.Register<AlgoFacade>();
+            registrator.Register<FileFacade>();
+            registrator.Register<RunFacade>();
+            registrator.Register<RuleFacade>();
+            registrator.Register<StatsFacade>();
 
-            serviceRegistry.Register<AlgoFacade>();
-            serviceRegistry.Register<FileFacade>();
-            serviceRegistry.Register<RunFacade>();
-            serviceRegistry.Register<RuleFacade>();
-            serviceRegistry.Register<StatsFacade>();
+            registrator.Register<IApiKeyGenerator, RndApiKeyGenerator>();
+            registrator.Register<IArgumentTranslator, BasicArgumentTranslator>();
+            registrator.Register<IEmailSender, MockMessageSender>();
 
-            serviceRegistry.Register<IApiKeyGenerator, RndApiKeyGenerator>();
-            serviceRegistry.Register<IArgumentTranslator, BasicArgumentTranslator>();
-            serviceRegistry.Register<IEmailSender, MockMessageSender>();
 
             if (ModeOptions.IsLocal)
             {
-                serviceRegistry.Register<ILaunchService, LocalLaunchService>();
+                registrator.Register<ILaunchService, LocalLaunchService>();
             }
             else
             {
-                serviceRegistry.Register<ILaunchService, RemoteLaunchService>();
+                registrator.Register<ILaunchService, RemoteLaunchService>();
             }
-
         }
+
     }
 }

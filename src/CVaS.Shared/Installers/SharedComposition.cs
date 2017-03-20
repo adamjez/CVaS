@@ -12,69 +12,65 @@ using CVaS.Shared.Services.File.Temporary;
 using CVaS.Shared.Services.Interpreter;
 using CVaS.Shared.Services.Process;
 using CVaS.Shared.Services.Time;
-using EasyNetQ;
-using LightInject;
 using Microsoft.EntityFrameworkCore;
+using DryIoc;
 
 namespace CVaS.Shared.Installers
 {
-    public class SharedComposition : ICompositionRoot
+    public class SharedComposition
     {
         public static bool IsWebApplication { get; set; }
 
-        public void Compose(IServiceRegistry serviceRegistry)
+        public SharedComposition(IRegistrator registrator)
         {
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
             if (isWindows)
             {
-                serviceRegistry.Register<IInterpreterResolver, ConfigInterpreterResolver>();
+                registrator.Register<IInterpreterResolver, ConfigInterpreterResolver>();
 
-                serviceRegistry.Register<IProcessService, BaseProcessService>();
-                serviceRegistry.Decorate<IProcessService, WindowsDecoratorProcessService>();
+                registrator.Register<IProcessService, BaseProcessService>();
+                registrator.Register<IProcessService, WindowsDecoratorProcessService>(setup: Setup.Decorator);
             }
             else
             {
-                serviceRegistry.Register<IProcessService, BaseProcessService>();
+                registrator.Register<IProcessService, BaseProcessService>();
             }
 
+            registrator.Register<BrokerFactory>(Reuse.Singleton);
+            registrator.Register<BrokerStatus>(Reuse.InCurrentScope);
 
-            serviceRegistry.Register<BrokerFactory>(new PerContainerLifetime());
-            serviceRegistry.Register<BrokerStatus>(new PerRequestLifeTime());
-            
-
-            serviceRegistry.Register<Func<AppDbContext>>(c =>
+            registrator.RegisterDelegate<AppDbContext>(r =>
             {
-                var options = c.TryGetInstance<DbContextOptions<AppDbContext>>();
-                return () => new AppDbContext(options);
+                var options = r.Resolve<DbContextOptions<AppDbContext>>();
+                return new AppDbContext(options);
             });
 
-            serviceRegistry.Register<IUnitOfWorkProvider, EntityFrameworkUnitOfWorkProvider>(new PerContainerLifetime());
+            registrator.Register<IUnitOfWorkProvider, EntityFrameworkUnitOfWorkProvider>(Reuse.InCurrentScope);
 
             if (IsWebApplication)
             {
-                serviceRegistry.Register<UnitOfWorkRegistryBase, AsyncLocalUnitOfWorkRegistry>();
-                serviceRegistry.Register<IUnitOfWorkRegistry, HttpContextUnitOfWorkRegistry>();
+                registrator.Register<UnitOfWorkRegistryBase, AsyncLocalUnitOfWorkRegistry>();
+                registrator.Register<IUnitOfWorkRegistry, HttpContextUnitOfWorkRegistry>();
             }
             else
             {
-                serviceRegistry.Register<IUnitOfWorkRegistry, AsyncLocalUnitOfWorkRegistry>();
+                registrator.Register<IUnitOfWorkRegistry, AsyncLocalUnitOfWorkRegistry>();
             }
 
+            registrator.Register<FileRepository>();
+            registrator.Register<AlgorithmRepository>();
+            registrator.Register<RunRepository>();
+            registrator.Register<UserRepository>();
+            registrator.Register<RuleRepository>();
 
-            serviceRegistry.Register<FileRepository>();
-            serviceRegistry.Register<AlgorithmRepository>();
-            serviceRegistry.Register<RunRepository>();
-            serviceRegistry.Register<UserRepository>();
-            serviceRegistry.Register<RuleRepository>();
+            registrator.Register<ITemporaryFileProvider, TemporaryFileProvider>();
+            registrator.Register<FileSystemWrapper>();
+            registrator.Register<UserLocalFileProvider>();
+            registrator.Register<IAlgorithmFileProvider, AlgorithmFileProvider>();
 
-            serviceRegistry.Register<ITemporaryFileProvider, TemporaryFileProvider>();
-            serviceRegistry.Register<FileSystemWrapper>();
-            serviceRegistry.Register<UserLocalFileProvider>();
-            serviceRegistry.Register<IAlgorithmFileProvider, AlgorithmFileProvider>();
-
-            serviceRegistry.Register<ICurrentTimeProvider, UtcNowTimeProvider>(new PerContainerLifetime());
-
+            registrator.Register<ICurrentTimeProvider, UtcNowTimeProvider>(Reuse.Singleton);
         }
+
     }
 }

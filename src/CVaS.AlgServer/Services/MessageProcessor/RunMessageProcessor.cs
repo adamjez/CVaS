@@ -6,8 +6,8 @@ using CVaS.Shared.Exceptions;
 using CVaS.Shared.Messages;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.Launch;
-using LightInject;
 using Microsoft.Extensions.Logging;
+using DryIoc;
 
 namespace CVaS.AlgServer.Services.MessageProcessor
 {
@@ -17,16 +17,16 @@ namespace CVaS.AlgServer.Services.MessageProcessor
         private readonly ILaunchService _launchService;
         private readonly RunRepository _runRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-        private readonly IServiceFactory _serviceFactory;
+        private readonly IContainer _container;
 
         public RunMessageProcessor(ILogger<RunMessageProcessor> logger, ILaunchService launchService, RunRepository runRepository,
-            IUnitOfWorkProvider unitOfWorkProvider, IServiceFactory serviceFactory)
+            IUnitOfWorkProvider unitOfWorkProvider, IContainer container)
         {
             _logger = logger;
             _launchService = launchService;
             _runRepository = runRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
-            _serviceFactory = serviceFactory;
+            _container = container;
         }
         public async Task<RunResultMessage> ProcessAsync(CreateAlgorithmMessage request)
         {
@@ -54,8 +54,7 @@ namespace CVaS.AlgServer.Services.MessageProcessor
         {
             _logger.LogInformation("Processing message - Run Id: " + request.RunId);
 
-            // ToDo: check, concurency
-            //using (_serviceFactory.BeginScope())
+            using (_container.OpenScope())
             {
                 using (_unitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
                 {

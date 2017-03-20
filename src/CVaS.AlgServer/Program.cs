@@ -1,5 +1,6 @@
 ﻿using CVaS.AlgServer.Options;
 using CVaS.AlgServer.Services.Server;
+using DryIoc;
 
 namespace CVaS.AlgServer
 {
@@ -10,11 +11,11 @@ namespace CVaS.AlgServer
             var env = EnviromentOptions.GetEnviromentOptions();
             var startup = new Startup(env);
 
-            using (var provider = startup.ConfigureServices()) 
+            using (var container = startup.ConfigureServices()) 
             {
-                startup.Configure(provider);
+                startup.Configure(container);
 
-                var server = (BrokerServer)provider.GetInstance(typeof(BrokerServer));
+                var server = container.Resolve<BrokerServer>();
                 server.StartAndWait();
             }
         }

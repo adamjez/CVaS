@@ -23,6 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DryIoc.dll" Version="2.10.2" />
+    <PackageReference Include="DryIoc.Microsoft.DependencyInjection" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="1.1.1" />
@@ -34,8 +36,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="1.1.1" />
     <PackageReference Include="EasyNetQ" Version="2.0.4-netcore1438" />
-    <PackageReference Include="LightInject" Version="5.0.2" />
-    <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="2.0.1" />
     <PackageReference Include="FluentScheduler" Version="5.1.4" />
     <PackageReference Include="System.IO.FileSystem.DriveInfo" Version="4.3.0" />
   </ItemGroup>

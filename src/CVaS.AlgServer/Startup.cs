@@ -7,13 +7,13 @@ using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
 using CVaS.Shared.Services.Launch;
 using FluentScheduler;
-using LightInject;
-using LightInject.Microsoft.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using EasyNetQ;
 using CVaS.Shared.Helpers;
+using DryIoc;
+using DryIoc.Microsoft.DependencyInjection;
 
 namespace CVaS.AlgServer
 {
@@ -33,7 +33,7 @@ namespace CVaS.AlgServer
         public IConfigurationRoot Configuration { get; }
 
 
-        public IServiceContainer ConfigureServices()
+        public DryIoc.IContainer ConfigureServices()
         {
             var services = new ServiceCollection();
 
@@ -47,14 +47,14 @@ namespace CVaS.AlgServer
             services.AddDatabaseServices(Configuration);
             services.AddStorageServices(Configuration);
 
-            var container = new ServiceContainer();
+            services.AddSingleton(Configuration);
 
-            container.RegisterFrom<SharedComposition>();
-            container.RegisterInstance(Configuration);
-            // Just hack to not to try dispose container bcs of StackOverflow Exception (container calling dispose on container ..)
-            container.Register<IServiceFactory>(factory => factory);
+            var container = new Container(rules => rules.WithImplicitRootOpenScope())
+                                .WithDependencyInjectionAdapter(services);
 
-            container.CreateServiceProvider(services);
+            SharedComposition.IsWebApplication = false;
+            container.ConfigureServiceProvider<SharedComposition>();
+
             return container;
         }
 
@@ -79,16 +79,16 @@ namespace CVaS.AlgServer
             services.AddTransient<FilesScanningAndCleaningJob>();
         }
 
-        public void Configure(IServiceContainer container)
+        public void Configure(DryIoc.IContainer container)
         {
-            var loggerFactory = container.GetInstance<ILoggerFactory>();
+            var loggerFactory = container.Resolve<ILoggerFactory>();
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            JobManager.JobFactory = new LightInjectJobFactory(container);
+            JobManager.JobFactory = new DryIoCJobFactory(container);
             JobManager.JobException += (info) => loggerFactory.CreateLogger(nameof(JobManager)).LogCritical("An error just happened with a scheduled job: " + info.Exception);
-            JobManager.Initialize(container.GetInstance<PeriodFilesCleaningRegistry>());
+            JobManager.Initialize(container.Resolve<PeriodFilesCleaningRegistry>());
         }
     }
 }

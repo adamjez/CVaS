@@ -8,7 +8,6 @@ using CVaS.Shared.Helpers;
 using CVaS.Web.Authentication;
 using CVaS.Web.Filters;
 using CVaS.Web.Installers;
-using LightInject;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger.Model;
-using LightInject.Microsoft.DependencyInjection;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Swashbuckle.SwaggerGen.Application;
@@ -24,6 +22,8 @@ using EasyNetQ;
 using Microsoft.Extensions.PlatformAbstractions;
 using EasyNetQ.ConnectionString;
 using System.Linq;
+using DryIoc;
+using DryIoc.Microsoft.DependencyInjection;
 
 namespace CVaS.Web
 {
@@ -68,19 +68,19 @@ namespace CVaS.Web
             // Inject an implementation of ISwaggerProvider with defaulted settings applied
             services.AddSwaggerGen(SwaggerSetup);
 
-            var container = new ServiceContainer();
+            services.AddTransient<AppContextSeed>();
+            services.AddSingleton(Configuration);
 
             var physicalProvider = hostingEnvironment.ContentRootFileProvider;
             // It's null when using ef migrations tools so we need to check first to not to throw exc
-            if (physicalProvider != null) container.RegisterInstance(physicalProvider);
+            if (physicalProvider != null) services.AddSingleton(physicalProvider);
 
-            container.RegisterInstance(Configuration);
-            container.Register<AppContextSeed>();
-
-            container.RegisterFrom<WebApiComposition>();
-            container.RegisterFrom<BusinessLayerComposition>();
-
-            return container.CreateServiceProvider(services);
+            return new Container()
+                .WithDependencyInjectionAdapter(services,
+                    // optional: propagate exception if specified types are not resolved, and prevent fallback to default Asp resolution
+                    throwIfUnresolved: type => type.Name.EndsWith("Controller"))
+                // add registrations from CompositionRoot classs
+                .ConfigureServiceProvider<CompositionRoot>();
         }
 
         private static void ConfigureIdentity(IServiceCollection services)

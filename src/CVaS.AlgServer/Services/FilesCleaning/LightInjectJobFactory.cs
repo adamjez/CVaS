@@ -1,19 +1,19 @@
-﻿using FluentScheduler;
-using LightInject;
+﻿using DryIoc;
+using FluentScheduler;
 
 namespace CVaS.AlgServer.Services.FilesCleaning
 {
-    public class LightInjectJobFactory : IJobFactory
+    public class DryIoCJobFactory : IJobFactory
     {
-        private readonly IServiceFactory _serviceFactory;
-        public LightInjectJobFactory(IServiceFactory serviceFactory)
+        private readonly IContainer _container;
+        public DryIoCJobFactory(IContainer container)
         {
-            _serviceFactory = serviceFactory;
+            _container = container;
         }
 
         public IJob GetJobInstance<T>() where T : IJob
         {
-            return _serviceFactory.GetInstance<T>();
+            return _container.Resolve<T>();
         }
     }
 }
