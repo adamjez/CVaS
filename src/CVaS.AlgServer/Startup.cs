@@ -49,7 +49,10 @@ namespace CVaS.AlgServer
 
             services.AddSingleton(Configuration);
 
-            var container = new Container(rules => rules.WithImplicitRootOpenScope())
+            var container = new Container(rules => rules
+                                                    .WithImplicitRootOpenScope()
+                                                    .WithoutThrowOnRegisteringDisposableTransient()
+                                                    .WithDefaultIfAlreadyRegistered(IfAlreadyRegistered.Throw))
                                 .WithDependencyInjectionAdapter(services);
 
             SharedComposition.IsWebApplication = false;

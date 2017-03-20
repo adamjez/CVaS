@@ -1,7 +1,5 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using CVaS.DAL;
-using CVaS.Shared.Core;
 using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Core.Registry;
 using CVaS.Shared.Repositories;
@@ -12,7 +10,6 @@ using CVaS.Shared.Services.File.Temporary;
 using CVaS.Shared.Services.Interpreter;
 using CVaS.Shared.Services.Process;
 using CVaS.Shared.Services.Time;
-using Microsoft.EntityFrameworkCore;
 using DryIoc;
 
 namespace CVaS.Shared.Installers
@@ -40,11 +37,19 @@ namespace CVaS.Shared.Installers
             registrator.Register<BrokerFactory>(Reuse.Singleton);
             registrator.Register<BrokerStatus>(Reuse.InCurrentScope);
 
-            registrator.RegisterDelegate<AppDbContext>(r =>
+            if (IsWebApplication)
             {
-                var options = r.Resolve<DbContextOptions<AppDbContext>>();
-                return new AppDbContext(options);
-            });
+                registrator.Register<AppDbContext>(Reuse.InCurrentScope, ifAlreadyRegistered: IfAlreadyRegistered.Replace,
+                    setup: Setup.With(condition: (request) => request.ParentOrWrapper.FactoryType != FactoryType.Wrapper));
+
+                // Registration for custom Unit Of Work Pattern => resolving using Func<AppDbContext>
+                registrator.Register<AppDbContext>(Reuse.Transient, ifAlreadyRegistered: IfAlreadyRegistered.AppendNotKeyed,
+                    setup: Setup.With(condition: (request) => request.ParentOrWrapper.FactoryType == FactoryType.Wrapper));
+            }
+            else
+            {
+                registrator.Register<AppDbContext>(Reuse.Transient, ifAlreadyRegistered: IfAlreadyRegistered.Replace);
+            }
 
             registrator.Register<IUnitOfWorkProvider, EntityFrameworkUnitOfWorkProvider>(Reuse.InCurrentScope);
 
@@ -71,6 +76,5 @@ namespace CVaS.Shared.Installers
 
             registrator.Register<ICurrentTimeProvider, UtcNowTimeProvider>(Reuse.Singleton);
         }
-
     }
 }
