@@ -159,7 +159,7 @@ namespace CVaS.Shared.Services.Launch
 
             return new DAL.Model.File()
             {
-                Path = await _userFileProvider.SaveAsync(zipFile.FullPath, ZipHelpers.ContentType),
+                LocationId = await _userFileProvider.SaveAsync(zipFile.FullPath, ZipHelpers.ContentType),
                 Type = FileType.Result,
                 ContentType = ZipHelpers.ContentType,
                 Extension = ZipHelpers.Extension,

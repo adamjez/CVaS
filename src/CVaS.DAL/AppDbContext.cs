@@ -23,7 +23,7 @@ namespace CVaS.DAL
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<File>()
-                .HasAlternateKey(c => c.Path);
+                .HasAlternateKey(c => c.LocationId);
         }
     }
 }

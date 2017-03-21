@@ -1,3 +1,5 @@
+using System;
+
 namespace CVaS.BL.DTO
 {
     public class StatsDTO
@@ -9,5 +11,7 @@ namespace CVaS.BL.DTO
         public int ActiveUserCountLastDay { get; set; }
         public int RegisterUserCountThisWeek { get; set; }
         public int UploadedFilesCountThisWeek { get; set; }
+        public long UploadedFilesSizeThisWeek { get; set; }
+        public int UploadedFilesSizeInMBThisWeek => (int)(UploadedFilesSizeThisWeek / Math.Pow(10, 6));
     }
 }

@@ -9,9 +9,10 @@ using CVaS.DAL.Model;
 namespace CVaS.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170321133912_RefactoringFileEntityAndAddingFileSize")]
+    partial class RefactoringFileEntityAndAddingFileSize
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.1")

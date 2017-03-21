@@ -86,7 +86,7 @@ namespace CVaS.Shared.Services.File.Algorithm
             // future Local File Path - sometimes Hash doesn't exist - only when zip result is used
             var localPath = dbFile.Hash != null 
                 ? _userLocalFileProvider.CreatePath(userId, dbFile.Hash, dbFile.Extension)
-                : _userLocalFileProvider.CreatePath(userId, dbFile.Path, dbFile.Extension);
+                : _userLocalFileProvider.CreatePath(userId, dbFile.LocationId, dbFile.Extension);
 
             // Check if file exists locally
             if (System.IO.File.Exists(localPath))
@@ -95,7 +95,7 @@ namespace CVaS.Shared.Services.File.Algorithm
             }
 
             var localFile = dbFile;
-            var resultTask = _userFileProvider.GetAsync(dbFile.Path)
+            var resultTask = _userFileProvider.GetAsync(dbFile.LocationId)
                 .ContinueWith(async task =>
                 {
                     await _fileSystem.SaveAsync((await task).Content, localPath);

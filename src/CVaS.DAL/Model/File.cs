@@ -10,7 +10,7 @@ namespace CVaS.DAL.Model
 
         [Required]
         [MaxLength(256)]
-        public string Path { get; set; }
+        public string LocationId { get; set; }
          
         public FileType Type { get; set; }
 
@@ -21,6 +21,8 @@ namespace CVaS.DAL.Model
 
         [MaxLength(16)]
         public byte[] Hash { get; set; }
+
+        public long FileSize { get; set; }
 
         public string ContentType { get; set; }
 

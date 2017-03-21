@@ -81,7 +81,7 @@ namespace CVaS.Web.Controllers.Api
                 throw new BadRequestException("File Id has to  be specified");
             }
 
-            var remoteFileId = (await _fileFacade.GetSafelyAsync(fileId)).Path;
+            var remoteFileId = (await _fileFacade.GetSafelyAsync(fileId)).LocationId;
 
             if (_userFileProvider is UserSystemFileProvider)
             {

@@ -35,7 +35,7 @@ namespace CVaS.BL.Facades
                     throw new UnauthorizedAccessException();
                 }
 
-                await _userFileProvider.DeleteAsync(file.Path);
+                await _userFileProvider.DeleteAsync(file.LocationId);
 
                 _fileRepository.Delete(file);
                 await uow.CommitAsync();
@@ -51,6 +51,7 @@ namespace CVaS.BL.Facades
                 using (var memStream = new MemoryStream())
                 {
                     await fileStream.CopyToAsync(memStream);
+                    
                     memStream.Seek(0, SeekOrigin.Begin);
 
                     using (var md5Hash = System.Security.Cryptography.MD5.Create())
@@ -67,12 +68,13 @@ namespace CVaS.BL.Facades
 
                         var fileEntity = new File()
                         {
-                            Path = path,
+                            LocationId = path,
                             UserId = CurrentUserProvider.Id,
                             Type = FileType.Upload,
                             Hash = hash,
                             Extension = Path.GetExtension(fileName),
-                            ContentType = contentType
+                            ContentType = contentType,
+                            FileSize = memStream.Length
                         };
 
                         uow.Context.Files.Add(fileEntity);
@@ -91,7 +93,7 @@ namespace CVaS.BL.Facades
             {
                 var files = pathFiles.Select(path => new File()
                 {
-                    Path = path,
+                    LocationId = path,
                     UserId = userId,
                     Type = FileType.Upload
                 }).ToList();

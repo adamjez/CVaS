@@ -41,6 +41,9 @@ namespace CVaS.BL.Facades
                     UploadedFilesCountThisWeek = 
                         await uow.Context.Files.CountAsync(f => f.CreatedAt > now.AddDays(-7)),
 
+                    UploadedFilesSizeThisWeek = 
+                        await uow.Context.Files.Where(f => f.CreatedAt > now.AddDays(-7)).SumAsync(f => f.FileSize),
+
                     ActiveUserCountLastDay =
                         await uow.Context.Users.CountAsync(u => u.Runs.Any(r => r.CreatedAt > now.AddDays(-1))),
 
