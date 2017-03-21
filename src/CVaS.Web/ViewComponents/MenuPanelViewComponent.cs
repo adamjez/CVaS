@@ -1,17 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using CVaS.DAL.Model;
+﻿using CVaS.DAL.Model;
 using CVaS.Shared.Providers;
 using CVaS.Web.Models;
-using CVaS.Web.Providers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CVaS.Web.ViewComponents
 {
-    public class LoginPanelViewComponent : ViewComponent
+    public class MenuPanelViewComponent : ViewComponent
     {
         private readonly ICurrentUserProvider _currentUserProvider;
-        public LoginPanelViewComponent(ICurrentUserProvider currentUserProvider)
+        public MenuPanelViewComponent(ICurrentUserProvider currentUserProvider)
         {
             _currentUserProvider = currentUserProvider;
         }
