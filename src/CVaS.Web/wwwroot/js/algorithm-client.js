@@ -55,6 +55,27 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
         element.append(button);
     }
 
+    var showImageFromZip = function (element, zipFileUrl) {
+        zip.createReader(new zip.HttpReader(zipFileUrl), function (zipReader) {
+            zipReader.getEntries(function (entries) {
+                // get data from the first file
+                entries.forEach(function (entry) {
+                    entry.getData(new zip.BlobWriter("application/octet-stream"), function (data) {
+                        // close the reader and calls callback function with uncompressed data as parameter
+                        zipReader.close();
+
+                        element.prepend('<a class="result-preview" href="#"><img class="result-preview" src="' + URL.createObjectURL(data) + '"/></a>');
+                        element.find("a.result-preview").click(function (ev) {
+                            $.featherlight('<img src="' + URL.createObjectURL(data) + '"/>');
+                            ev.preventDefault();
+                            return false;
+                        });
+                    });
+                })
+            });
+        }, onerror);
+    }
+
     var showResult = function (runId, status, duration, stdOut, stdErr, zipFile, element) {
         // Clear inner html
         element.html("");
@@ -79,31 +100,10 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
             element.append('<p>StdErr: ' + stdErr + '</p>');
         }
 
-        if (zipFile === undefined) {
-            return;
+        if (zipFile !== undefined) {
+            element.append('<p>Zip: <a href= "' + zipFile + '">download</a></p>');
+            showImageFromZip(element, zipFile);
         }
-
-        element.append('<p>Zip: <a href= "' + zipFile + '">Download</a></p>');
-
-        zip.createReader(new zip.HttpReader(zipFile), function (zipReader) {
-            zipReader.getEntries(function (entries) {
-                // get data from the first file
-                entries.forEach(function (entry) {
-                    entry.getData(new zip.BlobWriter("application/octet-stream"), function (data) {
-                        // close the reader and calls callback function with uncompressed data as parameter
-                        zipReader.close();
-
-                        element.prepend('<a class="result-preview" href="#"><img class="result-preview" src="' + URL.createObjectURL(data) + '"/></a>');
-                        element.find("a.result-preview").click(function(ev) {
-                            $.featherlight('<img src="' + URL.createObjectURL(data) + '"/>');
-
-                            ev.preventDefault();
-                            return false;
-                        });
-                    });
-                })
-            });
-        }, onerror);
     };
 
     var runAlgorithm = function (filename, id, qqId) {
@@ -116,7 +116,7 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
         var requestBody = _this.createRequestBodyCallback(id);
         var jsonBody = JSON.stringify(requestBody);
 
-        showMessage("POST", _this.algorithmEndpoint, jsonBody);
+        showMessage('POST', _this.algorithmEndpoint, jsonBody);
 
         $.ajax({
             type: 'POST',

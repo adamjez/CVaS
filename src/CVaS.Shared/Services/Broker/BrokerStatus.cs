@@ -18,16 +18,19 @@ namespace CVaS.Shared.Services.Broker
             _brokerOptions = brokerOptions;
         }
 
-        public Task<int?> GetConnectedClients()
+        public Task<int?> GetConnectedAlgServersCount()
         {
             if (!_bus.IsConnected)
             {
                 return null;
             }
 
-            var client = new ManagementClient("https://"+_brokerOptions.Value.Hostname, _brokerOptions.Value.Username, _brokerOptions.Value.Password, 443);
+            var client = new ManagementClient(_brokerOptions.Value.Hostname, _brokerOptions.Value.Username, _brokerOptions.Value.Password);
 
-            return Task.FromResult<int?>(client.GetConnections().Count());
+            return Task.FromResult<int?>(
+                client.GetConnections()
+                    .Where(c => c.ClientProperties.Application == "CVaS.AlgServer.dll")
+                    .Count());
         }
     }
 }

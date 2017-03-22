@@ -34,7 +34,7 @@ namespace CVaS.BL.Facades
             _launchService = launchService;
         }
 
-        public async Task<RunResult> RunAlgorithmAsync(string codeName, IEnumerable<object> arguments)
+        public async Task<RunResult> RunAlgorithmAsync(string codeName, IEnumerable<object> arguments, int? timeout = null)
         {
             using (UnitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
             {
@@ -48,7 +48,7 @@ namespace CVaS.BL.Facades
                 var args = _argumentTranslator.Process(arguments);
 
                 // Create Run In Db
-                return await CreateRunAndLaunch(algorithm, args);
+                return await CreateRunAndLaunch(algorithm, args, timeout);
             }
         }
 
@@ -58,7 +58,7 @@ namespace CVaS.BL.Facades
             return await RunAlgorithmAsync(codeName, new List<object>() {"--help"});
         }
 
-        private async Task<RunResult> CreateRunAndLaunch(Algorithm algorithm, List<Argument> args)
+        private async Task<RunResult> CreateRunAndLaunch(Algorithm algorithm, List<Argument> args, int? timeout = null)
         {
             using (var uow = UnitOfWorkProvider.Create())
             {
@@ -72,7 +72,7 @@ namespace CVaS.BL.Facades
                 _runRepository.Insert(run);
                 await uow.CommitAsync();
 
-                return await _launchService.LaunchAsync(algorithm.CodeName, algorithm.FilePath, args, run);
+                return await _launchService.LaunchAsync(algorithm.CodeName, algorithm.FilePath, args, run, timeout);
             }
         }
 

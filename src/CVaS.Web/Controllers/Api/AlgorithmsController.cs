@@ -9,21 +9,25 @@ using CVaS.Web.Models;
 using CVaS.Web.Providers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using CVaS.Shared.Options;
 
 namespace CVaS.Web.Controllers.Api
 {
     [Route("[controller]")]
     public class AlgorithmsController : ApiController
     {
-        private readonly ILogger<AlgorithmsController> logger;
+        private readonly ILogger<AlgorithmsController> _logger;
         private readonly RunFacade _runFacade;
         private readonly AlgoFacade _algoFacade;
         private readonly IEnumerable<IArgumentParserProvider> _argumentParserProviders;
+        private readonly IOptions<AlgorithmOptions> _algorithmOptions;
 
         public AlgorithmsController(ILogger<AlgorithmsController> logger, RunFacade runFacade, AlgoFacade algoFacade, 
-            IEnumerable<IArgumentParserProvider> argumentParserProviders)
+            IEnumerable<IArgumentParserProvider> argumentParserProviders, IOptions<AlgorithmOptions> algorithmOptions)
         {
-            this.logger = logger;
+            _algorithmOptions = algorithmOptions;
+            _logger = logger;
             _runFacade = runFacade;
             _algoFacade = algoFacade;
             _argumentParserProviders = argumentParserProviders;
@@ -34,10 +38,14 @@ namespace CVaS.Web.Controllers.Api
         /// result of the process.
         /// </summary>
         /// <param name="codeName">CodeName of the algorithm to be run.</param>
-        /// <param name="options">Options are translated to command-line arguments</param>
+        /// <param name="options">Options are translated to command-line arguments. Expected
+        /// format is json containing one element or single array with simple types or dictionary with
+        /// only simple types</param>
+        /// <param name="timeout">Specifies maximum amount of time to wait for returning request. If timeout
+        /// is set to negative number, wait time is set to maximum possible time.</param>
         [HttpPost("{codeName}")]
         [Produces(typeof(AlgorithmResult))]
-        public async Task<IActionResult> Process(string codeName, [FromBody] object options)
+        public async Task<IActionResult> Process(string codeName, [FromBody] object options, [FromQuery]int? timeout)
         {
             if (!ModelState.IsValid)
             {
@@ -62,7 +70,7 @@ namespace CVaS.Web.Controllers.Api
                 return BadRequest(ModelState);
             }
 
-            var result = await _runFacade.RunAlgorithmAsync(codeName, parsedOptions);
+            var result = await _runFacade.RunAlgorithmAsync(codeName, parsedOptions, timeout);
 
             return Ok(new AlgorithmResult
             {

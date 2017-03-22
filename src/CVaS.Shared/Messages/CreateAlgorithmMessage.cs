@@ -8,5 +8,6 @@ namespace CVaS.Shared.Messages
         public int AlgorithmId { get; set; }
         public int RunId { get; set; }
         public List<Argument> Arguments { get; set; }
+        public int? Timeout { get; set; }
     }
 }

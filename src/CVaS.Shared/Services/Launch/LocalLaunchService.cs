@@ -54,7 +54,7 @@ namespace CVaS.Shared.Services.Launch
         }
 
 
-        public async Task<RunResult> LaunchAsync(string codeName, string pathFile, List<Argument.Argument> args, Run run)
+        public async Task<RunResult> LaunchAsync(string codeName, string pathFile, List<Argument.Argument> args, Run run, int? timeout = null)
         {
             var filePath = _algorithmFileProvider.GetAlgorithmFilePath(codeName, pathFile);
 
@@ -77,7 +77,9 @@ namespace CVaS.Shared.Services.Launch
 
                 var task = _processService.RunAsync(filePath, stringArguments, tokenSource.Token);
 
-                var result = await task.WithTimeout(TimeSpan.FromSeconds(_options.Value.LightTimeoutInSeconds));
+                var lightTimeout = !timeout.HasValue || timeout < 0 ? _options.Value.LightTimeoutInSeconds : timeout.Value;
+
+                var result = await task.WithTimeout(TimeSpan.FromSeconds(lightTimeout));
                 if (!result.Completed)
                 {
                     // timeout/cancellation logic

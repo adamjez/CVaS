@@ -81,4 +81,8 @@
       <ContentWithTargetPath Include="@(_DocumentationFile->'%(FullPath)')" RelativePath="%(_DocumentationFile.Identity)" TargetPath="%(_DocumentationFile.Filename)%(_DocumentationFile.Extension)" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
+
+  <Target Name="CreateDockerImage" AfterTargets="Publish">
+    <Exec Command="docker build -t adamjez1/cvas:latest $(PublishDir)" />
+  </Target>
 </Project>

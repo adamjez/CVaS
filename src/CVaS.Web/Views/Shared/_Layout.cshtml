@@ -71,5 +71,8 @@
     </environment>
 
     @RenderSection("scripts", required: false)
-    <mini-profiler position="@RenderPosition.Right" max-traces="5" /></body>
+    <environment names="Development">
+        <mini-profiler position="@RenderPosition.Right" max-traces="10" />
+    </environment>
+</body>
 </html>

@@ -23,12 +23,13 @@ namespace CVaS.BL.Services.Launch
             _logger = logger;
         }
 
-        public async Task<RunResult> LaunchAsync(string codeName, string filePath, List<Argument> args, Run run)
+        public async Task<RunResult> LaunchAsync(string codeName, string filePath, List<Argument> args, Run run, int? timeout = null)
         {
             var message = new CreateAlgorithmMessage()
             {
                 Arguments = args,
-                RunId = run.Id
+                RunId = run.Id,
+                Timeout = timeout
             };
 
             try

@@ -61,7 +61,7 @@ namespace CVaS.AlgServer.Services.MessageProcessor
                     var run = await _runRepository.GetByIdSafely(request.RunId, (r) => r.Algorithm);
 
                     var result = await _launchService.LaunchAsync(run.Algorithm.CodeName, run.Algorithm.FilePath,
-                        request.Arguments, run);
+                        request.Arguments, run, request.Timeout);
 
                     return new RunResultMessage()
                     {
