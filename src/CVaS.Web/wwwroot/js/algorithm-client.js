@@ -59,11 +59,11 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
         // Clear inner html
         element.html("");
 
-        element.append('<p>RunId: ' + runId + '</p>');
+        element.append('<p>Id: ' + runId + '</p>');
         element.append('<p>Status: ' + status + '</p>');
 
         if (duration !== undefined) {
-            element.append('<p>Duration: ' + duration + ' ms</p>');
+            element.append('<p>Duration: ' + (duration / 1000).toFixed(2) + ' s</p>');
         }
 
         if (status === "notFinished") {
@@ -83,7 +83,7 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
             return;
         }
 
-        element.append('<p>Zip: <a href= "' + zipFile + '"> ' + zipFile + '</a></p>');
+        element.append('<p>Zip: <a href= "' + zipFile + '">Download</a></p>');
 
         zip.createReader(new zip.HttpReader(zipFile), function (zipReader) {
             zipReader.getEntries(function (entries) {
@@ -93,10 +93,12 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
                         // close the reader and calls callback function with uncompressed data as parameter
                         zipReader.close();
 
-                        element.prepend('<img class="result-preview" src="' + URL.createObjectURL(data) + '"/>');
-                        element.find("img.result-preview").elevateZoom({
-                            zoomWindowPosition: 11,
-                            scrollZoom: true
+                        element.prepend('<a class="result-preview" href="#"><img class="result-preview" src="' + URL.createObjectURL(data) + '"/></a>');
+                        element.find("a.result-preview").click(function(ev) {
+                            $.featherlight('<img src="' + URL.createObjectURL(data) + '"/>');
+
+                            ev.preventDefault();
+                            return false;
                         });
                     });
                 })

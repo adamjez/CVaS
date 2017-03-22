@@ -39,9 +39,4 @@
     <PackageReference Include="FluentScheduler" Version="5.1.4" />
     <PackageReference Include="System.IO.FileSystem.DriveInfo" Version="4.3.0" />
   </ItemGroup>
-
-  <Target Name="PostpublishScript" AfterTargets="Publish">
-    <Exec Command="docker build -t adamjez1/cvas.algserver $(TargetDir)\publish" />
-  </Target>
-
 </Project>

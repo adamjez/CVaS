@@ -139,6 +139,11 @@ img.result-preview {
     float: right;
 }
 
+.featherlight .featherlight-content {
+    max-width: 90%;
+    max-height: 90%;
+}
+
 .loader {
     margin: auto;
     border: 8px solid #f3f3f3; /* Light grey */
