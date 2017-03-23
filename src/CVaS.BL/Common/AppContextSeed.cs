@@ -163,6 +163,36 @@ namespace CVaS.BL.Common
 
                     uow.Context.Algorithms.Add(algorithm10);
 
+                    var algorithm11 = new Algorithm()
+                    {
+                        CodeName = "age-detection",
+                        FilePath = "run.ps1",
+                        Title = "Age Detection",
+                        Description = "Age detection from image source"
+                    };
+
+                    uow.Context.Algorithms.Add(algorithm11);
+
+                    var algorithm12 = new Algorithm()
+                    {
+                        CodeName = "gender-detection",
+                        FilePath = "run.ps1",
+                        Title = "Gender Detection",
+                        Description = "Gender detection from image source"
+                    };
+
+                    uow.Context.Algorithms.Add(algorithm12);
+
+                    var algorithm13 = new Algorithm()
+                    {
+                        CodeName = "similarity",
+                        FilePath = "similarity.py",
+                        Title = "Image Similarity",
+                        Description = "Similarity of two images"
+                    };
+
+                    uow.Context.Algorithms.Add(algorithm13);
+
                     uow.Context.SaveChanges();
 
                 }

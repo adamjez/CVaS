@@ -125,11 +125,17 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
         var loader = result.find('.loader');
         var resultDiv = result.find('div.result');
 
-        loader.show();
-
         var requestBody = _this.createRequestBodyCallback(id);
+        // if callback returns null, we dont run algorithm
+        // Most common use is that client want more images uploaded
+        if (requestBody === null) {
+            resultDiv.append('<p><b>Upload next image to trigger algorithm run</b></p>');
+            return;
+        }
+
         var jsonBody = JSON.stringify(requestBody);
 
+        loader.show();
         showMessage('POST', _this.algorithmEndpoint, jsonBody);
 
         $.ajax({

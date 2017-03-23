@@ -20,11 +20,11 @@ namespace CVaS.Web.Controllers.Api
         private readonly ILogger<AlgorithmsController> _logger;
         private readonly RunFacade _runFacade;
         private readonly AlgoFacade _algoFacade;
-        private readonly IEnumerable<IArgumentParserProvider> _argumentParserProviders;
+        private readonly IEnumerable<IArgumentParser> _argumentParserProviders;
         private readonly IOptions<AlgorithmOptions> _algorithmOptions;
 
         public AlgorithmsController(ILogger<AlgorithmsController> logger, RunFacade runFacade, AlgoFacade algoFacade, 
-            IEnumerable<IArgumentParserProvider> argumentParserProviders, IOptions<AlgorithmOptions> algorithmOptions)
+            IEnumerable<IArgumentParser> argumentParserProviders, IOptions<AlgorithmOptions> algorithmOptions)
         {
             _algorithmOptions = algorithmOptions;
             _logger = logger;

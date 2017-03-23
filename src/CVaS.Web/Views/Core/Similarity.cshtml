@@ -1,0 +1,40 @@
+﻿@model CVaS.Web.Models.LayoutViewModel
+@{
+    Layout = "_AlgorithmLayout";
+}
+
+<h3>Description</h3>
+<p>Algorithm for similarity of two images by <a target="_blank" href="http://opencv.org/">opencv</a> with python.</p>
+
+<h3>API</h3>
+<div class="well well-lg">
+    <h4>Input</h4>
+    <span>Two images in array</span><br />
+    <span>Example: [&quot;local://1&quot; ,&quot;local://2&quot;]</span>
+    
+    <h4>Return</h4>
+    <span>JSON object with properties:</span>
+    <ul>
+        <li>histogram: 1.0 for identical images, less than 1.0 if images differs</li>
+        <li>featureDescriptor: 0.0 for identical images, more than 0.0 if images differs</li>
+    </ul>
+</div>
+
+@section Scripts {
+    <script>
+        var uploadedFiles = []
+        var callback = function (fileId) {
+            uploadedFiles.push("local://" + fileId)
+
+            if (uploadedFiles.length == 2) { 
+                array = uploadedFiles;
+                uploadedFiles = [];
+                return array;
+            }
+
+            return null;
+        }
+
+        var client = new AlgorithmClient('/algorithms/similarity', callback);
+    </script>
+}

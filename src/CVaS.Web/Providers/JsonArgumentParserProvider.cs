@@ -9,7 +9,7 @@ namespace CVaS.Web.Providers
     /// Arguments can be only one layer deep, so
     /// JArray can not contains another JArray on so on
     /// </summary>
-    public class JsonArgumentParserProvider : IArgumentParserProvider
+    public class JsonArgumentParser : IArgumentParser
     {
         public bool CanParse(object arguments)
         {
@@ -48,35 +48,26 @@ namespace CVaS.Web.Providers
 
         private static object ParseValues(JToken token, bool topLevel)
         {
-            if (token.Type == JTokenType.String)
+            switch (token.Type)
             {
-                return token.Value<string>();
-            }
-            else if (token.Type == JTokenType.Integer)
-            {
-                return token.Value<int>();
-            }
-            else if (token.Type == JTokenType.Float)
-            {
-                return token.Value<float>();
-            }
-            else if (token.Type == JTokenType.Boolean)
-            {
-                return token.Value<bool>();
-            }
-            else if (token.Type == JTokenType.Object && topLevel)
-            {
-                var dict = new Dictionary<string, object>();
-                foreach (var property in token.Value<JObject>())
-                {
-                    dict.Add(property.Key, ParseValues(property.Value, false));
-                }
+                case JTokenType.String:
+                    return token.Value<string>();
+                case JTokenType.Integer:
+                    return token.Value<int>();
+                case JTokenType.Float:
+                    return token.Value<float>();
+                case JTokenType.Boolean:
+                    return token.Value<bool>();
+                case JTokenType.Object when (topLevel):
+                    var dict = new Dictionary<string, object>();
+                    foreach (var property in token.Value<JObject>())
+                    {
+                        dict.Add(property.Key, ParseValues(property.Value, false));
+                    }
 
-                return dict;
-            }
-            else
-            {
-                throw new ArgumentException(nameof(token));
+                    return dict;
+                default:
+                    throw new ArgumentException(nameof(token));
             }
         }
     }

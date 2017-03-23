@@ -30,17 +30,22 @@ namespace CVaS.BL.Services.ArgumentTranslator
         private IEnumerable<Argument> ProcessSimpleType(object arg)
         {
             var typeInfo = arg.GetType().GetTypeInfo();
+
             if (arg is string)
             {
                 return new[] { ProccessString((string)arg)};
             }
             else if (arg is float)
             {
-                return new[] { new GenericArgument<string>(((float)arg).ToString(CultureInfo.InvariantCulture))};
+                return new[] { new GenericArgument<float>((float)arg)};
             }
             else if (arg is double)
             {
-                return new[] { new GenericArgument<string>(((double)arg).ToString(CultureInfo.InvariantCulture))};
+                return new[] { new GenericArgument<double>((double)arg)};
+            }
+            else if (arg is int)
+            {
+                return new[] { new GenericArgument<int>((int)arg) };
             }
             else if (typeInfo.IsPrimitive)
             {

@@ -7,7 +7,7 @@ namespace CVaS.Web.Providers
     /// Parses primite arguments like bool, int, float
     /// and event String
     /// </summary>
-    public class PrimitiveArgumentParserProvider : IArgumentParserProvider
+    public class PrimitiveArgumentParserProvider : IArgumentParser
     {
         public bool CanParse(object argument)
         {

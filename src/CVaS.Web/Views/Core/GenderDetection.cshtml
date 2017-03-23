@@ -4,16 +4,16 @@
 }
 
 <h3>Description</h3>
-<p>Algorithm for colorful image colorization in images by <a target="_blank" href="http://richzhang.github.io/colorization/">Richard Zhang, Phillip Isola, Alexei A. Efros</a></p>
+<p>Algorithm for gender detection in images by <a target="_blank" href="http://www.openu.ac.il/home/hassner/projects/cnn_agegender/">Gil Levi, Tal Hassner</a></p>
 
 <h3>API</h3>
 <div class="well well-lg">
     <h4>Input</h4>
-    <span>Single grayscale image</span><br />
+    <span>Single image with person</span><br />
     <span>Example: &quot;local://1&quot;</span>
 
     <h4>Return</h4>
-    <span>Colorized image</span>
+    <span>Text with detected genre</span>
 </div>
 @section Scripts {
     <script>
@@ -21,6 +21,6 @@
             return "local://" + fileId;
         }
 
-        var client = new AlgorithmClient('/algorithms/colorization', callback);
+        var client = new AlgorithmClient('/algorithms/gender-detection', callback);
     </script>
 }

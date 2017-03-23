@@ -7,7 +7,7 @@ namespace CVaS.Web.Providers
     /// Interface for parser of arguments 
     /// when starting algorithm
     /// </summary>
-    public interface IArgumentParserProvider
+    public interface IArgumentParser
     {
         bool CanParse(object arguments);
 
