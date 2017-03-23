@@ -1,7 +1,8 @@
 ﻿@model CVaS.Web.Models.AdminSectionViewModel
 
-
-<h2>@Model.Title</h2>
+<div class="page-header">
+    <h2>@Model.Title</h2>
+</div>
 
 <div class="admin-tabs">
     <ul id="mainTab" class="nav nav-tabs nav-justified">
@@ -61,7 +62,6 @@
                         <div class="form-group">
                             <input type="text" class="form-control" id="addRegexInput" asp-for="NewRule.Regex" placeholder="Regular expression" size="40">
                         </div>
-
                         <button type="submit" class="btn btn-default">Add rule</button>
                     </form>
                 </div>

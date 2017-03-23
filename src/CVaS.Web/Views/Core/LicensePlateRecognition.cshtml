@@ -3,22 +3,19 @@
     Layout = "_AlgorithmLayout";
 }
 
-<div class="row col-md-12">
-    <dl>
-        <dt>Description</dt>
-        <dd>Algorithm for recognition license plate in images or videos is provided by <a target="_blank" href="https://github.com/openalpr/openalpr">OpenAlpr</a>.</dd>
-    </dl>
-</div>
+<h3>Description</h3>
+<p>Algorithm for recognition license plate in images or videos is provided by <a target="_blank" href="https://github.com/openalpr/openalpr">OpenAlpr</a>.</p>
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="algorithm-run">
+<div class="well well-lg col-md-12">
+    <form id="algorithm-run">
+        <fieldset>
+            <legend>Options</legend>
             <div class="form-group">
                 <label for="inputPlatesCount">Result plates count</label>
                 <input type="number" class="form-control" id="inputPlatesCount" placeholder="Enter result count" min="1" max="10" value="1">
             </div>
-            <fieldset class="form-group">
-                <legend>Specify license plate region</legend>
+            <div class="form-group">
+                <label class="control-label">Specify license plate region</label>
                 <div class="form-check">
                     <label class="form-check-label">
                         <input type="radio" class="form-check-input" name="optionsRadios" id="euRadioOption" value="eu" checked>
@@ -31,9 +28,9 @@
                         US
                     </label>
                 </div>
-            </fieldset>
-        </form>
-    </div>
+            </div>
+        </fieldset>
+    </form>
 </div>
 
 @section Scripts {

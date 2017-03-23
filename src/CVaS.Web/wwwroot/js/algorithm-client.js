@@ -13,6 +13,19 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
         $("#request-message").delay(5000).slideUp(500, 0);
     };
 
+    var createLabelForStatus = function (status) {
+        var label = 'info';
+
+        if (status.toUpperCase() === 'success'.toUpperCase())
+            label = 'success';
+        else if (status.toUpperCase() === 'timeouted'.toUpperCase())
+            label = 'warning';
+        else
+            label = 'danger';
+
+        return '<span class="label label-' + label +'">' + status + '</span>'
+    }
+
     var checkForRun = function (runId, divElement) {
         $.ajax({
             type: 'GET',
@@ -81,7 +94,8 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
         element.html("");
 
         element.append('<p>Id: ' + runId + '</p>');
-        element.append('<p>Status: ' + status + '</p>');
+
+        element.append('<p>Status: ' + createLabelForStatus(status) + '</p>');
 
         if (duration !== undefined) {
             element.append('<p>Duration: ' + (duration / 1000).toFixed(2) + ' s</p>');

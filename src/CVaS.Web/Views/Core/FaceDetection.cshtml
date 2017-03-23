@@ -3,17 +3,50 @@
     Layout = "_AlgorithmLayout";
 }
 
-<div class="row col-md-12">
-    <dl>
-        <dt>Description</dt>
-        <dd>Algorithm for face detection in images by <a target="_blank" href="http://opencv.org/">opencv</a> with python.</dd>
-    </dl>
+<h3>Description</h3>
+<p>Algorithm for face detection in images by <a target="_blank" href="http://opencv.org/">opencv</a> with python.</p>
+
+<div class="well well-lg col-md-12">
+    <form id="algorithm-run">
+        <fieldset>
+            <legend>Options</legend>
+
+            <div class="form-group">
+                <label class="control-label">Output type</label>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="2" checked>
+                        Text
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="3">
+                        Image
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="1">
+                        Both
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="inputPlatesCount">Scale factor</label>
+                <input type="number" class="form-control" id="inputScaleFactor" placeholder="Enter scale factor" min="1" max="10" value="1.1">
+                <p class="help-block">Parameter specifying how much the image size is reduced at each image scale.</p>
+            </div>
+        </fieldset>
+    </form>
 </div>
 
 @section Scripts {
     <script>
         var callback = function (fileId) {
-            return "local://" + fileId;
+            var form = $('#algorithm-run');
+            return ["local://" + fileId, form.find('#inputScaleFactor').val(), form.find('input[type=radio]:checked').val()];
         }
 
         var client = new AlgorithmClient('/algorithms/face-detection', callback);

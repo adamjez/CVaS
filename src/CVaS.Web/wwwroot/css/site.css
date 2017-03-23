@@ -49,30 +49,23 @@ textarea {
     }
 }
 
-h2 {
-    font-size: 14px;
-    font-weight: 700;
-    /*color: #959595;*/
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding-bottom: 9px;
-    margin: 30px 0 20px;
-    border-bottom: 1px solid #eee;
-}
-
 /* Button Logout */
-.navbar-inverse .btn-logout {
+.navbar-default .btn-logout {
     width: 100%;
-    padding: 3px 20px;
     text-align: left;
-    /*color: #000;*/
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #7b8a8b;
+    white-space: nowrap;
 }
 
-.navbar-inverse .in .btn-link:hover, .navbar-inverse .in .btn-link:focus {
+.navbar-default .in .btn-link:hover, .navbar-inverse .in .btn-link:focus {
     color: #fff;
 }
 
-.navbar-inverse .btn-logout:hover, .navbar-inverse .btn-logout:focus {
+.navbar-default .btn-logout:hover, .navbar-inverse .btn-logout:focus {
     color: #23527c;
     text-decoration: underline;
     background-color: transparent;
@@ -110,17 +103,12 @@ img.clippy {
     margin-top: -2px;
 }
 
-h4 {
-    padding-bottom: 12px;
-    margin-bottom: 20px;
-    border: 0;
-    border-bottom: 1px solid #eee;
-}
 
-/* Core Section */
+
+/* Algorithms Section */
 #message {
     position: fixed;
-    top: 60px;
+    top: 70px;
     left: 10px;
     width: 100%;
     z-index: 4;
@@ -157,6 +145,12 @@ img.result-preview {
 .qq-upload-file {
     width: 150px !important;
 }
+
+.qq-uploader {
+    min-height: 400px;
+    max-height: 600px;
+}
+
 
 @keyframes spin {
     0% {

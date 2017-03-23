@@ -3,18 +3,16 @@
     Layout = "_AlgorithmLayout";
 }
 
-<div class="row col-md-12">
-    <dl>
-        <dt>Description</dt>
-        <dd>Algorithm for text recognitionin images is provided by <a target="_blank" href="https://github.com/tesseract-ocr/tesseract">Tesseract OCR</a>.</dd>
-    </dl>
-</div>
+<h3>Description</h3>
+<p>Algorithm for text recognitionin images is provided by <a target="_blank" href="https://github.com/tesseract-ocr/tesseract">Tesseract OCR</a>.</p>
 
-<div class="row">
-    <div class="col-md-12">
-        <form id="algorithm-run">
-            <fieldset class="form-group">
-                <legend>Specify language</legend>
+
+<div class="well well-lg col-md-12">
+    <form id="algorithm-run">
+        <fieldset>
+            <legend>Options</legend>
+            <div class="form-group">
+                <label class="control-label">Specify language</label>
                 <div class="form-check">
                     <label class="form-check-label">
                         <input type="checkbox" class="form-check-input" name="optionscheckboxes" id="engcheckboxOption" value="eng" checked>
@@ -33,10 +31,10 @@
                         DEU
                     </label>
                 </div>
-            </fieldset>
+            </div>
 
-            <fieldset class="form-group">
-                <legend>Page segmentation modes</legend>
+            <div class="form-group">
+                <label class="control-label">Page segmentation modes</label>
                 <div class="form-check">
                     <label class="form-check-label">
                         <input type="radio" class="form-check-input" name="optionsRadios" value="3" checked>
@@ -85,9 +83,9 @@
                         Treat the image as a single character.
                     </label>
                 </div>
-            </fieldset>
-        </form>
-    </div>
+            </div>
+        </fieldset>
+    </form>
 </div>
 
 @section Scripts {

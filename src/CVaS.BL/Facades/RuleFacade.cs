@@ -80,7 +80,7 @@ namespace CVaS.BL.Facades
             {
                 var rules = await uow.Context.Rules.Where(r => r.IsEnabled).ToListAsync();
 
-                return rules.All(rule => Regex.IsMatch(emailAddress, rule.Regex, RegexOptions.Singleline));
+                return rules.Any(rule => Regex.IsMatch(emailAddress, rule.Regex, RegexOptions.Singleline));
             }
         }
     }
