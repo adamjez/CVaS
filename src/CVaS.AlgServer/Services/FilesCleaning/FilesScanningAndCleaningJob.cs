@@ -94,9 +94,15 @@ namespace CVaS.AlgServer.Services.FilesCleaning
                 sumFilesSize += file.Length;
             }
 
-            foreach (var fileSystemInfo in temporaryDirectoryInfo.EnumerateDirectories())
+            foreach (var directoryInfo in temporaryDirectoryInfo.EnumerateDirectories())
             {
-                CheckAllCachedFilesSlow(fileSystemInfo, pressure);
+                var fileSizeInDirectory = CheckAllCachedFilesSlow(directoryInfo, pressure);
+                if (fileSizeInDirectory == 0)
+                {
+                    directoryInfo.Delete(true);
+                }
+
+                sumFilesSize += fileSizeInDirectory;
             }
 
             return sumFilesSize;

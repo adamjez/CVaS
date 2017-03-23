@@ -53,10 +53,11 @@ namespace CVaS.Shared.Services.File.Algorithm
                 if (!files.Any())
                     return;
 
-                var filesEntities = await _fileRepository.GetByIds(files.Select(f => f.FileId));
+                var fileIds = files.Select(f => f.FileId).Distinct().ToList();
+                var filesEntities = await _fileRepository.GetByIds(fileIds);
 
                 // We didn't get all files => some files are missing
-                if (files.Count != filesEntities.Count)
+                if (fileIds.Count == filesEntities.Count)
                 {
                     throw new NotFoundException();
                 }
