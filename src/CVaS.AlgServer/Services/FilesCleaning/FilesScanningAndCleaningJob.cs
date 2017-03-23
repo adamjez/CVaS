@@ -38,10 +38,16 @@ namespace CVaS.AlgServer.Services.FilesCleaning
                 var currentDrive = new DriveInfo(Directory.GetDirectoryRoot(temporaryDirectoryPath));
                 var driveFreeSpacePressure = currentDrive.AvailableFreeSpace < 1000 * 1000 * _options.Value.DrivePressureSpaceInMB;
 
+                if (driveFreeSpacePressure)
+                {
+                    _logger.LogWarning("Running FilesScanningAndCleaningJob under memory pressure, AvailableFreeSpace=" + currentDrive.AvailableFreeSpace);
+                }
+
                 var directorySize = CheckAllCachedFilesSlow(temporaryDirectoryInfo, driveFreeSpacePressure);
 
-                if (directorySize > _options.Value.DirectoryMaxSpaceInMB * 1000 * 1000)
+                if (directorySize > (_options.Value.DirectoryMaxSpaceInMB * 1000 * 1000))
                 {
+                    _logger.LogWarning("Running FilesScanningAndCleaningJob under memory pressure, directorySize=" + directorySize);
                     CheckAllCachedFilesSlow(temporaryDirectoryInfo, true);
                 }
 
@@ -58,7 +64,7 @@ namespace CVaS.AlgServer.Services.FilesCleaning
             {
                 if (currentTimeUtc - file.LastAccessTimeUtc > fileCacheRetentionTimeSpan)
                 {
-                    _logger.LogInformation("Deleting Cached File: " + file.FullName);
+                    _logger.LogInformation($"Deleting Cached File: {file.FullName} ({currentTimeUtc - file.LastAccessTimeUtc} - {fileCacheRetentionTimeSpan})");
                     file.Delete();
                     continue;
                 }
@@ -79,7 +85,7 @@ namespace CVaS.AlgServer.Services.FilesCleaning
             {
                 if (currentTimeUtc - file.LastAccessTimeUtc > fileCacheRetentionTimeSpan)
                 {
-                    _logger.LogInformation("Deleting Cached File: " + file.FullName);
+                    _logger.LogInformation($"Deleting Cached File: {file.FullName} (pressure={pressure})");
                     try
                     {
                         file.Delete();
@@ -99,6 +105,7 @@ namespace CVaS.AlgServer.Services.FilesCleaning
                 var fileSizeInDirectory = CheckAllCachedFilesSlow(directoryInfo, pressure);
                 if (fileSizeInDirectory == 0)
                 {
+                    _logger.LogInformation("Deleting Empty Folder File: " + directoryInfo.FullName);
                     directoryInfo.Delete(true);
                 }
 
