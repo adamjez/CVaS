@@ -22,7 +22,7 @@ namespace CVaS.BL.Installers
 
             registrator.Register<ApiKeyManager>();
 
-            registrator.Register<AlgoFacade>();
+            registrator.Register<AlgorithmFacade>();
             registrator.Register<FileFacade>();
             registrator.Register<RunFacade>();
             registrator.Register<RuleFacade>();

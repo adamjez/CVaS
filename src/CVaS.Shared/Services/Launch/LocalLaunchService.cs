@@ -106,7 +106,8 @@ namespace CVaS.Shared.Services.Launch
                     StdErr = result.Value.StdError,
                     RunId = run.Id,
                     Result = savedRun.Result,
-                    Duration = (result.Value.FinishedAt - result.Value.StartedAt).TotalMilliseconds
+                    CreatedAt = result.Value.StartedAt,
+                    FinishedAt = result.Value.FinishedAt
                 };
             }
         }

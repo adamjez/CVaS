@@ -67,7 +67,8 @@ namespace CVaS.AlgServer.Services.MessageProcessor
                     {
                         StdOut = result.StdOut,
                         StdErr = result.StdErr,
-                        Duration = result.Duration,
+                        CreatedAt = result.CreatedAt,
+                        FinishedAt = result.FinishedAt,
                         FileId = result.FileId,
                         Result = result.Result,
                         RunId = result.RunId

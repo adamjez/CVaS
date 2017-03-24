@@ -150,7 +150,7 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
             dataType: "json",
             success: function (data) {
                 loader.hide();
-                showResult(data.runId, data.status, data.duration, data.stdOut,
+                showResult(data.id, data.status, data.duration, data.stdOut,
                     data.stdErr, data.zip, resultDiv);
             },
             complete: function () {

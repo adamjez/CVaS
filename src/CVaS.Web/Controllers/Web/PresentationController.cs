@@ -13,13 +13,13 @@ namespace CVaS.Web.Controllers.Web
 {
     public class PresentationController : WebController
     {
-        private readonly AlgoFacade _algoFacade;
+        private readonly AlgorithmFacade _algorithmFacade;
         private readonly IRazorViewEngine _viewEngine;
 
-        public PresentationController(ICurrentUserProvider currentUserProvider, AlgoFacade algoFacade, IRazorViewEngine viewEngine)
+        public PresentationController(ICurrentUserProvider currentUserProvider, AlgorithmFacade algoFacade, IRazorViewEngine viewEngine)
             : base(currentUserProvider)
         {
-            _algoFacade = algoFacade;
+            _algorithmFacade = algoFacade;
             _viewEngine = viewEngine;
         }
 
@@ -40,7 +40,7 @@ namespace CVaS.Web.Controllers.Web
                 return NotFound();
             }
 
-            var algorithm = await _algoFacade.Get(id);
+            var algorithm = await _algorithmFacade.Get(id);
 
             var viewName = Regex.Replace(algorithm.CodeName.Replace('-', ' ').ToTitleCase(), @"\s+", "");
 

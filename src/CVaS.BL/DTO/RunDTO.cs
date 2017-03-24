@@ -21,7 +21,7 @@ namespace CVaS.BL.DTO
 
         public DateTime? FinishedAt { get; set; }
 
-        public int? Duration => FinishedAt.HasValue ? (int?)(FinishedAt.Value - CreatedAt).TotalMilliseconds : null;
+        public double? Duration => FinishedAt.HasValue ? (double?)(FinishedAt.Value - CreatedAt).TotalMilliseconds : null;
 
         public string Zip { get; set; }
     }

@@ -15,11 +15,11 @@ namespace CVaS.Web.Controllers.Web
     [Authorize(Roles = Roles.Admin, ActiveAuthenticationSchemes = AuthenticationScheme.WebCookie)]
     public class AdminController : WebController
     {
-        private readonly AlgoFacade _algoFacade;
+        private readonly AlgorithmFacade _algoFacade;
         private readonly RuleFacade _ruleFacade;
         private readonly StatsFacade _statsFacade;
 
-        public AdminController(ICurrentUserProvider currentUserProvider, AlgoFacade algoFacade, RuleFacade ruleFacade, StatsFacade statsFacade)
+        public AdminController(ICurrentUserProvider currentUserProvider, AlgorithmFacade algoFacade, RuleFacade ruleFacade, StatsFacade statsFacade)
             : base(currentUserProvider)
         {
             _algoFacade = algoFacade;

@@ -19,11 +19,11 @@ namespace CVaS.Web.Controllers.Api
     {
         private readonly ILogger<AlgorithmsController> _logger;
         private readonly RunFacade _runFacade;
-        private readonly AlgoFacade _algoFacade;
+        private readonly AlgorithmFacade _algoFacade;
         private readonly IEnumerable<IArgumentParser> _argumentParserProviders;
         private readonly IOptions<AlgorithmOptions> _algorithmOptions;
 
-        public AlgorithmsController(ILogger<AlgorithmsController> logger, RunFacade runFacade, AlgoFacade algoFacade, 
+        public AlgorithmsController(ILogger<AlgorithmsController> logger, RunFacade runFacade, AlgorithmFacade algoFacade, 
             IEnumerable<IArgumentParser> argumentParserProviders, IOptions<AlgorithmOptions> algorithmOptions)
         {
             _algorithmOptions = algorithmOptions;
@@ -44,7 +44,7 @@ namespace CVaS.Web.Controllers.Api
         /// <param name="timeout">Specifies maximum amount of time to wait for returning request. If timeout
         /// is set to negative number, wait time is set to maximum possible time.</param>
         [HttpPost("{codeName}")]
-        [Produces(typeof(AlgorithmResult))]
+        [Produces(typeof(RunDTO))]
         public async Task<IActionResult> Process(string codeName, [FromBody] object options, [FromQuery]int? timeout)
         {
             if (!ModelState.IsValid)
@@ -72,14 +72,15 @@ namespace CVaS.Web.Controllers.Api
 
             var result = await _runFacade.RunAlgorithmAsync(codeName, parsedOptions, timeout);
 
-            return Ok(new AlgorithmResult
+            return Ok(new RunDTO
             {
-                RunId = result.RunId,
+                Id = result.RunId,
                 StdOut = result.StdOut,
                 StdErr = result.StdErr,
                 Zip = result.FileId != null ? Url.Link(nameof(FilesController.GetFile), new { fileId = result.FileId }) : null,
                 Status = result.Result,
-                Duration = result.Duration
+                CreatedAt = result.CreatedAt,
+                FinishedAt = result.FinishedAt
             });
         }
 

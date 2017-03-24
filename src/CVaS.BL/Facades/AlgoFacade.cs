@@ -14,12 +14,12 @@ using CVaS.Shared.Services.Time;
 
 namespace CVaS.BL.Facades
 {
-    public class AlgoFacade : AppFacadeBase
+    public class AlgorithmFacade : AppFacadeBase
     {
         private readonly AlgorithmRepository _algorithmRepository;
         private readonly ICurrentTimeProvider _currentTimeProvider;
 
-        public AlgoFacade(IUnitOfWorkProvider unitOfWorkProvider, ICurrentUserProvider currentUserProvider, 
+        public AlgorithmFacade(IUnitOfWorkProvider unitOfWorkProvider, ICurrentUserProvider currentUserProvider, 
             AlgorithmRepository algorithmRepository, ICurrentTimeProvider currentTimeProvider) 
             : base(unitOfWorkProvider, currentUserProvider)
         {
