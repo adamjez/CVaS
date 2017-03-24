@@ -6,7 +6,7 @@
 *.user
 *.userosscache
 *.sln.docstates
-wwwroot/lib/*
+src/CVaS.Web/wwwroot/lib/*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
