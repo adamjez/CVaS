@@ -11,12 +11,12 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 
 namespace CVaS.Web.Controllers.Web
 {
-    public class CoreController : WebController
+    public class PresentationController : WebController
     {
         private readonly AlgoFacade _algoFacade;
         private readonly IRazorViewEngine _viewEngine;
 
-        public CoreController(ICurrentUserProvider currentUserProvider, AlgoFacade algoFacade, IRazorViewEngine viewEngine)
+        public PresentationController(ICurrentUserProvider currentUserProvider, AlgoFacade algoFacade, IRazorViewEngine viewEngine)
             : base(currentUserProvider)
         {
             _algoFacade = algoFacade;
