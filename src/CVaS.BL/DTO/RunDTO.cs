@@ -5,11 +5,11 @@ namespace CVaS.BL.DTO
 {
     public class RunDTO
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string AlgorithmCode { get; set; }
 
-        public int? FileId { get; set; }
+        public Guid? FileId { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

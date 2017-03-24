@@ -16,10 +16,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="wwwroot\js\algorithm-client.js" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="wwwroot\**\*;docker-compose.yml;Dockerfile;.dockerignore">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>

@@ -83,14 +83,12 @@ namespace CVaS.BL.Services.ArgumentTranslator
         {
             if (arg.StartsWith(LocalFileScheme))
             {
-                int fileId;
-
-                if (!int.TryParse(arg.Substring(LocalFileScheme.Length), out fileId))
+                if (Guid.TryParse(arg.Substring(LocalFileScheme.Length), out Guid fileId))
                 {
-                    throw new ArgumentMalformedException($"File id in argument: \"{arg}\" is malformed");
+                    return new FileArgument(fileId);
                 }
 
-                return new FileArgument(fileId);
+                throw new ArgumentMalformedException($"File id in argument: \"{arg}\" is malformed");
             }
             else
             {

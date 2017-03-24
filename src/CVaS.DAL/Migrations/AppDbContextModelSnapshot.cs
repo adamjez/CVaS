@@ -120,7 +120,7 @@ namespace CVaS.DAL.Migrations
 
             modelBuilder.Entity("CVaS.DAL.Model.File", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("ContentType");
@@ -170,14 +170,14 @@ namespace CVaS.DAL.Migrations
 
             modelBuilder.Entity("CVaS.DAL.Model.Run", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("AlgorithmId");
 
                     b.Property<DateTime>("CreatedAt");
 
-                    b.Property<int?>("FileId");
+                    b.Property<Guid?>("FileId");
 
                     b.Property<DateTime?>("FinishedAt");
 

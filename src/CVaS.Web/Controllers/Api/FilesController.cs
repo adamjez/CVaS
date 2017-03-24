@@ -16,6 +16,7 @@ using CVaS.Shared.Services.File.Providers;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
+using System;
 
 namespace CVaS.Web.Controllers.Api
 {
@@ -53,7 +54,7 @@ namespace CVaS.Web.Controllers.Api
             }
             var reader = new MultipartReader(boundary, HttpContext.Request.Body);
 
-            var fileIds = new List<int>();
+            var fileIds = new List<Guid>();
             MultipartSection section;
             while ((section = await reader.ReadNextSectionAsync()) != null)
             {
@@ -74,7 +75,7 @@ namespace CVaS.Web.Controllers.Api
         /// </summary>
         /// <param name="fileId">Identifier of file</param>
         [HttpGet, Route("{fileId}", Name = nameof(GetFile))]
-        public async Task<FileStreamResult> GetFile(int fileId)
+        public async Task<FileStreamResult> GetFile(Guid fileId)
         {
             if (!ModelState.IsValid)
             {
@@ -115,7 +116,7 @@ namespace CVaS.Web.Controllers.Api
         /// </summary>
         /// <param name="fileId">File Identifier</param>
         [HttpDelete, Route("{fileId}")]
-        public async Task<IActionResult> DeleteUserFile(int fileId)
+        public async Task<IActionResult> DeleteUserFile(Guid fileId)
         {
             if (!ModelState.IsValid)
             {
@@ -132,7 +133,7 @@ namespace CVaS.Web.Controllers.Api
         /// </summary>
         /// <param name="fileId">File Identifier</param>
         [HttpHead, Route("{fileId}")]
-        public async Task<IActionResult> HeadUserFile(int fileId)
+        public async Task<IActionResult> HeadUserFile(Guid fileId)
         {
             if (!ModelState.IsValid)
             {

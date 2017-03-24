@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CVaS.Shared.Repositories
 {
-    public class FileRepository : EntityFrameworkRepository<File, int>
+    public class FileRepository : EntityFrameworkRepository<File, Guid>
     {
         public FileRepository(IUnitOfWorkProvider provider) : base(provider)
         {

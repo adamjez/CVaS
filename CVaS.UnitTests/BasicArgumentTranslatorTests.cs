@@ -110,7 +110,7 @@ namespace CVaS.UnitTests
         [Fact]
         public void ArgumentTranslator_LocalFileParse_FileArgumentExpected()
         {
-            int id = 54165;
+            var id = Guid.NewGuid();
             var filePath = "local://" + id;
 
             var expected = new FileArgument(id);

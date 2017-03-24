@@ -1,5 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using CVaS.DAL.Model;
+using System;
 
 namespace CVaS.Web.Models
 {
@@ -13,7 +14,7 @@ namespace CVaS.Web.Models
 
         public string Zip { get; set; }
 
-        public int RunId { get; set; }
+        public Guid RunId { get; set; }
 
         public RunResultType Status { get; set; }
 

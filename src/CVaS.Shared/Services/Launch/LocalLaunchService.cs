@@ -111,7 +111,7 @@ namespace CVaS.Shared.Services.Launch
             }
         }
 
-        private async Task AfterRunFinished(int runId, Task<ProcessResult> action, string runFolder)
+        private async Task AfterRunFinished(Guid runId, Task<ProcessResult> action, string runFolder)
         {
             using (var uow = _unitOfWorkProvider.Create(DbContextOptions.AlwaysCreateOwnContext))
             {

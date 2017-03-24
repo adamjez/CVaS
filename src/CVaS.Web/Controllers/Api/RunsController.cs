@@ -3,6 +3,7 @@ using CVaS.BL.DTO;
 using CVaS.BL.Facades;
 using CVaS.Shared.Providers;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace CVaS.Web.Controllers.Api
 {
@@ -21,11 +22,11 @@ namespace CVaS.Web.Controllers.Api
         /// <summary>
         /// Retrieve basic informace about Run.
         /// </summary>
-        /// <param name="runId">Identifier of run paired with user</param>
+        /// <param name="runId">Identifier of run created by current user</param>
         /// <returns></returns>
         [HttpGet("{runId}")]
         [Produces(typeof(RunDTO))]
-        public async Task<IActionResult> Get(int runId)
+        public async Task<IActionResult> Get(Guid runId)
         {
             if (!ModelState.IsValid)
             {

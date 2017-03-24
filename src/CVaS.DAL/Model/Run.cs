@@ -3,11 +3,11 @@ using CVaS.DAL.Common;
 
 namespace CVaS.DAL.Model
 {
-    public class Run : IEntity<int>
+    public class Run : IEntity<Guid>
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
-        public int? FileId { get; set; }
+        public Guid? FileId { get; set; }
 
         public virtual File File { get; set; }
 

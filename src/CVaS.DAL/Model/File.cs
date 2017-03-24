@@ -1,12 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using CVaS.DAL.Common;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CVaS.DAL.Model
 {
-    public class File : IEntity<int>
+    public class File : IEntity<Guid>
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(256)]

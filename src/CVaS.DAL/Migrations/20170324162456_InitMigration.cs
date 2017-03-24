@@ -122,20 +122,20 @@ namespace CVaS.DAL.Migrations
                 name: "Files",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<Guid>(nullable: false),
                     ContentType = table.Column<string>(nullable: true),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     Extension = table.Column<string>(nullable: true),
+                    FileSize = table.Column<long>(nullable: false),
                     Hash = table.Column<byte[]>(maxLength: 16, nullable: true),
-                    Path = table.Column<string>(maxLength: 256, nullable: false),
+                    LocationId = table.Column<string>(maxLength: 256, nullable: false),
                     Type = table.Column<int>(nullable: false),
                     UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Files", x => x.Id);
-                    table.UniqueConstraint("AK_Files_Path", x => x.Path);
+                    table.UniqueConstraint("AK_Files_LocationId", x => x.LocationId);
                     table.ForeignKey(
                         name: "FK_Files_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -213,11 +213,10 @@ namespace CVaS.DAL.Migrations
                 name: "Run",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<Guid>(nullable: false),
                     AlgorithmId = table.Column<int>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
-                    FileId = table.Column<int>(nullable: true),
+                    FileId = table.Column<Guid>(nullable: true),
                     FinishedAt = table.Column<DateTime>(nullable: true),
                     Result = table.Column<int>(nullable: false),
                     StdErr = table.Column<string>(nullable: true),

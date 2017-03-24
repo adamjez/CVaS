@@ -109,14 +109,14 @@ namespace CVaS.Shared.Services.File.Algorithm
 
         private struct LocalFileResult
         {
-            public LocalFileResult(string localPath, int id)
+            public LocalFileResult(string localPath, Guid id)
             {
                 LocalPath = localPath;
                 Id = id;
             }
 
             public string LocalPath { get; }
-            public int Id { get; }
+            public Guid Id { get; }
         }
     }
 }

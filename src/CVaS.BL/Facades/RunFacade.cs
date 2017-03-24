@@ -76,7 +76,7 @@ namespace CVaS.BL.Facades
             }
         }
 
-        public async Task<RunDTO> GetSafelyAsync(int runId)
+        public async Task<RunDTO> GetSafelyAsync(Guid runId)
         {
             using (UnitOfWorkProvider.Create())
             {

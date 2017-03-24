@@ -24,7 +24,7 @@ namespace CVaS.BL.Facades
             _userFileProvider = userFileProvider;
         }
 
-        public async Task DeleteAsync(int fileId)
+        public async Task DeleteAsync(Guid fileId)
         {
             using (var uow = UnitOfWorkProvider.Create())
             {
@@ -42,7 +42,7 @@ namespace CVaS.BL.Facades
             }
         }
 
-        public async Task<int> AddFileAsync(Stream fileStream, string fileName, string contentType)
+        public async Task<Guid> AddFileAsync(Stream fileStream, string fileName, string contentType)
         {
             using (var uow = UnitOfWorkProvider.Create())
             {
@@ -106,7 +106,7 @@ namespace CVaS.BL.Facades
             }
         }
 
-        public async Task<File> GetSafelyAsync(int fileId)
+        public async Task<File> GetSafelyAsync(Guid fileId)
         {
             using (UnitOfWorkProvider.Create())
             {

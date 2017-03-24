@@ -9,7 +9,7 @@ using CVaS.DAL.Model;
 namespace CVaS.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20170311104600_InitMigration")]
+    [Migration("20170324162456_InitMigration")]
     partial class InitMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -121,7 +121,7 @@ namespace CVaS.DAL.Migrations
 
             modelBuilder.Entity("CVaS.DAL.Model.File", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("ContentType");
@@ -130,10 +130,12 @@ namespace CVaS.DAL.Migrations
 
                     b.Property<string>("Extension");
 
+                    b.Property<long>("FileSize");
+
                     b.Property<byte[]>("Hash")
                         .HasMaxLength(16);
 
-                    b.Property<string>("Path")
+                    b.Property<string>("LocationId")
                         .IsRequired()
                         .HasMaxLength(256);
 
@@ -143,7 +145,7 @@ namespace CVaS.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Path");
+                    b.HasAlternateKey("LocationId");
 
                     b.HasIndex("UserId");
 
@@ -169,14 +171,14 @@ namespace CVaS.DAL.Migrations
 
             modelBuilder.Entity("CVaS.DAL.Model.Run", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("AlgorithmId");
 
                     b.Property<DateTime>("CreatedAt");
 
-                    b.Property<int?>("FileId");
+                    b.Property<Guid?>("FileId");
 
                     b.Property<DateTime?>("FinishedAt");
 
