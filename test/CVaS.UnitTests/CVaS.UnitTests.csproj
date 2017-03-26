@@ -11,9 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\CVaS.BL\CVaS.BL.csproj" />
-    <ProjectReference Include="..\src\CVaS.Shared\CVaS.Shared.csproj" />
-    <ProjectReference Include="..\src\CVaS.Web\CVaS.Web.csproj" />
+    <ProjectReference Include="..\..\src\CVaS.BL\CVaS.BL.csproj" />
+    <ProjectReference Include="..\..\src\CVaS.Shared\CVaS.Shared.csproj" />
+    <ProjectReference Include="..\..\src\CVaS.Web\CVaS.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

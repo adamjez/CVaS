@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger.Model;
-using MongoDB.Driver;
 using Newtonsoft.Json;
 using Swashbuckle.SwaggerGen.Application;
 using EasyNetQ;
@@ -107,7 +106,7 @@ namespace CVaS.Web
                     options.Cookies.ApplicationCookie.ExpireTimeSpan = TimeSpan.FromDays(150);
                     options.Cookies.ApplicationCookie.LoginPath = "/Account/Login/";
                     options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOff";
-                    options.Cookies.ApplicationCookie.AuthenticationScheme = Authentication.AuthenticationScheme.WebCookie;
+                    options.Cookies.ApplicationCookie.AuthenticationScheme = AuthenticationScheme.WebCookie;
                     options.Cookies.ApplicationCookie.AutomaticAuthenticate = true;
                     options.Cookies.ApplicationCookie.AutomaticChallenge = false;
                 })
@@ -158,7 +157,7 @@ namespace CVaS.Web
 
             app.UseApiAuthentication(new ApiAuthenticationOptions()
             {
-                AuthenticationScheme = Authentication.AuthenticationScheme.ApiKey,
+                AuthenticationScheme = AuthenticationScheme.ApiKey,
                 HeaderScheme = "Simple"
             });
             app.UseIdentity();
@@ -190,7 +189,7 @@ namespace CVaS.Web
                 .Wait();
         }
 
-        private void SwaggerSetup(SwaggerGenOptions options)
+        private static void SwaggerSetup(SwaggerGenOptions options)
         {
             options.SingleApiVersion(new Info
             {
