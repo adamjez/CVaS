@@ -1,6 +1,18 @@
 ﻿"use strict";
-function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
+function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) {
+    if (options === undefined)
+    {
+        options = {
+            messageHideDelay: 5000,
+            slideUpDuration: 500,
+            checkForRunInterval: 10,
+            runsEndpoint: '/runs',
+            filesEndpoint: '/files'
+        };
+    }
+
     var _this = this;
+    this.options = options;
     this.algorithmEndpoint = algorithmEndpoint;
     this.createRequestBodyCallback = createRequestBodyCallback;
 
@@ -10,7 +22,9 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
         $("#body-request-message").html("<p>" + method + " " + location + "</p><p>BODY: " + body + "</p>");
         $("#request-message").show();
         $("#request-message").alert();
-        $("#request-message").delay(5000).slideUp(500, 0);
+        $("#request-message")
+            .delay(_this.options.messageHideDelay)
+            .slideUp(_this.options.slideUpDuration, 0);
     };
 
     var createLabelForStatus = function (status) {
@@ -29,7 +43,7 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
     var checkForRun = function (runId, divElement) {
         $.ajax({
             type: 'GET',
-            url: '/runs/' + runId,
+            url: _this.options.runsEndpoint + '/' + runId,
             timeout: 0,
             headers: {
                 "accept": "application/json"
@@ -43,25 +57,27 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
 
     var notFinishedResult = function (runId, element) {
         var button = document.createElement('button');
-        button.innerHTML = 'Check Again (Checking again automatically)';
+        button.innerHTML = 'Cancel';
 
-        element.append('<div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div ></div >');
+        element.append('<p class="status-message"><b>Checking again automatically</b></p>')
+        element.append('<div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div></div>');
 
-        var timeleft = 6;
+        var timeleft = _this.options.checkForRunInterval;
         var downloadTimer = setInterval(function () {
             if (timeleft <= 0) {
                 clearInterval(downloadTimer);
                 checkForRun(runId, element);
             }
             else {
-                var currentValue = 100 - (--timeleft) * 20;
-                element.find('.progress-bar').css('width', currentValue + '%').attr('aria-valuenow', currentValue);
+                var oneSecondRatio = 100 / _this.options.checkForRunInterval;
+                var currentValueInPercent = 100 - (--timeleft) * oneSecondRatio;
+                element.find('.progress-bar').css('width', currentValueInPercent + '%').attr('aria-valuenow', currentValueInPercent);
             }
         }, 1000);
 
         button.onclick = function () {
             clearInterval(downloadTimer);
-            checkForRun(runId, element);
+            element.find('.status-message').html('<b>Canceled</b>')
             return false;
         };
 
@@ -166,11 +182,11 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback) {
         .fineUploader({
             template: 'qq-template-gallery',
             request: {
-                endpoint: '/files'
+                endpoint: _this.options.filesEndpoint
             },
             deleteFile: {
                 enabled: false,
-                endpoint: '/files'
+                endpoint: _this.options.filesEndpoint
             },
             thumbnails: {
                 placeholders: {

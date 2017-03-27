@@ -20,27 +20,27 @@ namespace CVaS.Web.Controllers.Web
         private readonly ILogger<AccountController> _logger;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
-        private readonly IApiKeyGenerator _apiKeyGenerator;
         private readonly IEmailSender _emailSender;
         private readonly ICurrentUserProvider _currentUserProvider;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly ApiKeyManager _apiKeyManager;
         private readonly RuleFacade _ruleFacade;
+        private readonly AccountFacade _accountFacade;
 
         public AccountController(ILogger<AccountController> logger, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager,
-            IApiKeyGenerator apiKeyGenerator, IEmailSender emailSender, ICurrentUserProvider currentUserProvider, IUnitOfWorkProvider unitOfWorkProvider,
-            ApiKeyManager apiKeyManager, RuleFacade ruleFacade)
+            IEmailSender emailSender, ICurrentUserProvider currentUserProvider, IUnitOfWorkProvider unitOfWorkProvider,
+            ApiKeyManager apiKeyManager, RuleFacade ruleFacade, AccountFacade accountFacade)
             : base(currentUserProvider)
         {
             _logger = logger;
             _signInManager = signInManager;
             _userManager = userManager;
-            _apiKeyGenerator = apiKeyGenerator;
             _emailSender = emailSender;
             _currentUserProvider = currentUserProvider;
             _unitOfWorkProvider = unitOfWorkProvider;
             _apiKeyManager = apiKeyManager;
             _ruleFacade = ruleFacade;
+            _accountFacade = accountFacade;
         }
 
         // GET: /Account/Login
@@ -68,29 +68,18 @@ namespace CVaS.Web.Controllers.Web
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                using (_unitOfWorkProvider.Create())
-                {
-                    var user = await _userManager.FindByNameAsync(model.UserName);
+                var result = await _accountFacade.SignInAsync(model.UserName, model.Password);
 
-                    if (user != null)
-                    {
-                        if (user.EmailConfirmed)
-                        {
-                            var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, lockoutOnFailure: false);
-                            if (result.Succeeded)
-                            {
-                                _logger.LogInformation(1, "User logged in.");
-                                return RedirectToLocal(returnUrl);
-                            }
-                        }
-                        else
-                        {
-                            ModelState.AddModelError(string.Empty, "You have to confirm email first.");
-                        }
-                    }
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation(1, "User logged in.");
+                    return RedirectToLocal(returnUrl);
                 }
+                else if (result.IsNotAllowed)
+                {
+                    ModelState.AddModelError(string.Empty, "You have to confirm email first.");
+                }
+
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             }
 
@@ -117,39 +106,32 @@ namespace CVaS.Web.Controllers.Web
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid &&  await _ruleFacade.Validate(model.Email))
+
+            var allowedEmail = await _ruleFacade.Validate(model.Email);
+            if (ModelState.IsValid && allowedEmail)
             {
-                using (_unitOfWorkProvider.Create())
+                var result = await _accountFacade.CreateUserAsync(model.Email, model.Password);
+
+                if (result.Suceeded)
                 {
-                    var user = new AppUser
-                    {
-                        UserName = model.Email,
-                        Email = model.Email,
-                        ApiKey = _apiKeyGenerator.Generate()
-                    };
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(result.User);
+                    var callbackUrl = Url.Action(nameof(ConfirmEmail), "Account",
+                        new { userId = result.User.Id, code = code },
+                        protocol: HttpContext.Request.Scheme);
 
-                    var result = await _userManager.CreateAsync(user, model.Password);
-                    if (result.Succeeded)
-                    {
-                        // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
-                        // Send an email with this link
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        var callbackUrl = Url.Action(nameof(ConfirmEmail), "Account",
-                            new {userId = user.Id, code = code},
-                            protocol: HttpContext.Request.Scheme);
-
-                        await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
-                            $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
-
-                        _logger.LogInformation(3, "User created a new account with password.");
-
-                        return Redirect(callbackUrl);
-                    }
-                    AddErrors(result);
+                    await _emailSender.SendEmailAsync(result.User.Email, "Confirm your account",
+                        $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+                    return Redirect(callbackUrl);
+                }
+                else
+                {
+                    AddErrors(result.Identity);
                 }
             }
-
-            ModelState.AddModelError(nameof(model.Email), "Email Address is not in allowed email address list.");
+            else if (!allowedEmail)
+            {
+                ModelState.AddModelError(nameof(model.Email), "Email Address is not in allowed email address list.");
+            }
 
             // If we got this far, something failed, redisplay form
             return View(model);
@@ -241,7 +223,7 @@ namespace CVaS.Web.Controllers.Web
                 using (_unitOfWorkProvider.Create())
                 {
                     var user = await _userManager.FindByNameAsync(model.Email);
-                    if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                    if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
                     {
                         // Don't reveal that the user does not exist or is not confirmed
                         return RedirectToAction(nameof(ForgotPasswordConfirmation));
@@ -250,7 +232,7 @@ namespace CVaS.Web.Controllers.Web
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                     // Send an email with this link
                     var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                    var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new {userId = user.Id, code = code},
+                    var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, code = code },
                         protocol: HttpContext.Request.Scheme);
                     await _emailSender.SendEmailAsync(model.Email, "Reset Password",
                         $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
@@ -344,12 +326,12 @@ namespace CVaS.Web.Controllers.Web
                     {
                         await _signInManager.SignInAsync(user, false);
                         _logger.LogInformation(3, "User changed their password successfully.");
-                        return RedirectToAction(nameof(Settings), new {Message = ManageMessageId.ChangePasswordSuccess});
+                        return RedirectToAction(nameof(Settings), new { Message = ManageMessageId.ChangePasswordSuccess });
                     }
                     AddErrors(result);
                     return View(nameof(Settings), model);
                 }
-                return RedirectToAction(nameof(Settings), new {Message = ManageMessageId.Error});
+                return RedirectToAction(nameof(Settings), new { Message = ManageMessageId.Error });
             }
         }
 
