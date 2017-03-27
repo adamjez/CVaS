@@ -1,4 +1,4 @@
-﻿using CVaS.AlgServer.Options;
+﻿using CVaS.Shared.Options;
 using CVaS.Shared.Services.File.Temporary;
 using FluentScheduler;
 using Microsoft.Extensions.Logging;
@@ -11,9 +11,10 @@ namespace CVaS.AlgServer.Services.FilesCleaning
     public class FilesScanningAndCleaningJob : IJob
     {
         private readonly ILogger<FilesScanningAndCleaningJob> _logger;
-        private readonly object _lock = new object();
         private readonly ITemporaryFileProvider _temporaryFileProvider;
         private readonly IOptions<FilesCleaningOptions> _options;
+
+        private readonly object _executeLock = new object();
         private readonly double PressureRetentionInMinutes = 1;
 
         public FilesScanningAndCleaningJob(ILogger<FilesScanningAndCleaningJob> logger, IOptions<FilesCleaningOptions> options, ITemporaryFileProvider temporaryFileProvider)
@@ -25,13 +26,14 @@ namespace CVaS.AlgServer.Services.FilesCleaning
 
         public void Execute()
         {
-            lock (_lock)
+            lock (_executeLock)
             {
                 var temporaryDirectoryPath = _temporaryFileProvider.ResolveTemporaryPath();
                 var temporaryDirectoryInfo = new DirectoryInfo(temporaryDirectoryPath);
 
                 if (!temporaryDirectoryInfo.Exists)
                 {
+                    _logger.LogError("Cannot proceed file scanning becouse temporary directory don't exists");
                     return;
                 }
 
@@ -43,39 +45,19 @@ namespace CVaS.AlgServer.Services.FilesCleaning
                     _logger.LogWarning("Running FilesScanningAndCleaningJob under memory pressure, AvailableFreeSpace=" + currentDrive.AvailableFreeSpace);
                 }
 
-                var directorySize = CheckAllCachedFilesSlow(temporaryDirectoryInfo, driveFreeSpacePressure);
+                var directorySize = CheckAllCachedFiles(temporaryDirectoryInfo, driveFreeSpacePressure);
 
                 if (directorySize > (_options.Value.DirectoryMaxSpaceInMB * 1000 * 1000))
                 {
                     _logger.LogWarning("Running FilesScanningAndCleaningJob under memory pressure, directorySize=" + directorySize);
-                    CheckAllCachedFilesSlow(temporaryDirectoryInfo, true);
+                    CheckAllCachedFiles(temporaryDirectoryInfo, true);
                 }
 
                 _logger.LogInformation("Finished running FilesScanningAndCleaningJob");
             }
         }
 
-        private long CheckAllCachedFilesFast(DirectoryInfo temporaryDirectoryInfo, bool pressure)
-        {
-            var currentTimeUtc = DateTime.UtcNow;
-            var fileCacheRetentionTimeSpan = TimeSpan.FromMinutes(pressure ? PressureRetentionInMinutes : _options.Value.FileCacheRetentionTimeInMinutes);
-            var sumFilesSize = 0L;
-            foreach (var file in temporaryDirectoryInfo.GetFiles("*", SearchOption.AllDirectories))
-            {
-                if (currentTimeUtc - file.LastAccessTimeUtc > fileCacheRetentionTimeSpan)
-                {
-                    _logger.LogInformation($"Deleting Cached File: {file.FullName} ({currentTimeUtc - file.LastAccessTimeUtc} - {fileCacheRetentionTimeSpan})");
-                    file.Delete();
-                    continue;
-                }
-
-                sumFilesSize += file.Length;
-            }
-
-            return sumFilesSize;
-        }
-
-        private long CheckAllCachedFilesSlow(DirectoryInfo temporaryDirectoryInfo, bool pressure)
+        private long CheckAllCachedFiles(DirectoryInfo temporaryDirectoryInfo, bool pressure)
         {
             var currentTimeUtc = DateTime.UtcNow;
             var fileCacheRetentionTimeSpan = TimeSpan.FromMinutes(pressure ? PressureRetentionInMinutes : _options.Value.FileCacheRetentionTimeInMinutes);
@@ -83,36 +65,54 @@ namespace CVaS.AlgServer.Services.FilesCleaning
 
             foreach (var file in temporaryDirectoryInfo.EnumerateFiles())
             {
-                if (currentTimeUtc - file.LastAccessTimeUtc > fileCacheRetentionTimeSpan)
-                {
-                    _logger.LogInformation($"Deleting Cached File: {file.FullName} (pressure={pressure})");
-                    try
-                    {
-                        file.Delete();
-                    }
-                    catch (Exception exc)
-                    {
-                        _logger.LogWarning("Cannot delete file: " + exc);
-                    }
-                    continue;
-                }
-
-                sumFilesSize += file.Length;
+                sumFilesSize += CheckFile(file, pressure, currentTimeUtc, fileCacheRetentionTimeSpan);
             }
 
-            foreach (var directoryInfo in temporaryDirectoryInfo.EnumerateDirectories())
+            foreach (var directory in temporaryDirectoryInfo.EnumerateDirectories())
             {
-                var fileSizeInDirectory = CheckAllCachedFilesSlow(directoryInfo, pressure);
-                if (fileSizeInDirectory == 0)
-                {
-                    _logger.LogInformation("Deleting Empty Folder File: " + directoryInfo.FullName);
-                    directoryInfo.Delete(true);
-                }
-
-                sumFilesSize += fileSizeInDirectory;
+                sumFilesSize += CheckDirectory(directory, pressure);
             }
 
             return sumFilesSize;
+        }
+
+        private long CheckFile(FileInfo file, bool pressure, DateTime currentTimeUtc, TimeSpan fileCacheRetentionTimeSpan)
+        {
+            if (currentTimeUtc - file.LastAccessTimeUtc > fileCacheRetentionTimeSpan)
+            {
+                _logger.LogInformation($"Deleting Cached File: {file.FullName} (pressure={pressure})");
+                try
+                {
+                    file.Delete();
+                }
+                catch (Exception exc)
+                {
+                    _logger.LogWarning("Cannot delete file: " + exc);
+                }
+                return 0;
+            }
+
+            return file.Length;
+        }
+
+        private long CheckDirectory(DirectoryInfo directory, bool pressure)
+        {
+            var fileSizeInDirectory = CheckAllCachedFiles(directory, pressure);
+            if (fileSizeInDirectory == 0)
+            {
+                _logger.LogInformation("Deleting Empty Folder File: " + directory.FullName);
+
+                try
+                {
+                    directory.Delete(true);
+                }
+                catch (Exception exc)
+                {
+                    _logger.LogWarning("Cannot delete file: " + exc);
+                }
+            }
+
+            return fileSizeInDirectory;
         }
     }
 }

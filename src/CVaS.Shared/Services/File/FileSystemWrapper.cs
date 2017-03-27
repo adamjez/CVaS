@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -51,6 +52,11 @@ namespace CVaS.Shared.Services.File
         public string GetDirectoryFromFile(string filePath)
         {
             return Directory.GetParent(filePath).FullName;
+        }
+
+        internal void TouchFile(string filePath)
+        {
+            System.IO.File.SetLastWriteTimeUtc(filePath, DateTime.UtcNow);
         }
     }
 }

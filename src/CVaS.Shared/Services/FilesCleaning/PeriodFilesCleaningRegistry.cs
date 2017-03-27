@@ -1,5 +1,4 @@
-﻿using System;
-using CVaS.AlgServer.Options;
+﻿using CVaS.Shared.Options;
 using FluentScheduler;
 using Microsoft.Extensions.Options;
 

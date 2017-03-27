@@ -54,7 +54,11 @@ namespace CVaS.Web
             ConfigureOptions(services);
             ConfigureIdentity(services);
 
-            if (!_modeOptions.IsLocal)
+            if (_modeOptions.IsLocal)
+            {
+                services.AddJobsService(Configuration);
+            }
+            else
             {
                 ConfigureBroker(services);
             }
@@ -172,7 +176,8 @@ namespace CVaS.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, AppContextSeed contextSeed, IMemoryCache cache)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, AppContextSeed contextSeed, 
+            IMemoryCache cache, DryIoc.IContainer container)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -214,6 +219,11 @@ namespace CVaS.Web
 
             contextSeed.SeedAsync()
                 .Wait();
+
+            if (_modeOptions.IsLocal)
+            {
+                ServicesExtensions.InitializeJobs(container);
+            }
         }
     }
 }
