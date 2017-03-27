@@ -10,7 +10,7 @@ namespace CVaS.Shared.Services.File.Temporary
 
         public TemporaryFileProvider(IOptions<DirectoryPathOptions> directoryPathOptions)
         {
-            this.temporaryDirectory = directoryPathOptions.Value.Temporary ?? Path.GetTempPath();
+            temporaryDirectory = directoryPathOptions.Value.Temporary ?? Path.GetTempPath();
         }
 
         public string CreateTemporaryFolder()

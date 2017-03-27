@@ -1,5 +1,4 @@
-﻿using CVaS.BL.Services.Broker;
-using CVaS.Shared.Providers;
+﻿using CVaS.BL.Providers;
 using CVaS.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

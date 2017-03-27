@@ -8,7 +8,7 @@ using CVaS.Shared.Exceptions;
 using CVaS.Shared.Options;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.Argument;
-using CVaS.Shared.Services.File.Providers;
+using CVaS.Shared.Services.File.User;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

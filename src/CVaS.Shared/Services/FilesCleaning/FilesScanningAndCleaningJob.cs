@@ -1,12 +1,12 @@
-﻿using CVaS.Shared.Options;
+﻿using System;
+using System.IO;
+using CVaS.Shared.Options;
 using CVaS.Shared.Services.File.Temporary;
 using FluentScheduler;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.IO;
 
-namespace CVaS.AlgServer.Services.FilesCleaning
+namespace CVaS.Shared.Services.FilesCleaning
 {
     public class FilesScanningAndCleaningJob : IJob
     {
@@ -14,8 +14,8 @@ namespace CVaS.AlgServer.Services.FilesCleaning
         private readonly ITemporaryFileProvider _temporaryFileProvider;
         private readonly IOptions<FilesCleaningOptions> _options;
 
-        private readonly object _executeLock = new object();
-        private readonly double PressureRetentionInMinutes = 1;
+        private readonly object _executionLock = new object();
+        private readonly double _pressureRetentionInMinutes = 1;
 
         public FilesScanningAndCleaningJob(ILogger<FilesScanningAndCleaningJob> logger, IOptions<FilesCleaningOptions> options, ITemporaryFileProvider temporaryFileProvider)
         {
@@ -26,7 +26,7 @@ namespace CVaS.AlgServer.Services.FilesCleaning
 
         public void Execute()
         {
-            lock (_executeLock)
+            lock (_executionLock)
             {
                 var temporaryDirectoryPath = _temporaryFileProvider.ResolveTemporaryPath();
                 var temporaryDirectoryInfo = new DirectoryInfo(temporaryDirectoryPath);
@@ -60,7 +60,7 @@ namespace CVaS.AlgServer.Services.FilesCleaning
         private long CheckAllCachedFiles(DirectoryInfo temporaryDirectoryInfo, bool pressure)
         {
             var currentTimeUtc = DateTime.UtcNow;
-            var fileCacheRetentionTimeSpan = TimeSpan.FromMinutes(pressure ? PressureRetentionInMinutes : _options.Value.FileCacheRetentionTimeInMinutes);
+            var fileCacheRetentionTimeSpan = TimeSpan.FromMinutes(pressure ? _pressureRetentionInMinutes : _options.Value.FileCacheRetentionTimeInMinutes);
             var sumFilesSize = 0L;
 
             foreach (var file in temporaryDirectoryInfo.EnumerateFiles())

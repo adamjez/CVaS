@@ -1,7 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace CVaS.Shared.Services.File.Providers
+namespace CVaS.Shared.Services.File.User
 {
     public abstract class UserFileProvider : IUserFileProvider
     {

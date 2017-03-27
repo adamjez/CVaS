@@ -8,6 +8,7 @@ using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.Launch;
 using Microsoft.Extensions.Logging;
 using DryIoc;
+using CVaS.Shared.Models;
 
 namespace CVaS.AlgServer.Services.MessageProcessor
 {
@@ -60,8 +61,8 @@ namespace CVaS.AlgServer.Services.MessageProcessor
                 {
                     var run = await _runRepository.GetByIdSafely(request.RunId, (r) => r.Algorithm);
 
-                    var result = await _launchService.LaunchAsync(run.Algorithm.CodeName, run.Algorithm.FilePath,
-                        request.Arguments, run, request.Timeout);
+                    var result = await _launchService.LaunchAsync(run.Algorithm, run, 
+                        new RunSettings { Arguments = request.Arguments, Timeout = request.Timeout });
 
                     return new RunResultMessage()
                     {

@@ -96,7 +96,7 @@ namespace CVaS.Web
             return new Container()
                 .WithDependencyInjectionAdapter(services,
                     throwIfUnresolved: type => type.Name.EndsWith("Controller"))
-                .ConfigureServiceProvider<CompositionRoot>();
+                .ConfigureServiceProvider<WebApiCompositionRoot>();
         }
 
         private static void ConfigureIdentity(IServiceCollection services)

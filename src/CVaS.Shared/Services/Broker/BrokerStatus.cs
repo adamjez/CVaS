@@ -34,9 +34,9 @@ namespace CVaS.Shared.Services.Broker
             try
             {
                 return Task.FromResult<int?>(
-                    client.GetConnections()
-                        .Where(c => c.ClientProperties.Application == "CVaS.AlgServer.dll")
-                        .Count());
+                    client
+                        .GetConnections()
+                        .Count(c => c.ClientProperties.Application == "CVaS.AlgServer.dll"));
 
             }
             catch (Exception exc)

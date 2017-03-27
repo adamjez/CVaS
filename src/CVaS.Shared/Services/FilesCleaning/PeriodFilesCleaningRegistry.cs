@@ -2,7 +2,7 @@
 using FluentScheduler;
 using Microsoft.Extensions.Options;
 
-namespace CVaS.AlgServer.Services.FilesCleaning
+namespace CVaS.Shared.Services.FilesCleaning
 {
     public class PeriodFilesCleaningRegistry : Registry
     {

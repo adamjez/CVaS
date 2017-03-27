@@ -1,16 +1,16 @@
 ﻿using CVaS.BL.Services.Broker;
-using CVaS.Shared.Providers;
 using CVaS.Web.Providers;
 using DryIoc;
 using CVaS.Shared.Options;
 using CVaS.BL.Installers;
 using Microsoft.Extensions.Options;
+using CVaS.BL.Providers;
 
 namespace CVaS.Web.Installers
 {
-    public class CompositionRoot
+    public class WebApiCompositionRoot
     {
-        public CompositionRoot(IRegistrator registrator, IOptions<ModeOptions> options)
+        public WebApiCompositionRoot(IRegistrator registrator, IOptions<ModeOptions> options)
         {
             BusinessLayerComposition.ModeOptions = options.Value;
             var blComposition = new BusinessLayerComposition(registrator);

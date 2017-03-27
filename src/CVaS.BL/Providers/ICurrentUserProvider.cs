@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace CVaS.Shared.Providers
+namespace CVaS.BL.Providers
 {
     public interface ICurrentUserProvider
     {

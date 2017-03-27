@@ -2,10 +2,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using CVaS.BL.DTO;
 using CVaS.Shared.Core.Provider;
-using CVaS.Shared.Providers;
 using CVaS.Shared.Services.Broker;
 using CVaS.Shared.Services.Time;
 using Microsoft.EntityFrameworkCore;
+using CVaS.BL.Providers;
 
 namespace CVaS.BL.Facades
 {

@@ -14,23 +14,12 @@ namespace CVaS.Web.Models
         public bool IsError { get; set; }
         [DataMember]
         public string Detail { get; set; }
-        //[DataMember]
-        //public List<ModelError> Errors { get; set; }
 
         public ApiError(string message)
         {
-            this.Message = message;
+            Message = message;
             IsError = true;
         }
 
-        //public ApiError(ModelStateDictionary modelState)
-        //{
-        //    this.IsError = true;
-        //    if (modelState != null && modelState.Any(m => m.Value.Errors.Count > 0))
-        //    {
-        //        Message = "Please correct the specified errors and try again.";
-        //        Errors = modelState.SelectMany(m => m.Value.Errors).ToList();
-        //    }
-        //}
     }
 }

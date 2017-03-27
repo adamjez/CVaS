@@ -1,7 +1,7 @@
 ﻿using DryIoc;
 using FluentScheduler;
 
-namespace CVaS.AlgServer.Services.FilesCleaning
+namespace CVaS.Shared.Services.FilesCleaning
 {
     public class DryIoCJobFactory : IJobFactory
     {

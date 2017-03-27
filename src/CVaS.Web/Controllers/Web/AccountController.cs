@@ -5,12 +5,12 @@ using CVaS.BL.Services.ApiKey;
 using CVaS.BL.Services.Email;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
-using CVaS.Shared.Providers;
 using CVaS.Web.Models.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using CVaS.BL.Providers;
 
 namespace CVaS.Web.Controllers.Web
 {

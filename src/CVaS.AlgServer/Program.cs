@@ -1,5 +1,5 @@
 ﻿using CVaS.AlgServer.Options;
-using CVaS.AlgServer.Services.Server;
+using CVaS.AlgServer.Server;
 using DryIoc;
 
 namespace CVaS.AlgServer

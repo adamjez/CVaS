@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using CVaS.BL.DTO;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
-using CVaS.Shared.Providers;
 using CVaS.Shared.Repositories;
 using Microsoft.EntityFrameworkCore;
+using CVaS.BL.Providers;
 
 namespace CVaS.BL.Facades
 {

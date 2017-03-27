@@ -1,12 +1,10 @@
 ﻿using CVaS.AlgServer.Options;
+using CVaS.AlgServer.Server;
 using CVaS.AlgServer.Services.BrokerReceiver;
-using CVaS.AlgServer.Services.FilesCleaning;
 using CVaS.AlgServer.Services.MessageProcessor;
-using CVaS.AlgServer.Services.Server;
 using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
 using CVaS.Shared.Services.Launch;
-using FluentScheduler;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

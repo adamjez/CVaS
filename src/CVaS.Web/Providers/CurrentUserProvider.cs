@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Security.Claims;
-using CVaS.BL.Common;
 using CVaS.DAL.Model;
-using CVaS.Shared.Providers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using CVaS.BL.Providers;
 
 namespace CVaS.Web.Providers
 {
@@ -18,8 +17,8 @@ namespace CVaS.Web.Providers
         private readonly IHttpContextAccessor _contextAccessor;
         public CurrentUserProvider(IHttpContextAccessor contextAccessor, UserManager<AppUser> userManager)
         {
-            this._userManager = userManager;
-            this._contextAccessor = contextAccessor;
+            _userManager = userManager;
+            _contextAccessor = contextAccessor;
         }
 
         public int Id => GetId();

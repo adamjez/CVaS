@@ -1,4 +1,4 @@
-﻿using CVaS.Shared.Providers;
+﻿using CVaS.BL.Providers;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using System.Linq;
 

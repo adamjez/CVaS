@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
-using CVaS.Shared.Providers;
 using CVaS.Shared.Repositories;
-using CVaS.Shared.Services.File.Providers;
 using File = CVaS.DAL.Model.File;
+using CVaS.BL.Providers;
+using CVaS.Shared.Services.File.User;
 
 namespace CVaS.BL.Facades
 {

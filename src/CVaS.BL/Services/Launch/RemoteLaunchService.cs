@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using CVaS.BL.Services.Broker;
 using CVaS.DAL.Model;
 using CVaS.Shared.Exceptions;
 using CVaS.Shared.Messages;
 using CVaS.Shared.Models;
-using CVaS.Shared.Services.Argument;
 using CVaS.Shared.Services.Launch;
 using Microsoft.Extensions.Logging;
 
@@ -23,13 +21,13 @@ namespace CVaS.BL.Services.Launch
             _logger = logger;
         }
 
-        public async Task<RunResult> LaunchAsync(string codeName, string filePath, List<Argument> args, Run run, int? timeout = null)
+        public async Task<RunResult> LaunchAsync(Algorithm algorithm, Run run, RunSettings settings)
         {
             var message = new CreateAlgorithmMessage()
             {
-                Arguments = args,
                 RunId = run.Id,
-                Timeout = timeout
+                Arguments = settings.Arguments,
+                Timeout = settings.Timeout
             };
 
             try

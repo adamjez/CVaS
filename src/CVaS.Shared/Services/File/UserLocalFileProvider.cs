@@ -15,7 +15,7 @@ namespace CVaS.Shared.Services.File
         {
             _fileSystemWrapper = fileSystemWrapper;
             var temporaryDirectoryPath = directoryPathOptions.Value.Temporary ?? Path.GetTempPath();
-            this.userFilesDirectory = Path.Combine(temporaryDirectoryPath, UserFilesDirectoryName);
+            userFilesDirectory = Path.Combine(temporaryDirectoryPath, UserFilesDirectoryName);
         }
 
         public string CreatePath(int userId, byte[] fileHash, string fileExtension)
@@ -31,8 +31,6 @@ namespace CVaS.Shared.Services.File
             {
                 _fileSystemWrapper.CreateDirectory(pathToUserDirectory);
             }
-
-            var fileHashPathFriendly = fileId.Replace("-", "").ToLower();
 
             return Path.Combine(pathToUserDirectory, fileId + fileExtension);
         }
