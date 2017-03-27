@@ -6,6 +6,7 @@ using CVaS.BL.Services.Email;
 using CVaS.BL.Services.Launch;
 using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
+using CVaS.Shared.Services.Broker;
 using CVaS.Shared.Services.Launch;
 using DryIoc;
 
@@ -36,10 +37,12 @@ namespace CVaS.BL.Installers
             if (ModeOptions.IsLocal)
             {
                 registrator.Register<ILaunchService, LocalLaunchService>();
+                registrator.Register<IBrokerStatus, LocalBrokerStatus>(Reuse.InCurrentScope);
             }
             else
             {
                 registrator.Register<ILaunchService, RemoteLaunchService>();
+                registrator.Register<IBrokerStatus, BrokerStatus>(Reuse.InCurrentScope);
             }
         }
 

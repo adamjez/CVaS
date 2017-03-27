@@ -22,12 +22,4 @@ namespace CVaS.Web.Models
         public RuleViewModel NewRule { get; set; }
         public StatsDTO Stats { get; set; }
     }
-
-    public class LoginPanelViewModel
-    {
-        public bool SignedIn { get; set; }
-
-        public string CurrentUserName { get; set; }
-        public bool IsAdmin { get; set; }
-    }
 }

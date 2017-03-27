@@ -35,7 +35,6 @@ namespace CVaS.Shared.Installers
             }
 
             registrator.Register<BrokerFactory>(Reuse.Singleton);
-            registrator.Register<BrokerStatus>(Reuse.InCurrentScope);
 
             if (IsWebApplication)
             {

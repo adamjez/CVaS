@@ -142,7 +142,8 @@ namespace CVaS.Web.Controllers.Api
 
             var file = await _fileFacade.GetSafelyAsync(fileId);
 
-            HttpContext.Response.Headers.Add("Content-Type", file.ContentType);
+            HttpContext.Response.ContentType = file.ContentType;
+            HttpContext.Response.ContentLength = file.FileSize;
 
             return Ok();
         }

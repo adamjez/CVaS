@@ -5,6 +5,8 @@ using CVaS.Shared.Core.Provider;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using CVaS.Shared.Options;
+using Microsoft.Extensions.Options;
 
 namespace CVaS.BL.Common
 {
@@ -13,15 +15,18 @@ namespace CVaS.BL.Common
         private readonly UserManager<AppUser> _userManager;
         private readonly IApiKeyGenerator _apiKeyGenerator;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+        private readonly IOptions<DatabaseOptions> _databaseOptions;
 
-        public AppContextSeed(UserManager<AppUser> userManager, IApiKeyGenerator apiKeyGenerator, IUnitOfWorkProvider unitOfWorkProvider)
+        public AppContextSeed(UserManager<AppUser> userManager, IApiKeyGenerator apiKeyGenerator, IUnitOfWorkProvider unitOfWorkProvider,
+            IOptions<DatabaseOptions> databaseOptions)
         {
+            _databaseOptions = databaseOptions;
             _userManager = userManager;
             _apiKeyGenerator = apiKeyGenerator;
             _unitOfWorkProvider = unitOfWorkProvider;
         }
 
-        public async Task SeedAsync(string username = null, string email = null, string password = null)
+        public async Task SeedAsync()
         {
             using (var uow = _unitOfWorkProvider.Create())
             {
@@ -50,13 +55,13 @@ namespace CVaS.BL.Common
                 {
                     var user = new AppUser()
                     {
-                        UserName = username,
-                        Email = email,
+                        UserName = _databaseOptions.Value.DefaultUsername,
+                        Email = _databaseOptions.Value.DefaultEmail,
                         ApiKey = _apiKeyGenerator.Generate(),
                         EmailConfirmed = true
                     };
 
-                    await _userManager.CreateAsync(user, password);
+                    await _userManager.CreateAsync(user, _databaseOptions.Value.DefaultPassword);
 
                     await _userManager.AddToRoleAsync(user, Roles.Admin);
                 }

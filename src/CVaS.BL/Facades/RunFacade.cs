@@ -60,7 +60,7 @@ namespace CVaS.BL.Facades
 
         private async Task<RunResult> CreateRunAndLaunch(Algorithm algorithm, List<Argument> args, int? timeout = null)
         {
-            using (var uow = UnitOfWorkProvider.Create())
+            using (var uow = UnitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
             {
                 var run = new Run()
                 {

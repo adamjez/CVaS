@@ -1,6 +1,5 @@
 ﻿using System;
 using CVaS.BL.Common;
-using CVaS.BL.Installers;
 using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Shared.Options;
@@ -32,8 +31,9 @@ namespace CVaS.Web
 {
     public class Startup
     {
-        private readonly IHostingEnvironment hostingEnvironment;
-        private readonly DatabaseOptions _databaseOptions = new DatabaseOptions();
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ModeOptions _modeOptions = new ModeOptions();
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -43,7 +43,7 @@ namespace CVaS.Web
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
 
-            hostingEnvironment = env;
+            _hostingEnvironment = env;
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -53,12 +53,21 @@ namespace CVaS.Web
         {
             ConfigureOptions(services);
             ConfigureIdentity(services);
-            ConfigureBroker(services);
+
+            if (!_modeOptions.IsLocal)
+            {
+                ConfigureBroker(services);
+            }
+
             services.AddDatabaseServices(Configuration);
             services.AddStorageServices(Configuration);
 
-            // Add framework services.
-            services.AddMvc(options => { options.Filters.Add(typeof(HttpExceptionFilterAttribute)); })
+            // Add mvc framework services.
+            services
+                .AddMvc(options => 
+                {
+                    options.Filters.Add(typeof(HttpExceptionFilterAttribute));
+                })
                 .AddJsonOptions(options =>
                 {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
@@ -70,27 +79,25 @@ namespace CVaS.Web
             services.AddMemoryCache(options => options.CompactOnMemoryPressure = true);
 
             // Inject an implementation of ISwaggerProvider with defaulted settings applied
-            services.AddSwaggerGen(SwaggerSetup);
+            services.AddSwaggerGen(ConfigureSwagger);
             services.AddMiniProfiler();
 
             services.AddTransient<AppContextSeed>();
             services.AddSingleton(Configuration);
 
-            var physicalProvider = hostingEnvironment.ContentRootFileProvider;
+            var physicalProvider = _hostingEnvironment.ContentRootFileProvider;
             // It's null when using ef migrations tools so we need to check first to not to throw exc
             if (physicalProvider != null) services.AddSingleton(physicalProvider);
 
             return new Container()
                 .WithDependencyInjectionAdapter(services,
-                    // optional: propagate exception if specified types are not resolved, and prevent fallback to default Asp resolution
                     throwIfUnresolved: type => type.Name.EndsWith("Controller"))
-                // add registrations from CompositionRoot classs
                 .ConfigureServiceProvider<CompositionRoot>();
         }
 
         private static void ConfigureIdentity(IServiceCollection services)
         {
-            // Set ASP.NET Identity and cooie authentication
+            // Set ASP.NET Identity and cookie authentication
             services.AddIdentity<AppUser, AppRole>(options =>
                 {
                     // Password settings
@@ -119,8 +126,8 @@ namespace CVaS.Web
         {
             var connectionString = Configuration.GetConnectionString("RabbitMq");
             var connectionStringParser = new ConnectionStringParser();
-
             var connectionConfiguration = connectionStringParser.Parse(connectionString);
+
             services.Configure<BrokerOptions>((option) => { 
                 option.Hostname = connectionConfiguration.Hosts.First().Host;
                 option.Username = connectionConfiguration.UserName;
@@ -137,9 +144,31 @@ namespace CVaS.Web
             services.Configure<AlgorithmOptions>(Configuration.GetSection("Algorithm"));
             services.Configure<ModeOptions>(Configuration.GetSection("Mode"));
             services.Configure<DirectoryPathOptions>(Configuration.GetSection("DirectoryPaths"));
+            services.Configure<DatabaseOptions>(Configuration.GetSection("Database"));
 
-            Configuration.GetSection("Mode").Bind(BusinessLayerComposition.ModeOptions);
-            Configuration.GetSection("Database").Bind(_databaseOptions);
+            Configuration.GetSection("Mode").Bind(_modeOptions);
+        }
+
+        private static void ConfigureSwagger(SwaggerGenOptions options)
+        {
+            options.SingleApiVersion(new Info
+            {
+                Version = "v1",
+                Title = "Computer Vision as Service API",
+                Description = "A simple api to run computer vision algorithms.",
+                TermsOfService = "None"
+            });
+            options.AddSecurityDefinition("Bearer", new ApiKeyScheme()
+            {
+                In = "header",
+                Name = "Authorization",
+                Description = "Api Key Authentication",
+                Type = "apiKey"
+            });
+
+            var basePath = PlatformServices.Default.Application.ApplicationBasePath;
+            var pathToDoc = System.IO.Path.Combine(basePath, "CVaS.Web.xml");
+            options.IncludeXmlComments(pathToDoc);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -165,9 +194,9 @@ namespace CVaS.Web
             app.UseMiniProfiler(new MiniProfilerOptions
             {
                 RouteBasePath = "~/profiler",
+                ResultsListAuthorize = (r) => true,
                 SqlFormatter = new StackExchange.Profiling.SqlFormatters.InlineFormatter(),
                 Storage = new MemoryCacheStorage(cache, TimeSpan.FromMinutes(60))
-
             });
 
             app.UseMvc(routes =>
@@ -183,32 +212,8 @@ namespace CVaS.Web
             // Enable middleware to serve swagger-ui assets (HTML, JS, CSS etc.)
             app.UseSwaggerUi();
 
-            contextSeed.SeedAsync(_databaseOptions.DefaultUsername,
-                _databaseOptions.DefaultEmail,
-                _databaseOptions.DefaultPassword)
+            contextSeed.SeedAsync()
                 .Wait();
-        }
-
-        private static void SwaggerSetup(SwaggerGenOptions options)
-        {
-            options.SingleApiVersion(new Info
-            {
-                Version = "v1",
-                Title = "Computer Vision as Service API",
-                Description = "A simple api to run computer vision algorithms.",
-                TermsOfService = "None"
-            });
-            options.AddSecurityDefinition("Bearer", new ApiKeyScheme()
-            {
-                In = "header",
-                Name = "Authorization",
-                Description = "Api Key Authentication",
-                Type = "apiKey"
-            });
-
-            var basePath = PlatformServices.Default.Application.ApplicationBasePath;
-            var pathToDoc = System.IO.Path.Combine(basePath, "CVaS.Web.xml");
-            options.IncludeXmlComments(pathToDoc);
         }
     }
 }

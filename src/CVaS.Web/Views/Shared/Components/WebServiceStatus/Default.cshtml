@@ -1,0 +1,16 @@
+﻿@model CVaS.Web.Models.WebServiceStatusViewModel
+
+@if (!Model.IsLocalMode && !Model.IsAnyAlgServerOnline)
+{
+
+<div id="message">
+    <div id="request-message" class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <div id="body-request-message">
+            Oh snap! <br />
+            Currently there isn't connected any algortihm server. <br /> 
+            For more information look at <a asp-controller="Admin" asp-action="Index" class="alert-link">Admin Section</a>.
+        </div>
+    </div>
+</div>
+}

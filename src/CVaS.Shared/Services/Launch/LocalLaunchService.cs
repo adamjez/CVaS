@@ -38,8 +38,7 @@ namespace CVaS.Shared.Services.Launch
 
         public LocalLaunchService(IOptions<AlgorithmOptions> options, IProcessService processService, IUnitOfWorkProvider unitOfWorkProvider,
             RunRepository runRepository, ITemporaryFileProvider temporaryFileProvider, IUserFileProvider userFileProvider, IAlgorithmFileProvider algorithmFileProvider, 
-            ILogger<LocalLaunchService> logger, 
-            FileSystemWrapper fileSystemWrapper)
+            ILogger<LocalLaunchService> logger, FileSystemWrapper fileSystemWrapper)
         {
             _options = options;
             _processService = processService;
@@ -163,10 +162,11 @@ namespace CVaS.Shared.Services.Launch
             return new DAL.Model.File()
             {
                 LocationId = await _userFileProvider.SaveAsync(zipFile.FullPath, ZipHelpers.ContentType),
-                Type = FileType.Result,
+                FileSize = _fileSystemWrapper.FileSize(zipFile.FullPath),
                 ContentType = ZipHelpers.ContentType,
                 Extension = ZipHelpers.Extension,
-                UserId = userId
+                Type = FileType.Result,
+                UserId = userId,
             };
         }
     }

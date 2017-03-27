@@ -15,11 +15,9 @@ namespace CVaS.Shared.Helpers
     {
         public static void AddDatabaseServices(this IServiceCollection services, IConfigurationRoot configuration)
         {
-            var databaseConfiguration = new DatabaseOptions();
-            configuration.GetSection("Database").Bind(databaseConfiguration);
             // We choose what database provider we will use
-            // In configuration have to be "MySQL" or "MSSQL" 
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var msSqlConnectionString = configuration.GetConnectionString("MsSql");
+            var connectionString = msSqlConnectionString ?? configuration.GetConnectionString("MySql");
 
             if (connectionString == null)
             {
@@ -29,15 +27,15 @@ namespace CVaS.Shared.Helpers
                 throw new ArgumentNullException(nameof(connectionString));
             }
 
-            if (databaseConfiguration.Provider == "MySQL")
+            if (msSqlConnectionString != null)
             {
                 services.AddDbContext<AppDbContext>(options =>
-                    options.UseMySQL(connectionString));
+                    options.UseSqlServer(connectionString));
             }
             else
             {
                 services.AddDbContext<AppDbContext>(options =>
-                    options.UseSqlServer(connectionString));
+                      options.UseMySQL(connectionString));
             }
         }
 
