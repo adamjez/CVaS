@@ -113,7 +113,6 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
     }
 
     var showResult = function (runId, status, duration, stdOut, stdErr, zipFile, element, elementImgOut) {
-       
         // Clear inner html
         element.html("");
 

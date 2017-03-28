@@ -147,7 +147,7 @@ img.clippy {
 
 .qq-uploader {
     min-height: 400px;
-    max-height: 600px;
+    max-height: 1200px;
 }
 
 
@@ -165,7 +165,7 @@ img.clippy {
     position: relative;
 }
 
-.qq-upload-list li.qq-upload-success {
+.qq-upload-list li {
     overflow: hidden;
     width: 48%;
     display: inline-block;
@@ -227,7 +227,7 @@ img.result-preview,
 }
 
 .qq-image-full-width .qq-thumbnail-selector {
-    width: 50%;
+    /*width: 50%;*/
 }
 
 .arrow-top,

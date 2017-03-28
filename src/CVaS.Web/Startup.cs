@@ -68,7 +68,7 @@ namespace CVaS.Web
 
             // Add mvc framework services.
             services
-                .AddMvc(options => 
+                .AddMvc(options =>
                 {
                     options.Filters.Add(typeof(HttpExceptionFilterAttribute));
                 })
@@ -132,7 +132,8 @@ namespace CVaS.Web
             var connectionStringParser = new ConnectionStringParser();
             var connectionConfiguration = connectionStringParser.Parse(connectionString);
 
-            services.Configure<BrokerOptions>((option) => { 
+            services.Configure<BrokerOptions>((option) =>
+            {
                 option.Hostname = connectionConfiguration.Hosts.First().Host;
                 option.Username = connectionConfiguration.UserName;
                 option.Password = connectionConfiguration.Password;
@@ -176,7 +177,7 @@ namespace CVaS.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, AppContextSeed contextSeed, 
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, AppContextSeed contextSeed,
             IMemoryCache cache, DryIoc.IContainer container)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
@@ -196,13 +197,16 @@ namespace CVaS.Web
             });
             app.UseIdentity();
 
-            app.UseMiniProfiler(new MiniProfilerOptions
+            if (env.IsDevelopment())
             {
-                RouteBasePath = "~/profiler",
-                ResultsListAuthorize = (r) => true,
-                SqlFormatter = new StackExchange.Profiling.SqlFormatters.InlineFormatter(),
-                Storage = new MemoryCacheStorage(cache, TimeSpan.FromMinutes(60))
-            });
+                app.UseMiniProfiler(new MiniProfilerOptions
+                {
+                    RouteBasePath = "~/profiler",
+                    ResultsListAuthorize = (r) => true,
+                    SqlFormatter = new StackExchange.Profiling.SqlFormatters.InlineFormatter(),
+                    Storage = new MemoryCacheStorage(cache, TimeSpan.FromMinutes(60))
+                });
+            }
 
             app.UseMvc(routes =>
             {
