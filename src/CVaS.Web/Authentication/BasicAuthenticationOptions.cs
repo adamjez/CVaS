@@ -39,7 +39,7 @@ namespace CVaS.Web.Authentication
             {
                 if (!IsAscii(value))
                 {
-                    throw new ArgumentOutOfRangeException("Realm", "Realm must be US ASCII");
+                    throw new ArgumentOutOfRangeException(nameof(Realm), "Realm must be US ASCII");
                 }
 
                 _realm = value;

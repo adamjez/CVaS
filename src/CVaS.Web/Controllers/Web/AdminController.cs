@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 using CVaS.BL.DTO;
 using CVaS.BL.Facades;
 using CVaS.DAL.Model;
-using CVaS.Shared.Providers;
 using CVaS.Web.Authentication;
 using CVaS.Web.Models;
 using CVaS.Web.Models.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CVaS.BL.Providers;
 
 namespace CVaS.Web.Controllers.Web
 {

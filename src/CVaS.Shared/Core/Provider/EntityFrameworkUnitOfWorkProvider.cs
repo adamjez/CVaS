@@ -16,7 +16,7 @@ namespace CVaS.Shared.Core.Provider
         /// </summary>
         public EntityFrameworkUnitOfWorkProvider(IUnitOfWorkRegistry registry, Func<AppDbContext> dbContextFactory) : base(registry)
         {
-            this._dbContextFactory = dbContextFactory;
+            _dbContextFactory = dbContextFactory;
         }
 
         /// <summary>

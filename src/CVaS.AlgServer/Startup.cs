@@ -1,12 +1,10 @@
 ﻿using CVaS.AlgServer.Options;
+using CVaS.AlgServer.Server;
 using CVaS.AlgServer.Services.BrokerReceiver;
-using CVaS.AlgServer.Services.FilesCleaning;
 using CVaS.AlgServer.Services.MessageProcessor;
-using CVaS.AlgServer.Services.Server;
 using CVaS.Shared.Installers;
 using CVaS.Shared.Options;
 using CVaS.Shared.Services.Launch;
-using FluentScheduler;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -43,9 +41,10 @@ namespace CVaS.AlgServer
 
             ConfigureAlgorithmServices(services);
             ConfigureBrokerServices(services);
-            ConfigureJobsServices(services);
+
             services.AddDatabaseServices(Configuration);
             services.AddStorageServices(Configuration);
+            services.AddJobsService(Configuration);
 
             services.AddSingleton(Configuration);
 
@@ -75,13 +74,6 @@ namespace CVaS.AlgServer
             services.AddTransient<BrokerServer>();
         }
 
-        private void ConfigureJobsServices(IServiceCollection services)
-        {
-            services.Configure<FilesCleaningOptions>(Configuration.GetSection("FilesCleaning"));
-            services.AddTransient<PeriodFilesCleaningRegistry>();
-            services.AddTransient<FilesScanningAndCleaningJob>();
-        }
-
         public void Configure(DryIoc.IContainer container)
         {
             var loggerFactory = container.Resolve<ILoggerFactory>();
@@ -89,9 +81,7 @@ namespace CVaS.AlgServer
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            JobManager.JobFactory = new DryIoCJobFactory(container);
-            JobManager.JobException += (info) => loggerFactory.CreateLogger(nameof(JobManager)).LogCritical("An error just happened with a scheduled job: " + info.Exception);
-            JobManager.Initialize(container.Resolve<PeriodFilesCleaningRegistry>());
+            ServicesExtensions.InitializeJobs(container);
         }
     }
 }

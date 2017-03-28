@@ -1,5 +1,5 @@
-﻿using CVaS.DAL.Model;
-using CVaS.Shared.Providers;
+﻿using CVaS.BL.Providers;
+using CVaS.DAL.Model;
 using CVaS.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 

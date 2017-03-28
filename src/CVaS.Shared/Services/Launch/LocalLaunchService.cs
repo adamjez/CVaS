@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
@@ -15,8 +13,8 @@ using CVaS.Shared.Options;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.File;
 using CVaS.Shared.Services.File.Algorithm;
-using CVaS.Shared.Services.File.Providers;
 using CVaS.Shared.Services.File.Temporary;
+using CVaS.Shared.Services.File.User;
 using CVaS.Shared.Services.Process;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -38,8 +36,7 @@ namespace CVaS.Shared.Services.Launch
 
         public LocalLaunchService(IOptions<AlgorithmOptions> options, IProcessService processService, IUnitOfWorkProvider unitOfWorkProvider,
             RunRepository runRepository, ITemporaryFileProvider temporaryFileProvider, IUserFileProvider userFileProvider, IAlgorithmFileProvider algorithmFileProvider, 
-            ILogger<LocalLaunchService> logger, 
-            FileSystemWrapper fileSystemWrapper)
+            ILogger<LocalLaunchService> logger, FileSystemWrapper fileSystemWrapper)
         {
             _options = options;
             _processService = processService;
@@ -54,9 +51,9 @@ namespace CVaS.Shared.Services.Launch
         }
 
 
-        public async Task<RunResult> LaunchAsync(string codeName, string pathFile, List<Argument.Argument> args, Run run, int? timeout = null)
+        public async Task<RunResult> LaunchAsync(Algorithm algorithm, Run run, RunSettings settings)
         {
-            var filePath = _algorithmFileProvider.GetAlgorithmFilePath(codeName, pathFile);
+            var filePath = _algorithmFileProvider.GetAlgorithmFilePath(algorithm.CodeName, algorithm.FilePath);
 
             if (!_fileSystemWrapper.ExistsFile(filePath))
             {
@@ -66,9 +63,9 @@ namespace CVaS.Shared.Services.Launch
             using (var uow = _unitOfWorkProvider.Create())
             {
                 // Download and Transform file arguments
-                await _algorithmFileProvider.DownloadFiles(args, run.UserId);
+                await _algorithmFileProvider.DownloadFiles(settings.Arguments, run.UserId);
 
-                var stringArguments = args.Select(arg => arg.ToString()).ToList();
+                var stringArguments = settings.Arguments.Select(arg => arg.ToString()).ToList();
 
                 var runFolder = _temporaryFileProvider.CreateTemporaryFolder();
                 stringArguments.Insert(0, runFolder);
@@ -77,7 +74,9 @@ namespace CVaS.Shared.Services.Launch
 
                 var task = _processService.RunAsync(filePath, stringArguments, tokenSource.Token);
 
-                var lightTimeout = !timeout.HasValue || timeout < 0 ? _options.Value.LightTimeoutInSeconds : timeout.Value;
+                var lightTimeout = !settings.Timeout.HasValue || settings.Timeout < 0 
+                    ? _options.Value.LightTimeoutInSeconds 
+                    : settings.Timeout.Value;
 
                 var result = await task.WithTimeout(TimeSpan.FromSeconds(lightTimeout));
                 if (!result.Completed)
@@ -163,10 +162,11 @@ namespace CVaS.Shared.Services.Launch
             return new DAL.Model.File()
             {
                 LocationId = await _userFileProvider.SaveAsync(zipFile.FullPath, ZipHelpers.ContentType),
-                Type = FileType.Result,
+                FileSize = _fileSystemWrapper.FileSize(zipFile.FullPath),
                 ContentType = ZipHelpers.ContentType,
                 Extension = ZipHelpers.Extension,
-                UserId = userId
+                Type = FileType.Result,
+                UserId = userId,
             };
         }
     }

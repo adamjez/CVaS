@@ -1,9 +1,8 @@
-﻿using System;
-using CVaS.AlgServer.Options;
+﻿using CVaS.Shared.Options;
 using FluentScheduler;
 using Microsoft.Extensions.Options;
 
-namespace CVaS.AlgServer.Services.FilesCleaning
+namespace CVaS.Shared.Services.FilesCleaning
 {
     public class PeriodFilesCleaningRegistry : Registry
     {

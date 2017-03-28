@@ -71,7 +71,7 @@ namespace CVaS.Shared.Core
         protected virtual void OnDisposing()
         {
             var handler = Disposing;
-            if (handler != null) handler(this, EventArgs.Empty);
+            handler?.Invoke(this, EventArgs.Empty);
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using CVaS.BL.DTO;
 using CVaS.BL.Facades;
-using CVaS.Shared.Providers;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using CVaS.BL.Providers;
 
 namespace CVaS.Web.Controllers.Api
 {

@@ -1,10 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using System;
 
-namespace CVaS.Shared.Services.File.Providers
+namespace CVaS.Shared.Services.File.User
 {
     public class AzureStorageProvider : UserFileProvider
     {

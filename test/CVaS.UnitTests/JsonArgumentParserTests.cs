@@ -108,9 +108,11 @@ namespace CVaS.UnitTests
                 { "Text", "Text" }
             };
 
-            var jObject = new JObject();
-            jObject["Value"]= 10;
-            jObject["Text"] = "Text";
+            var jObject = new JObject
+            {
+                ["Value"] = 10,
+                ["Text"] = "Text"
+            };
 
             var result = (Dictionary<string, object>)_parser.Parse(jObject).First();
             Assert.Equal(dict, result);

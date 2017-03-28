@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,12 +16,12 @@ namespace CVaS.Shared.Services.File
 
         public void CreateDirectory(string directoryPath)
         {
-            System.IO.Directory.CreateDirectory(directoryPath);
+            Directory.CreateDirectory(directoryPath);
         }
 
         public void DeleteDirectory(string directoryPath)
         {
-            System.IO.Directory.Delete(directoryPath, true);
+            Directory.Delete(directoryPath, true);
         }
 
         public void DeleteFile(string filePath)
@@ -33,9 +34,14 @@ namespace CVaS.Shared.Services.File
             return System.IO.File.Exists(path);
         }
 
+        public long FileSize(string path)
+        {
+            return new FileInfo(path).Length;
+        }
+
         public bool ExistsDirectory(string path)
         {
-            return System.IO.Directory.Exists(path);
+            return Directory.Exists(path);
         }
 
         public bool IsEmpty(string directory)
@@ -46,6 +52,11 @@ namespace CVaS.Shared.Services.File
         public string GetDirectoryFromFile(string filePath)
         {
             return Directory.GetParent(filePath).FullName;
+        }
+
+        internal void TouchFile(string filePath)
+        {
+            System.IO.File.SetLastWriteTimeUtc(filePath, DateTime.UtcNow);
         }
     }
 }

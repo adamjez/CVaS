@@ -11,12 +11,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using CVaS.Shared.Exceptions;
-using CVaS.Shared.Providers;
-using CVaS.Shared.Services.File.Providers;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using System;
+using CVaS.Shared.Services.File.User;
 
 namespace CVaS.Web.Controllers.Api
 {
@@ -142,7 +141,8 @@ namespace CVaS.Web.Controllers.Api
 
             var file = await _fileFacade.GetSafelyAsync(fileId);
 
-            HttpContext.Response.Headers.Add("Content-Type", file.ContentType);
+            HttpContext.Response.ContentType = file.ContentType;
+            HttpContext.Response.ContentLength = file.FileSize;
 
             return Ok();
         }

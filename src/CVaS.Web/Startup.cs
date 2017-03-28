@@ -1,6 +1,5 @@
 ﻿using System;
 using CVaS.BL.Common;
-using CVaS.BL.Installers;
 using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Shared.Options;
@@ -15,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger.Model;
-using MongoDB.Driver;
 using Newtonsoft.Json;
 using Swashbuckle.SwaggerGen.Application;
 using EasyNetQ;
@@ -33,8 +31,9 @@ namespace CVaS.Web
 {
     public class Startup
     {
-        private readonly IHostingEnvironment hostingEnvironment;
-        private readonly DatabaseOptions _databaseOptions = new DatabaseOptions();
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ModeOptions _modeOptions = new ModeOptions();
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -44,7 +43,7 @@ namespace CVaS.Web
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
 
-            hostingEnvironment = env;
+            _hostingEnvironment = env;
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -54,12 +53,25 @@ namespace CVaS.Web
         {
             ConfigureOptions(services);
             ConfigureIdentity(services);
-            ConfigureBroker(services);
+
+            if (_modeOptions.IsLocal)
+            {
+                services.AddJobsService(Configuration);
+            }
+            else
+            {
+                ConfigureBroker(services);
+            }
+
             services.AddDatabaseServices(Configuration);
             services.AddStorageServices(Configuration);
 
-            // Add framework services.
-            services.AddMvc(options => { options.Filters.Add(typeof(HttpExceptionFilterAttribute)); })
+            // Add mvc framework services.
+            services
+                .AddMvc(options => 
+                {
+                    options.Filters.Add(typeof(HttpExceptionFilterAttribute));
+                })
                 .AddJsonOptions(options =>
                 {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
@@ -71,27 +83,25 @@ namespace CVaS.Web
             services.AddMemoryCache(options => options.CompactOnMemoryPressure = true);
 
             // Inject an implementation of ISwaggerProvider with defaulted settings applied
-            services.AddSwaggerGen(SwaggerSetup);
+            services.AddSwaggerGen(ConfigureSwagger);
             services.AddMiniProfiler();
 
             services.AddTransient<AppContextSeed>();
             services.AddSingleton(Configuration);
 
-            var physicalProvider = hostingEnvironment.ContentRootFileProvider;
+            var physicalProvider = _hostingEnvironment.ContentRootFileProvider;
             // It's null when using ef migrations tools so we need to check first to not to throw exc
             if (physicalProvider != null) services.AddSingleton(physicalProvider);
 
             return new Container()
                 .WithDependencyInjectionAdapter(services,
-                    // optional: propagate exception if specified types are not resolved, and prevent fallback to default Asp resolution
                     throwIfUnresolved: type => type.Name.EndsWith("Controller"))
-                // add registrations from CompositionRoot classs
-                .ConfigureServiceProvider<CompositionRoot>();
+                .ConfigureServiceProvider<WebApiCompositionRoot>();
         }
 
         private static void ConfigureIdentity(IServiceCollection services)
         {
-            // Set ASP.NET Identity and cooie authentication
+            // Set ASP.NET Identity and cookie authentication
             services.AddIdentity<AppUser, AppRole>(options =>
                 {
                     // Password settings
@@ -107,7 +117,7 @@ namespace CVaS.Web
                     options.Cookies.ApplicationCookie.ExpireTimeSpan = TimeSpan.FromDays(150);
                     options.Cookies.ApplicationCookie.LoginPath = "/Account/Login/";
                     options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOff";
-                    options.Cookies.ApplicationCookie.AuthenticationScheme = Authentication.AuthenticationScheme.WebCookie;
+                    options.Cookies.ApplicationCookie.AuthenticationScheme = AuthenticationScheme.WebCookie;
                     options.Cookies.ApplicationCookie.AutomaticAuthenticate = true;
                     options.Cookies.ApplicationCookie.AutomaticChallenge = false;
                 })
@@ -120,8 +130,8 @@ namespace CVaS.Web
         {
             var connectionString = Configuration.GetConnectionString("RabbitMq");
             var connectionStringParser = new ConnectionStringParser();
-
             var connectionConfiguration = connectionStringParser.Parse(connectionString);
+
             services.Configure<BrokerOptions>((option) => { 
                 option.Hostname = connectionConfiguration.Hosts.First().Host;
                 option.Username = connectionConfiguration.UserName;
@@ -138,59 +148,12 @@ namespace CVaS.Web
             services.Configure<AlgorithmOptions>(Configuration.GetSection("Algorithm"));
             services.Configure<ModeOptions>(Configuration.GetSection("Mode"));
             services.Configure<DirectoryPathOptions>(Configuration.GetSection("DirectoryPaths"));
+            services.Configure<DatabaseOptions>(Configuration.GetSection("Database"));
 
-            Configuration.GetSection("Mode").Bind(BusinessLayerComposition.ModeOptions);
-            Configuration.GetSection("Database").Bind(_databaseOptions);
+            Configuration.GetSection("Mode").Bind(_modeOptions);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, AppContextSeed contextSeed, IMemoryCache cache)
-        {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseStaticFiles();
-
-            app.UseApiAuthentication(new ApiAuthenticationOptions()
-            {
-                AuthenticationScheme = Authentication.AuthenticationScheme.ApiKey,
-                HeaderScheme = "Simple"
-            });
-            app.UseIdentity();
-
-            app.UseMiniProfiler(new MiniProfilerOptions
-            {
-                RouteBasePath = "~/profiler",
-                SqlFormatter = new StackExchange.Profiling.SqlFormatters.InlineFormatter(),
-                Storage = new MemoryCacheStorage(cache, TimeSpan.FromMinutes(60))
-
-            });
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
-
-            // Enable middleware to serve generated Swagger as a JSON endpoint
-            app.UseSwagger();
-
-            // Enable middleware to serve swagger-ui assets (HTML, JS, CSS etc.)
-            app.UseSwaggerUi();
-
-            contextSeed.SeedAsync(_databaseOptions.DefaultUsername,
-                _databaseOptions.DefaultEmail,
-                _databaseOptions.DefaultPassword)
-                .Wait();
-        }
-
-        private void SwaggerSetup(SwaggerGenOptions options)
+        private static void ConfigureSwagger(SwaggerGenOptions options)
         {
             options.SingleApiVersion(new Info
             {
@@ -210,6 +173,57 @@ namespace CVaS.Web
             var basePath = PlatformServices.Default.Application.ApplicationBasePath;
             var pathToDoc = System.IO.Path.Combine(basePath, "CVaS.Web.xml");
             options.IncludeXmlComments(pathToDoc);
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, AppContextSeed contextSeed, 
+            IMemoryCache cache, DryIoc.IContainer container)
+        {
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddDebug();
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseStaticFiles();
+
+            app.UseApiAuthentication(new ApiAuthenticationOptions()
+            {
+                AuthenticationScheme = AuthenticationScheme.ApiKey,
+                HeaderScheme = "Simple"
+            });
+            app.UseIdentity();
+
+            app.UseMiniProfiler(new MiniProfilerOptions
+            {
+                RouteBasePath = "~/profiler",
+                ResultsListAuthorize = (r) => true,
+                SqlFormatter = new StackExchange.Profiling.SqlFormatters.InlineFormatter(),
+                Storage = new MemoryCacheStorage(cache, TimeSpan.FromMinutes(60))
+            });
+
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui assets (HTML, JS, CSS etc.)
+            app.UseSwaggerUi();
+
+            contextSeed.SeedAsync()
+                .Wait();
+
+            if (_modeOptions.IsLocal)
+            {
+                ServicesExtensions.InitializeJobs(container);
+            }
         }
     }
 }

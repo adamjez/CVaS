@@ -3,11 +3,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CVaS.BL.Facades;
 using CVaS.BL.Helpers;
-using CVaS.Shared.Providers;
 using CVaS.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using CVaS.BL.Providers;
 
 namespace CVaS.Web.Controllers.Web
 {

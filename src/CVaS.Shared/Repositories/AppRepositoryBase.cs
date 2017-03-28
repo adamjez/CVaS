@@ -41,7 +41,7 @@ namespace CVaS.Shared.Repositories
 
         public virtual async Task<IList<TEntity>> GetByIds(IEnumerable<TKey> ids, params Expression<Func<TEntity, object>>[] includes)
         {
-            IQueryable<TEntity> query = this.Context.Set<TEntity>();
+            IQueryable<TEntity> query = Context.Set<TEntity>();
 
             foreach (var include in includes)
             {

@@ -39,7 +39,7 @@ namespace CVaS.Shared.Core
                 var parentUow = provider.GetCurrent() as EntityFrameworkUnitOfWork;
                 if (parentUow != null)
                 {
-                    this.Context = parentUow.Context;
+                    Context = parentUow.Context;
                     if (!parentUow.TransactionalModeEnabled)
                     {
                         canCommit = true;
@@ -49,7 +49,7 @@ namespace CVaS.Shared.Core
                 }
             }
 
-            this.Context = dbContextFactory();
+            Context = dbContextFactory();
             ownContext = true;
             canCommit = true;
         }

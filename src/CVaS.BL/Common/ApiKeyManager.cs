@@ -1,4 +1,3 @@
-using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CVaS.BL.Services.ApiKey;
@@ -62,11 +61,6 @@ namespace CVaS.BL.Common
                     }
 
                     principals = await _signInManager.CreateUserPrincipalAsync(user);
-
-                    //// Set cache options.
-                    //var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    //    // Keep in cache for this time, reset time if accessed.
-                    //    .SetSlidingExpiration(TimeSpan.FromMinutes(30));
 
                     // Save data in cache.
                     _memoryCache.Set(apiKey, principals);

@@ -8,7 +8,7 @@ using CVaS.Shared.Exceptions;
 using CVaS.Shared.Options;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.Argument;
-using CVaS.Shared.Services.File.Providers;
+using CVaS.Shared.Services.File.User;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -90,8 +90,10 @@ namespace CVaS.Shared.Services.File.Algorithm
                 : _userLocalFileProvider.CreatePath(userId, dbFile.LocationId, dbFile.Extension);
 
             // Check if file exists locally
-            if (System.IO.File.Exists(localPath))
+            if (_fileSystem.ExistsFile(localPath))
             {
+                // Touch file to not delete it in the mean time
+                _fileSystem.TouchFile(localPath);
                 return Task.FromResult(new LocalFileResult(localPath, dbFile.Id));
             }
 

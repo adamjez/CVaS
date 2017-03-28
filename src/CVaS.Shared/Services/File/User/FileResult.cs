@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace CVaS.Shared.Services.File.Providers
+namespace CVaS.Shared.Services.File.User
 {
     public struct FileResult
     {

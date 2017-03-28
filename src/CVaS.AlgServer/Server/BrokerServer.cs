@@ -4,7 +4,7 @@ using CVaS.AlgServer.Services.BrokerReceiver;
 using CVaS.AlgServer.Services.MessageProcessor;
 using Microsoft.Extensions.Logging;
 
-namespace CVaS.AlgServer.Services.Server
+namespace CVaS.AlgServer.Server
 {
     public class BrokerServer
     {

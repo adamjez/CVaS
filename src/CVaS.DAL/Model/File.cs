@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using CVaS.DAL.Common;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CVaS.DAL.Model
 {

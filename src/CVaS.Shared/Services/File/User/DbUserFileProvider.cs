@@ -4,7 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 
-namespace CVaS.Shared.Services.File.Providers
+namespace CVaS.Shared.Services.File.User
 {
     public class DbUserFileProvider : UserFileProvider
     {

@@ -21,12 +21,10 @@ namespace CVaS.Web.Controllers.Api
         private readonly RunFacade _runFacade;
         private readonly AlgorithmFacade _algoFacade;
         private readonly IEnumerable<IArgumentParser> _argumentParserProviders;
-        private readonly IOptions<AlgorithmOptions> _algorithmOptions;
 
         public AlgorithmsController(ILogger<AlgorithmsController> logger, RunFacade runFacade, AlgorithmFacade algoFacade, 
-            IEnumerable<IArgumentParser> argumentParserProviders, IOptions<AlgorithmOptions> algorithmOptions)
+            IEnumerable<IArgumentParser> argumentParserProviders)
         {
-            _algorithmOptions = algorithmOptions;
             _logger = logger;
             _runFacade = runFacade;
             _algoFacade = algoFacade;

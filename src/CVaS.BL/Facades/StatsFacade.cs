@@ -2,26 +2,23 @@ using System.Linq;
 using System.Threading.Tasks;
 using CVaS.BL.DTO;
 using CVaS.Shared.Core.Provider;
-using CVaS.Shared.Providers;
 using CVaS.Shared.Services.Broker;
 using CVaS.Shared.Services.Time;
-using EasyNetQ;
 using Microsoft.EntityFrameworkCore;
+using CVaS.BL.Providers;
 
 namespace CVaS.BL.Facades
 {
     public class StatsFacade : AppFacadeBase
     {
         private readonly ICurrentTimeProvider _currentTimeProvider;
-        private readonly IBus _bus;
-        private readonly BrokerStatus _brokerStatus;
+        private readonly IBrokerStatus _brokerStatus;
 
         public StatsFacade(IUnitOfWorkProvider unitOfWorkProvider, ICurrentUserProvider currentUserProvider, ICurrentTimeProvider currentTimeProvider, 
-            IBus bus, BrokerStatus brokerStatus) 
+            IBrokerStatus brokerStatus) 
             : base(unitOfWorkProvider, currentUserProvider)
         {
             _currentTimeProvider = currentTimeProvider;
-            _bus = bus;
             _brokerStatus = brokerStatus;
         }
 
@@ -50,9 +47,9 @@ namespace CVaS.BL.Facades
                     RegisterUserCountThisWeek = 
                         await uow.Context.Users.CountAsync(u => u.CreatedAt > now.AddDays(-7)),
 
-                    BrokerStatus = _bus.IsConnected ? "Connected" : "Disconnected",
+                    BrokerStatus = _brokerStatus.GetStatus(),
 
-                    BrokerClients = _bus.IsConnected ? await _brokerStatus.GetConnectedAlgServersCount() : null
+                    BrokerClients = await _brokerStatus.GetConnectedAlgServersCount()
                 };
 
                 return result;

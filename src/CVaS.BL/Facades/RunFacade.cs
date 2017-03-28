@@ -8,10 +8,10 @@ using CVaS.Shared.Core;
 using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Exceptions;
 using CVaS.Shared.Models;
-using CVaS.Shared.Providers;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.Argument;
 using CVaS.Shared.Services.Launch;
+using CVaS.BL.Providers;
 
 namespace CVaS.BL.Facades
 {
@@ -52,28 +52,9 @@ namespace CVaS.BL.Facades
             }
         }
 
-
         public async Task<RunResult> RunHelpAsync(string codeName)
         {
             return await RunAlgorithmAsync(codeName, new List<object>() {"--help"});
-        }
-
-        private async Task<RunResult> CreateRunAndLaunch(Algorithm algorithm, List<Argument> args, int? timeout = null)
-        {
-            using (var uow = UnitOfWorkProvider.Create())
-            {
-                var run = new Run()
-                {
-                    AlgorithmId = algorithm.Id,
-                    UserId = CurrentUserProvider.Id,
-                    Result = RunResultType.NotFinished
-                };
-
-                _runRepository.Insert(run);
-                await uow.CommitAsync();
-
-                return await _launchService.LaunchAsync(algorithm.CodeName, algorithm.FilePath, args, run, timeout);
-            }
         }
 
         public async Task<RunDTO> GetSafelyAsync(Guid runId)
@@ -99,6 +80,25 @@ namespace CVaS.BL.Facades
                     StdErr = run.StdErr,
                     AlgorithmCode = run.Algorithm.CodeName
                 };
+            }
+        }
+
+        private async Task<RunResult> CreateRunAndLaunch(Algorithm algorithm, List<Argument> args, int? timeout = null)
+        {
+            using (var uow = UnitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
+            {
+                var run = new Run()
+                {
+                    AlgorithmId = algorithm.Id,
+                    UserId = CurrentUserProvider.Id,
+                    Result = RunResultType.NotFinished
+                };
+
+                _runRepository.Insert(run);
+                await uow.CommitAsync();
+
+                var runSettings = new RunSettings { Arguments = args, Timeout = timeout };
+                return await _launchService.LaunchAsync(algorithm, run, runSettings);
             }
         }
     }

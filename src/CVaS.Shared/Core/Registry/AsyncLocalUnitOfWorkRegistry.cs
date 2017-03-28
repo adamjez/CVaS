@@ -9,11 +9,7 @@ namespace CVaS.Shared.Core.Registry
 
         protected internal override Stack<IUnitOfWork> GetStack()
         {
-            if (asyncLocalStack.Value == null)
-            {
-                asyncLocalStack.Value = new Stack<IUnitOfWork>();
-            }
-            return asyncLocalStack.Value;
+            return asyncLocalStack.Value ?? (asyncLocalStack.Value = new Stack<IUnitOfWork>());
         }
     }
 }

@@ -8,9 +8,9 @@ using System.Linq.Expressions;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Exceptions;
-using CVaS.Shared.Providers;
 using CVaS.Shared.Repositories;
 using CVaS.Shared.Services.Time;
+using CVaS.BL.Providers;
 
 namespace CVaS.BL.Facades
 {
@@ -45,7 +45,7 @@ namespace CVaS.BL.Facades
             {
                 Description = entity.Description,
                 CodeName = entity.CodeName,
-                LaunchCount = entity.Runs.Count(),
+                LaunchCount = entity.Runs.Count,
                 LaunchCountLastHour = entity.Runs.Count(r => r.CreatedAt > now.AddHours(-1)),
                 LaunchCountLastDay = entity.Runs.Count(r => r.CreatedAt > now.AddDays(-1))
             }))

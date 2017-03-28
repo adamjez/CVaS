@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@Model.Title - CVaS</title>
+    <title>@Model.Title</title>
 
     <environment names="Development">
         <link rel="stylesheet" href="~/lib/bootswatch-dist/css/bootstrap.css" />
@@ -28,6 +28,13 @@
     @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
 <body>
+
+    <authorize roles="Admin">
+        <cache authorize-roles="Admin" expires-after="@TimeSpan.FromMinutes(1)">
+            <vc:web-service-status />
+        </cache>
+    </authorize>
+
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -41,7 +48,7 @@
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Computer Vision as a Service</a>
             </div>
             <div class="collapse navbar-collapse" id="items-navbar-collapse">
-                @await Component.InvokeAsync("MenuPanel")
+                <vc:menu-panel />
             </div>
         </div>
     </nav>

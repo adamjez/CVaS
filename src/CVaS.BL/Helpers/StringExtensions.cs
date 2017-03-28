@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CVaS.BL.Helpers
+﻿namespace CVaS.BL.Helpers
 {
     public static class StringExtensions
     {
