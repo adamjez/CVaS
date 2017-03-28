@@ -15,7 +15,6 @@ namespace CVaS.UnitTests
         {
             _parser = new JsonArgumentParser();
         }
-            
 
         [Fact]
         public void JsonParser_JValueCanParse_TrueExpected()

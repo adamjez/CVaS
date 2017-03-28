@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace CVaS.Web.Providers
@@ -32,11 +33,7 @@ namespace CVaS.Web.Providers
 
             if (root.Type == JTokenType.Array)
             {
-
-                foreach (var token in root.Children())
-                {
-                    array.Add(ParseValues(token, true));
-                }
+                array.AddRange(root.Children().Select(token => ParseValues(token, true)));
             }
             else
             {
