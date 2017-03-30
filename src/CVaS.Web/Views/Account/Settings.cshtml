@@ -5,6 +5,12 @@
     <h2>@Model.Title</h2>
 </div>
 
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert alert-info" role="alert">@Model.StatusMessage</div>
+}
+
+
 <div class="panel panel-default  col-md-11">
     <div class="panel-body">
         <div>

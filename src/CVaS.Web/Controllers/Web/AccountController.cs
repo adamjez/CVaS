@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CVaS.BL.Common;
 using CVaS.BL.Facades;
-using CVaS.BL.Services.ApiKey;
 using CVaS.BL.Services.Email;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
@@ -11,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using CVaS.BL.Providers;
-using CVaS.Shared.Core;
+using AspNet.Mvc.TypedRouting;
 
 namespace CVaS.Web.Controllers.Web
 {
@@ -116,7 +115,9 @@ namespace CVaS.Web.Controllers.Web
                 if (result.Suceeded)
                 {
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(result.User);
-                    var callbackUrl = Url.Action(nameof(ConfirmEmail), "Account",
+
+                    var callbackUrl = Url.Action<AccountController>(
+                        c => c.ConfirmEmail(With.No<string>(), With.No<string>()),
                         new { userId = result.User.Id, code = code },
                         protocol: HttpContext.Request.Scheme);
 
@@ -168,12 +169,17 @@ namespace CVaS.Web.Controllers.Web
         }
 
         [HttpGet]
-        public async Task<ViewResult> Settings()
+        public async Task<ViewResult> Settings(ManageMessageId? message = null)
         {
             var viewModel = new SettingsViewModel()
             {
                 Title = "Settings",
-                ApiKey = await _apiKeyManager.GetApiKey(CurrentUserProvider.Id)
+                ApiKey = await _apiKeyManager.GetApiKey(CurrentUserProvider.Id),
+                StatusMessage = message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
+                : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
+                : message == ManageMessageId.Error ? "An error has occurred."
+                : message == ManageMessageId.RevokeApiKey ? "Your api key has been resetted."
+                : ""
             };
 
             InitializeLayoutModel(viewModel);
@@ -187,7 +193,7 @@ namespace CVaS.Web.Controllers.Web
         {
             await _apiKeyManager.RevokeAsync(CurrentUserProvider.Id);
 
-            return RedirectToActionPermanent(nameof(Settings));
+            return RedirectToActionPermanent(nameof(Settings), new { Message = ManageMessageId.RevokeApiKey });
         }
 
         [HttpGet]
@@ -223,8 +229,11 @@ namespace CVaS.Web.Controllers.Web
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                     // Send an email with this link
                     var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                    var callbackUrl = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, code = code },
+
+                    var callbackUrl = Url.Action<AccountController>(c => c.ResetPassword(With.No<string>()),
+                        new { userId = user.Id, code = code },
                         protocol: HttpContext.Request.Scheme);
+
                     await _emailSender.SendEmailAsync(model.Email, "Reset Password",
                         $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
 
@@ -333,7 +342,7 @@ namespace CVaS.Web.Controllers.Web
             await _signInManager.SignOutAsync();
             _logger.LogInformation(4, "User logged out.");
 
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return this.RedirectToActionPermanent<HomeController>(c => c.Index());
         }
 
         #region Helpers
@@ -367,7 +376,8 @@ namespace CVaS.Web.Controllers.Web
             SetPasswordSuccess,
             RemoveLoginSuccess,
             RemovePhoneSuccess,
-            Error
+            Error,
+            RevokeApiKey
         }
 
         #endregion

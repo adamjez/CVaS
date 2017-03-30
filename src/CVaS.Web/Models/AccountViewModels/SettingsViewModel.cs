@@ -21,5 +21,6 @@ namespace CVaS.Web.Models.AccountViewModels
         public string ConfirmPassword { get; set; }
 
         public string ApiKey { get; set; }
+        public string StatusMessage { get; set; }
     }
 }

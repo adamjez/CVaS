@@ -54,7 +54,7 @@ namespace CVaS.Web.Controllers.Web
 
             await _ruleFacade.Insert(new RuleDTO() { Regex = adminViewModel.NewRule.Regex});
 
-            return RedirectToActionPermanent("Index");
+            return RedirectToActionPermanent(nameof(Index));
         }
 
         [HttpPost]
@@ -68,7 +68,7 @@ namespace CVaS.Web.Controllers.Web
 
             await _ruleFacade.Remove(id);
 
-            return RedirectToActionPermanent("Index");
+            return RedirectToActionPermanent(nameof(Index));
         }
 
         [HttpPost]
@@ -82,7 +82,7 @@ namespace CVaS.Web.Controllers.Web
 
             await _ruleFacade.SetEnabled(id, true);
 
-            return RedirectToActionPermanent("Index");
+            return RedirectToActionPermanent(nameof(Index));
         }
 
         [HttpPost]
@@ -96,7 +96,7 @@ namespace CVaS.Web.Controllers.Web
 
             await _ruleFacade.SetEnabled(id, false);
 
-            return RedirectToActionPermanent("Index");
+            return RedirectToActionPermanent(nameof(Index));
         }
     }
 }

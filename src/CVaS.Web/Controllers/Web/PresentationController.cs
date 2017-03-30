@@ -44,15 +44,15 @@ namespace CVaS.Web.Controllers.Web
 
             var viewName = Regex.Replace(algorithm.CodeName.Replace('-', ' ').ToTitleCase(), @"\s+", "");
 
-            var layout = new LayoutViewModel
-            {
-                Title = algorithm.Title
-            };
-
             if (!ViewExists(viewName))
             {
                 return NotFound();
             }
+
+            var layout = new LayoutViewModel
+            {
+                Title = algorithm.Title
+            };
 
             return View(viewName, InitializeLayoutModel(layout));
         }
