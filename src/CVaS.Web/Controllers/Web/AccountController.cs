@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using CVaS.BL.Providers;
-using AspNet.Mvc.TypedRouting;
 
 namespace CVaS.Web.Controllers.Web
 {
@@ -326,12 +325,12 @@ namespace CVaS.Web.Controllers.Web
                     {
                         await _signInManager.SignInAsync(user, false);
                         _logger.LogInformation(3, "User changed their password successfully.");
-                        return RedirectToAction(nameof(Settings), new { Message = ManageMessageId.ChangePasswordSuccess });
+                        return RedirectToActionPermanent(nameof(Settings), new { Message = ManageMessageId.ChangePasswordSuccess });
                     }
                     AddErrors(result);
                     return View(nameof(Settings), model);
                 }
-                return RedirectToAction(nameof(Settings), new { Message = ManageMessageId.Error });
+                return RedirectToActionPermanent(nameof(Settings), new { Message = ManageMessageId.Error });
             }
         }
 
