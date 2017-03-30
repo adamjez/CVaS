@@ -21,7 +21,7 @@ namespace CVaS.Web.Installers
             registrator.Register<ICurrentUserProvider, CurrentUserProvider>(Reuse.InCurrentScope);
 
             registrator.Register<IArgumentParser, JsonArgumentParser>();
-            registrator.Register<IArgumentParser, PrimitiveArgumentParserProvider>();
+            registrator.Register<IArgumentParser, PrimitiveArgumentParser>();
         }
     }
 }

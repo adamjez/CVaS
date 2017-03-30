@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using CVaS.BL.DTO;
 using CVaS.BL.Facades;
 using CVaS.Shared.Services.Process;
-using CVaS.Web.Models;
+using CVaS.Web.Controllers.Web;
 using CVaS.Web.Providers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using CVaS.Shared.Options;
+using AspNet.Mvc.TypedRouting.LinkGeneration;
 
 namespace CVaS.Web.Controllers.Api
 {
@@ -23,7 +21,7 @@ namespace CVaS.Web.Controllers.Api
         private readonly AlgorithmFacade _algoFacade;
         private readonly IEnumerable<IArgumentParser> _argumentParserProviders;
 
-        public AlgorithmsController(ILogger<AlgorithmsController> logger, RunFacade runFacade, AlgorithmFacade algoFacade, 
+        public AlgorithmsController(ILogger<AlgorithmsController> logger, RunFacade runFacade, AlgorithmFacade algoFacade,
             IEnumerable<IArgumentParser> argumentParserProviders)
         {
             _logger = logger;
@@ -44,7 +42,7 @@ namespace CVaS.Web.Controllers.Api
         /// is set to negative number, wait time is set to maximum possible time.</param>
         [HttpPost("{codeName}")]
         [Produces(typeof(RunDTO))]
-        public async Task<IActionResult> Process(string codeName, [FromBody] object options, [FromQuery]int? timeout)
+        public async Task<IActionResult> Process(string codeName, [FromBody] object options, [FromQuery] int? timeout)
         {
             if (!ModelState.IsValid)
             {
@@ -71,16 +69,17 @@ namespace CVaS.Web.Controllers.Api
 
             var result = await _runFacade.RunAlgorithmAsync(codeName, parsedOptions, timeout);
 
-            return Ok(new RunDTO
-            {
-                Id = result.RunId,
-                StdOut = result.StdOut,
-                StdErr = result.StdErr,
-                Zip = result.FileId != null ? Url.Link(nameof(FilesController.GetFile), new { fileId = result.FileId }) : null,
-                Status = result.Result,
-                CreatedAt = result.CreatedAt,
-                FinishedAt = result.FinishedAt
-            });
+            return this.CreatedAtAction<RunsController>(c => c.Get(With.No<Guid>()), new { runId = result.RunId },
+                new RunDTO
+                {
+                    Id = result.RunId,
+                    StdOut = result.StdOut,
+                    StdErr = result.StdErr,
+                    Zip = result.FileId != null ? Url.Link(nameof(FilesController.GetFile), new { fileId = result.FileId }) : null,
+                    Status = result.Result,
+                    CreatedAt = result.CreatedAt,
+                    FinishedAt = result.FinishedAt
+                });
         }
 
         /// <summary>

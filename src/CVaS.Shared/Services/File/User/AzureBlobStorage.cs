@@ -6,11 +6,11 @@ using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace CVaS.Shared.Services.File.User
 {
-    public class AzureStorageProvider : UserFileProvider
+    public class AzureBlobStorage : FileStorage
     {
         private readonly CloudBlobClient _blobClient;
 
-        public AzureStorageProvider(CloudStorageAccount storageAccount)
+        public AzureBlobStorage(CloudStorageAccount storageAccount)
         {
             _blobClient = storageAccount.CreateCloudBlobClient();
         }

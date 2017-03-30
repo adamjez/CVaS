@@ -51,18 +51,18 @@ namespace CVaS.Shared.Helpers
             {
                 // One Client Per Application: Source http://mongodb.github.io/mongo-csharp-driver/2.2/getting_started/quick_tour/
                 services.AddSingleton((sf) => new MongoClient(configuration.GetConnectionString("MongoDb")).GetDatabase("fileDb"));
-                services.AddTransient<IUserFileProvider, DbUserFileProvider>();
+                services.AddTransient<IFileStorage, MongoDbFileStorage>();
             }
             else if (azureStorageConnectionString != null)
             {
                 // Retrieve storage account from connection string.
                 CloudStorageAccount storageAccount = CloudStorageAccount.Parse(azureStorageConnectionString);
                 services.AddSingleton(storageAccount);
-                services.AddTransient<IUserFileProvider, AzureStorageProvider>();
+                services.AddTransient<IFileStorage, AzureBlobStorage>();
             }
             else
             {
-                services.AddTransient<IUserFileProvider, UserSystemFileProvider>();
+                services.AddTransient<IFileStorage, FileSystemStorage>();
             }
         }
 

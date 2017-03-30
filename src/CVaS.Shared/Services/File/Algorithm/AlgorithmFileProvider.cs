@@ -19,18 +19,18 @@ namespace CVaS.Shared.Services.File.Algorithm
         private readonly IOptions<DirectoryPathOptions> _directoryPathOptions;
         private readonly ILogger<AlgorithmFileProvider> _logger;
         private readonly FileRepository _fileRepository;
-        private readonly IUserFileProvider _userFileProvider;
+        private readonly IFileStorage _fileStorage;
         private readonly FileSystemWrapper _fileSystem;
         private readonly UserLocalFileProvider _userLocalFileProvider;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
         public AlgorithmFileProvider(IOptions<DirectoryPathOptions> directoryPathOptions, ILogger<AlgorithmFileProvider> logger, FileRepository fileRepository,
-            IUserFileProvider userFileProvider, FileSystemWrapper fileSystem, IUnitOfWorkProvider unitOfWorkProvider, UserLocalFileProvider userLocalFileProvider)
+            IFileStorage fileStorage, FileSystemWrapper fileSystem, IUnitOfWorkProvider unitOfWorkProvider, UserLocalFileProvider userLocalFileProvider)
         {
             _directoryPathOptions = directoryPathOptions;
             _logger = logger;
             _fileRepository = fileRepository;
-            _userFileProvider = userFileProvider;
+            _fileStorage = fileStorage;
             _fileSystem = fileSystem;
             _unitOfWorkProvider = unitOfWorkProvider;
             _userLocalFileProvider = userLocalFileProvider;
@@ -98,7 +98,7 @@ namespace CVaS.Shared.Services.File.Algorithm
             }
 
             var localFile = dbFile;
-            var resultTask = _userFileProvider.GetAsync(dbFile.LocationId)
+            var resultTask = _fileStorage.GetAsync(dbFile.LocationId)
                 .ContinueWith(async task =>
                 {
                     await _fileSystem.SaveAsync((await task).Content, localPath);

@@ -47,7 +47,7 @@ namespace CVaS.DAL.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     AccessFailedCount = table.Column<int>(nullable: false),
-                    ApiKey = table.Column<string>(maxLength: 44, nullable: false),
+                    ApiKey = table.Column<byte[]>(maxLength: 32, nullable: false),
                     ConcurrencyStamp = table.Column<string>(nullable: true),
                     CreatedAt = table.Column<DateTime>(nullable: false),
                     Email = table.Column<string>(maxLength: 256, nullable: true),

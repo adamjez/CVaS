@@ -29,13 +29,13 @@ namespace CVaS.Shared.Services.Launch
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly RunRepository _runRepository;
         private readonly ITemporaryFileProvider _temporaryFileProvider;
-        private readonly IUserFileProvider _userFileProvider;
+        private readonly IFileStorage _fileStorage;
         private readonly IAlgorithmFileProvider _algorithmFileProvider;
         private readonly ILogger<LocalLaunchService> _logger;
         private readonly FileSystemWrapper _fileSystemWrapper;
 
         public LocalLaunchService(IOptions<AlgorithmOptions> options, IProcessService processService, IUnitOfWorkProvider unitOfWorkProvider,
-            RunRepository runRepository, ITemporaryFileProvider temporaryFileProvider, IUserFileProvider userFileProvider, IAlgorithmFileProvider algorithmFileProvider, 
+            RunRepository runRepository, ITemporaryFileProvider temporaryFileProvider, IFileStorage fileStorage, IAlgorithmFileProvider algorithmFileProvider, 
             ILogger<LocalLaunchService> logger, FileSystemWrapper fileSystemWrapper)
         {
             _options = options;
@@ -44,7 +44,7 @@ namespace CVaS.Shared.Services.Launch
             _runRepository = runRepository;
 
             _temporaryFileProvider = temporaryFileProvider;
-            _userFileProvider = userFileProvider;
+            _fileStorage = fileStorage;
             _algorithmFileProvider = algorithmFileProvider;
             _logger = logger;
             _fileSystemWrapper = fileSystemWrapper;
@@ -161,7 +161,7 @@ namespace CVaS.Shared.Services.Launch
 
             return new DAL.Model.File()
             {
-                LocationId = await _userFileProvider.SaveAsync(zipFile.FullPath, ZipHelpers.ContentType),
+                LocationId = await _fileStorage.SaveAsync(zipFile.FullPath, ZipHelpers.ContentType),
                 FileSize = _fileSystemWrapper.FileSize(zipFile.FullPath),
                 ContentType = ZipHelpers.ContentType,
                 Extension = ZipHelpers.Extension,

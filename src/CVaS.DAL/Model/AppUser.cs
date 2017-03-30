@@ -13,8 +13,8 @@ namespace CVaS.DAL.Model
 
         public ICollection<Run> Runs { get; private set; } = new List<Run>();
 
-        [Required, StringLength(44)]
-        public string ApiKey { get; set; }
+        [Required, MaxLength(32)]
+        public byte[] ApiKey { get; set; }
 
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 

@@ -69,9 +69,9 @@ namespace CVaS.DAL.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
-                    b.Property<string>("ApiKey")
+                    b.Property<byte[]>("ApiKey")
                         .IsRequired()
-                        .HasMaxLength(44);
+                        .HasMaxLength(32);
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();

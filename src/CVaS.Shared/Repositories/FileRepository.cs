@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CVaS.DAL.Model;
@@ -18,6 +19,13 @@ namespace CVaS.Shared.Repositories
             return await Context.Files
                 .Where(f => f.Hash == hash && f.UserId == userId)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<File>> GetByUser(int userId)
+        {
+            return await Context.Files
+                .Where(f => f.UserId == userId)
+                .ToListAsync();
         }
     }
 }

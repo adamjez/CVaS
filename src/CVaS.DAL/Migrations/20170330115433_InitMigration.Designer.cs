@@ -9,7 +9,7 @@ using CVaS.DAL.Model;
 namespace CVaS.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20170324162456_InitMigration")]
+    [Migration("20170330115433_InitMigration")]
     partial class InitMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,9 +70,9 @@ namespace CVaS.DAL.Migrations
 
                     b.Property<int>("AccessFailedCount");
 
-                    b.Property<string>("ApiKey")
+                    b.Property<byte[]>("ApiKey")
                         .IsRequired()
-                        .HasMaxLength(44);
+                        .HasMaxLength(32);
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();

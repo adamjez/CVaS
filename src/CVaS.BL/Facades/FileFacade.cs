@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CVaS.BL.DTO;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Repositories;
@@ -15,13 +16,13 @@ namespace CVaS.BL.Facades
     public class FileFacade : AppFacadeBase
     {
         private readonly FileRepository _fileRepository;
-        private readonly IUserFileProvider _userFileProvider;
+        private readonly IFileStorage _fileStorage;
         public FileFacade(IUnitOfWorkProvider unitOfWorkProvider, ICurrentUserProvider currentUserProvider,
-            FileRepository fileRepository, IUserFileProvider userFileProvider)
+            FileRepository fileRepository, IFileStorage fileStorage)
             : base(unitOfWorkProvider, currentUserProvider)
         {
             _fileRepository = fileRepository;
-            _userFileProvider = userFileProvider;
+            _fileStorage = fileStorage;
         }
 
         public async Task DeleteAsync(Guid fileId)
@@ -35,7 +36,7 @@ namespace CVaS.BL.Facades
                     throw new UnauthorizedAccessException();
                 }
 
-                await _userFileProvider.DeleteAsync(file.LocationId);
+                await _fileStorage.DeleteAsync(file.LocationId);
 
                 _fileRepository.Delete(file);
                 await uow.CommitAsync();
@@ -51,7 +52,7 @@ namespace CVaS.BL.Facades
                 using (var memStream = new MemoryStream())
                 {
                     await fileStream.CopyToAsync(memStream);
-                    
+
                     memStream.Seek(0, SeekOrigin.Begin);
 
                     using (var md5Hash = System.Security.Cryptography.MD5.Create())
@@ -64,7 +65,7 @@ namespace CVaS.BL.Facades
                         if (fileWithSameHash != null)
                             return fileWithSameHash.Id;
 
-                        var path = await _userFileProvider.SaveAsync(memStream, fileName, contentType);
+                        var path = await _fileStorage.SaveAsync(memStream, fileName, contentType);
 
                         var fileEntity = new File()
                         {
@@ -72,9 +73,9 @@ namespace CVaS.BL.Facades
                             UserId = CurrentUserProvider.Id,
                             Type = FileType.Upload,
                             Hash = hash,
-                            Extension = Path.GetExtension(fileName),
                             ContentType = contentType,
-                            FileSize = memStream.Length
+                            FileSize = memStream.Length,
+                            Extension = Path.GetExtension(fileName)
                         };
 
                         uow.Context.Files.Add(fileEntity);
@@ -87,22 +88,13 @@ namespace CVaS.BL.Facades
             }
         }
 
-        public async Task<IEnumerable<File>> AddUploadedAsync(IEnumerable<string> pathFiles, int userId)
+        public async Task<IEnumerable<FileDTO>> GetAllBySignedUserAsync()
         {
-            using (var uow = UnitOfWorkProvider.Create())
+            using (UnitOfWorkProvider.Create())
             {
-                var files = pathFiles.Select(path => new File()
-                {
-                    LocationId = path,
-                    UserId = userId,
-                    Type = FileType.Upload
-                }).ToList();
+                var file = await _fileRepository.GetByUser(CurrentUserProvider.Id);
 
-                uow.Context.Files.AddRange(files);
-
-                await uow.CommitAsync();
-
-                return files;
+                return file.Select(FileDTO.FromEntity);
             }
         }
 

@@ -2,6 +2,6 @@
 {
     public interface IApiKeyGenerator
     {
-        string Generate();
+        byte[] Generate();
     }
 }

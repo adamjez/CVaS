@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using CVaS.BL.Providers;
+using CVaS.Shared.Core;
 
 namespace CVaS.Web.Controllers.Web
 {
@@ -167,41 +168,31 @@ namespace CVaS.Web.Controllers.Web
         }
 
         [HttpGet]
-        public async Task<IActionResult> Settings()
-        {
-            using (_unitOfWorkProvider.Create())
-            {
-                var viewModel = new SettingsViewModel()
-                {
-                    Title = "Settings",
-                    ApiKey = (await _userManager.GetUserAsync(User)).ApiKey
-                };
-
-                InitializeLayoutModel(viewModel);
-
-                return View(viewModel);
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RevokeApiKey()
+        public async Task<ViewResult> Settings()
         {
             var viewModel = new SettingsViewModel()
             {
                 Title = "Settings",
-                ApiKey = await _apiKeyManager.RevokeAsync(CurrentUserProvider.Id)
+                ApiKey = await _apiKeyManager.GetApiKey(CurrentUserProvider.Id)
             };
 
             InitializeLayoutModel(viewModel);
 
-            return View("Settings", viewModel);
+            return View(nameof(Settings), viewModel);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<RedirectToActionResult> RevokeApiKey()
+        {
+            await _apiKeyManager.RevokeAsync(CurrentUserProvider.Id);
+
+            return RedirectToActionPermanent(nameof(Settings));
+        }
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult ForgotPassword()
+        public ViewResult ForgotPassword()
         {
             var viewModel = new ForgotPasswordViewModel()
             {

@@ -4,12 +4,12 @@ using CVaS.Shared.Services.File.Temporary;
 
 namespace CVaS.Shared.Services.File.User
 {
-    public class UserSystemFileProvider : UserFileProvider
+    public class FileSystemStorage : FileStorage
     {
         private readonly ITemporaryFileProvider _tmpFileProvider;
         private readonly FileSystemWrapper _fileSystemWrapper;
 
-        public UserSystemFileProvider(ITemporaryFileProvider tmpFileProvider, FileSystemWrapper fileSystemWrapper)
+        public FileSystemStorage(ITemporaryFileProvider tmpFileProvider, FileSystemWrapper fileSystemWrapper)
         {
             _tmpFileProvider = tmpFileProvider;
             _fileSystemWrapper = fileSystemWrapper;

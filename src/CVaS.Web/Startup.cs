@@ -26,6 +26,7 @@ using StackExchange.Profiling.Mvc;
 using StackExchange.Profiling;
 using StackExchange.Profiling.Storage;
 using Microsoft.Extensions.Caching.Memory;
+using AspNet.Mvc.TypedRouting;
 
 namespace CVaS.Web
 {
@@ -77,7 +78,9 @@ namespace CVaS.Web
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     options.SerializerSettings.Converters.Add(new StringEnumConverter(true));
                 })
-                .AddXmlDataContractSerializerFormatters();
+                .AddXmlDataContractSerializerFormatters()
+                .AddTypedRouting();
+
             services.AddRouting(options => options.LowercaseUrls = true);
 
             services.AddMemoryCache(options => options.CompactOnMemoryPressure = true);

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace CVaS.Shared.Services.File.User
 {
-    public abstract class UserFileProvider : IUserFileProvider
+    public abstract class FileStorage : IFileStorage
     {
         public async Task<string> SaveAsync(string filePath, string contentType)
         {

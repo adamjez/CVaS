@@ -1,3 +1,4 @@
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CVaS.BL.Services.ApiKey;
@@ -30,7 +31,7 @@ namespace CVaS.BL.Common
             _userManager = userManager;
         }
 
-        public async Task<string> RevokeAsync(int userId)
+        public async Task RevokeAsync(int userId)
         {
             using (var uow = _unitOfWorkProvider.Create())
             {
@@ -41,12 +42,25 @@ namespace CVaS.BL.Common
                 user.ApiKey = _apiKeyGenerator.Generate();
 
                 await uow.CommitAsync();
-
-                return user.ApiKey;
             }
         }
 
-        public async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(string apiKey)
+        public async Task<string> GetApiKey(int userId)
+        {
+            using (_unitOfWorkProvider.Create())
+            {
+                var user = await _userRepository.GetById(userId);
+
+                return Convert.ToBase64String(user.ApiKey);
+            }
+        }
+
+        public Task<ClaimsPrincipal> GetClaimsPrincipalAsync(string apiKey)
+        {
+            return GetClaimsPrincipalAsync(Convert.FromBase64String(apiKey));
+        }
+
+        public async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(byte[] apiKey)
         {
             using (_unitOfWorkProvider.Create())
             {

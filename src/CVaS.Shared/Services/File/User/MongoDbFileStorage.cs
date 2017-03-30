@@ -6,12 +6,12 @@ using MongoDB.Driver.GridFS;
 
 namespace CVaS.Shared.Services.File.User
 {
-    public class DbUserFileProvider : UserFileProvider
+    public class MongoDbFileStorage : FileStorage
     {
         private const string ContentType = "contentType";
         private readonly GridFSBucket _bucket;
 
-        public DbUserFileProvider(IMongoDatabase database)
+        public MongoDbFileStorage(IMongoDatabase database)
         {
             _bucket = new GridFSBucket(database);
         }

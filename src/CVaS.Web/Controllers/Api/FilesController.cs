@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using System;
+using CVaS.BL.DTO;
 using CVaS.Shared.Services.File.User;
 
 namespace CVaS.Web.Controllers.Api
@@ -24,13 +25,22 @@ namespace CVaS.Web.Controllers.Api
     {
         private readonly ILogger<FilesController> _logger;
         private readonly FileFacade _fileFacade;
-        private readonly IUserFileProvider _userFileProvider;
+        private readonly IFileStorage _fileStorage;
 
-        public FilesController(ILogger<FilesController> logger, FileFacade fileFacade, RunFacade runFacade, IUserFileProvider userFileProvider)
+        public FilesController(ILogger<FilesController> logger, FileFacade fileFacade, RunFacade runFacade, IFileStorage fileStorage)
         {
             _logger = logger;
             _fileFacade = fileFacade;
-            _userFileProvider = userFileProvider;
+            _fileStorage = fileStorage;
+        }
+
+        /// <summary>
+        /// Retrieves all user files metainformations
+        /// </summary>
+        [HttpGet, Route(""), Produces(typeof(IEnumerable<FileDTO>))]
+        public async Task<IEnumerable<FileDTO>> GetUserFiles()
+        {
+            return await _fileFacade.GetAllBySignedUserAsync();
         }
 
         /// <summary>
@@ -83,7 +93,7 @@ namespace CVaS.Web.Controllers.Api
 
             var remoteFileId = (await _fileFacade.GetSafelyAsync(fileId)).LocationId;
 
-            if (_userFileProvider is UserSystemFileProvider)
+            if (_fileStorage is FileSystemStorage)
             {
                 IFileInfo fileInfo = new PhysicalFileInfo(new FileInfo(remoteFileId));
 
@@ -102,7 +112,7 @@ namespace CVaS.Web.Controllers.Api
             }
             else
             {
-                var result = await _userFileProvider.GetAsync(remoteFileId);
+                var result = await _fileStorage.GetAsync(remoteFileId);
 
                 return new FileStreamResult(result.Content, result.ContentType);
             }
