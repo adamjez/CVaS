@@ -79,7 +79,8 @@ namespace CVaS.Web
                     options.SerializerSettings.Converters.Add(new StringEnumConverter(true));
                 })
                 .AddXmlDataContractSerializerFormatters()
-                .AddTypedRouting();
+                .AddTypedRouting()
+                .AddCookieTempDataProvider();
 
             services.AddRouting(options => options.LowercaseUrls = true);
 

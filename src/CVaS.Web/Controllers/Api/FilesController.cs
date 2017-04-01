@@ -17,6 +17,7 @@ using Microsoft.Extensions.FileProviders.Physical;
 using System;
 using CVaS.BL.DTO;
 using CVaS.Shared.Services.File.User;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace CVaS.Web.Controllers.Api
 {
@@ -51,16 +52,17 @@ namespace CVaS.Web.Controllers.Api
         [HttpPost("")]
         public async Task<IActionResult> UploadMultipleFiles()
         {
-            if (!MultipartFormHelpers.IsMultipartContentType(HttpContext.Request.ContentType))
+            if (!HttpContext.Request.IsMultipartContentType())
             {
                 return BadRequest();
             }
 
-            var boundary = MultipartFormHelpers.GetBoundary(HttpContext.Request.ContentType);
-            if (boundary == null)
+            var boundary = HttpContext.Request.GetMultipartBoundary();
+            if (string.IsNullOrEmpty(boundary))
             {
                 return BadRequest("Missing Boundary");
             }
+
             var reader = new MultipartReader(boundary, HttpContext.Request.Body);
 
             var fileIds = new List<Guid>();

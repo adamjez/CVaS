@@ -1,29 +1,25 @@
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using CVaS.BL.Services.ApiKey;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
 using CVaS.Shared.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 
-namespace CVaS.BL.Common
+namespace CVaS.BL.Services.ApiKey
 {
-    public class ApiKeyManager
+    public class ApiKeyManager : IApiKeyManager
     {
-        private readonly IMemoryCache _memoryCache;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly UserRepository _userRepository;
         private readonly IApiKeyGenerator _apiKeyGenerator;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
 
-        public ApiKeyManager(IMemoryCache memoryCache, IUnitOfWorkProvider unitOfWorkProvider, UserRepository userRepository, 
+        public ApiKeyManager(IUnitOfWorkProvider unitOfWorkProvider, UserRepository userRepository, 
             IApiKeyGenerator apiKeyGenerator, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager)
         {
-            _memoryCache = memoryCache;
             _unitOfWorkProvider = unitOfWorkProvider;
             _userRepository = userRepository;
             _apiKeyGenerator = apiKeyGenerator;
@@ -36,8 +32,6 @@ namespace CVaS.BL.Common
             using (var uow = _unitOfWorkProvider.Create())
             {
                 var user = await _userRepository.GetById(userId);
-
-                _memoryCache.Remove(user.ApiKey);
 
                 user.ApiKey = _apiKeyGenerator.Generate();
 
@@ -64,23 +58,13 @@ namespace CVaS.BL.Common
         {
             using (_unitOfWorkProvider.Create())
             {
-                ClaimsPrincipal principals;
-
-                if (!_memoryCache.TryGetValue(apiKey, out principals))
+                var user = await _userManager.Users.FirstOrDefaultAsync(us => us.ApiKey == apiKey);
+                if (user == null)
                 {
-                    var user = await _userManager.Users.FirstOrDefaultAsync(us => us.ApiKey == apiKey);
-                    if (user == null)
-                    {
-                        return null;
-                    }
-
-                    principals = await _signInManager.CreateUserPrincipalAsync(user);
-
-                    // Save data in cache.
-                    _memoryCache.Set(apiKey, principals);
+                    return null;
                 }
 
-                return principals;
+                return await _signInManager.CreateUserPrincipalAsync(user);
             }
         }
     }

@@ -1,5 +1,6 @@
 using System.Text.Encodings.Web;
 using CVaS.BL.Common;
+using CVaS.BL.Services.ApiKey;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -9,10 +10,10 @@ namespace CVaS.Web.Authentication
 {
     public class ApiAuthenticationMiddleware : AuthenticationMiddleware<ApiAuthenticationOptions>
     {
-        private readonly ApiKeyManager _apiKeyManager;
+        private readonly IApiKeyManager _apiKeyManager;
 
         public ApiAuthenticationMiddleware(RequestDelegate next, ILoggerFactory loggerFactory, UrlEncoder urlEncoder, 
-            IOptions<ApiAuthenticationOptions> options, ApiKeyManager apiKeyManager)
+            IOptions<ApiAuthenticationOptions> options, IApiKeyManager apiKeyManager)
             : base(next, options, loggerFactory, urlEncoder)
         {
             _apiKeyManager = apiKeyManager;

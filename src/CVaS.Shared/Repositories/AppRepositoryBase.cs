@@ -22,6 +22,11 @@ namespace CVaS.Shared.Repositories
             _provider = provider;
         }
 
+        public Task<TEntity> GetById(TKey id)
+        {
+            return Context.Set<TEntity>().FindAsync(id);
+        }
+
         public async Task<TEntity> GetById(TKey id, params Expression<Func<TEntity, object>>[] includes)
         {
             return (await GetByIds(new TKey[] { id }, includes)).FirstOrDefault();

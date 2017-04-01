@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using CVaS.BL.Common;
+using CVaS.BL.Services.ApiKey;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Authentication;
 
@@ -7,9 +7,9 @@ namespace CVaS.Web.Authentication
 {
     public class ApiAuthenticationHandler : AuthenticationHandler<ApiAuthenticationOptions>
     {
-        private readonly ApiKeyManager _apiKeyManager;
+        private readonly IApiKeyManager _apiKeyManager;
 
-        public ApiAuthenticationHandler(ApiKeyManager apiKeyManager)
+        public ApiAuthenticationHandler(IApiKeyManager apiKeyManager)
         {
             _apiKeyManager = apiKeyManager;
         }

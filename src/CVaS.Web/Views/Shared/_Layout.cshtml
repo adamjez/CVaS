@@ -30,7 +30,7 @@
 <body>
 
     <authorize roles="Admin">
-        <cache authorize-roles="Admin" expires-after="@TimeSpan.FromMinutes(1)">
+        <cache expires-after="@TimeSpan.FromMinutes(1)">
             <vc:web-service-status />
         </cache>
     </authorize>

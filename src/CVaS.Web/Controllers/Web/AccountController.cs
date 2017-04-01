@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Runtime.InteropServices.ComTypes;
+using System.Threading.Tasks;
 using CVaS.BL.Common;
 using CVaS.BL.Facades;
 using CVaS.BL.Services.Email;
@@ -10,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using CVaS.BL.Providers;
+using CVaS.BL.Services.ApiKey;
 
 namespace CVaS.Web.Controllers.Web
 {
@@ -22,13 +25,13 @@ namespace CVaS.Web.Controllers.Web
         private readonly IEmailSender _emailSender;
         private readonly ICurrentUserProvider _currentUserProvider;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-        private readonly ApiKeyManager _apiKeyManager;
+        private readonly IApiKeyManager _apiKeyManager;
         private readonly RuleFacade _ruleFacade;
         private readonly AccountFacade _accountFacade;
 
         public AccountController(ILogger<AccountController> logger, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager,
             IEmailSender emailSender, ICurrentUserProvider currentUserProvider, IUnitOfWorkProvider unitOfWorkProvider,
-            ApiKeyManager apiKeyManager, RuleFacade ruleFacade, AccountFacade accountFacade)
+            IApiKeyManager apiKeyManager, RuleFacade ruleFacade, AccountFacade accountFacade)
             : base(currentUserProvider)
         {
             _logger = logger;
@@ -168,8 +171,10 @@ namespace CVaS.Web.Controllers.Web
         }
 
         [HttpGet]
-        public async Task<ViewResult> Settings(ManageMessageId? message = null)
+        public async Task<ViewResult> Settings()
         {
+            var message = (ManageMessageId?)(int?)TempData[nameof(ManageMessageId)];
+
             var viewModel = new SettingsViewModel()
             {
                 Title = "Settings",
@@ -192,7 +197,7 @@ namespace CVaS.Web.Controllers.Web
         {
             await _apiKeyManager.RevokeAsync(CurrentUserProvider.Id);
 
-            return RedirectToActionPermanent(nameof(Settings), new { Message = ManageMessageId.RevokeApiKey });
+            return RedirectToSettingsPernament(ManageMessageId.RevokeApiKey);
         }
 
         [HttpGet]
@@ -325,12 +330,13 @@ namespace CVaS.Web.Controllers.Web
                     {
                         await _signInManager.SignInAsync(user, false);
                         _logger.LogInformation(3, "User changed their password successfully.");
-                        return RedirectToActionPermanent(nameof(Settings), new { Message = ManageMessageId.ChangePasswordSuccess });
+                        return RedirectToSettingsPernament(ManageMessageId.ChangePasswordSuccess);
                     }
                     AddErrors(result);
                     return View(nameof(Settings), model);
                 }
-                return RedirectToActionPermanent(nameof(Settings), new { Message = ManageMessageId.Error });
+
+                return RedirectToSettingsPernament(ManageMessageId.Error);
             }
         }
 
@@ -352,6 +358,12 @@ namespace CVaS.Web.Controllers.Web
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
+        }
+
+        private RedirectToActionResult RedirectToSettingsPernament(ManageMessageId? message = null)
+        {
+            TempData[nameof(ManageMessageId)] = message;
+            return RedirectToActionPermanent(nameof(Settings));
         }
 
         private IActionResult RedirectToLocal(string returnUrl)

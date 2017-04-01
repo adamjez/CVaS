@@ -21,7 +21,9 @@ namespace CVaS.BL.Installers
             SharedComposition.IsWebApplication = true;
             var sharedComposition = new SharedComposition(registrator);
 
-            registrator.Register<ApiKeyManager>();
+            registrator.Register<IApiKeyManager, ApiKeyManager>();
+            registrator.Register<IApiKeyManager, CachedApiKeyManager>(new CurrentScopeReuse(), setup: Setup.Decorator);
+
 
             registrator.Register<AccountFacade>();
             registrator.Register<AlgorithmFacade>();
