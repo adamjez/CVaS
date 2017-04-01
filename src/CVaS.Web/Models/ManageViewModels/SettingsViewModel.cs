@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace CVaS.Web.Models.AccountViewModels
+namespace CVaS.Web.Models.ManageViewModels
 {
     public class SettingsViewModel : LayoutViewModel
     {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices.ComTypes;
-using System.Threading.Tasks;
-using CVaS.BL.Common;
+﻿using System.Threading.Tasks;
 using CVaS.BL.Facades;
 using CVaS.BL.Services.Email;
 using CVaS.DAL.Model;
@@ -12,7 +9,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using CVaS.BL.Providers;
-using CVaS.BL.Services.ApiKey;
 
 namespace CVaS.Web.Controllers.Web
 {
@@ -23,24 +19,20 @@ namespace CVaS.Web.Controllers.Web
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
         private readonly IEmailSender _emailSender;
-        private readonly ICurrentUserProvider _currentUserProvider;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-        private readonly IApiKeyManager _apiKeyManager;
         private readonly RuleFacade _ruleFacade;
         private readonly AccountFacade _accountFacade;
 
         public AccountController(ILogger<AccountController> logger, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager,
             IEmailSender emailSender, ICurrentUserProvider currentUserProvider, IUnitOfWorkProvider unitOfWorkProvider,
-            IApiKeyManager apiKeyManager, RuleFacade ruleFacade, AccountFacade accountFacade)
+            RuleFacade ruleFacade, AccountFacade accountFacade)
             : base(currentUserProvider)
         {
             _logger = logger;
             _signInManager = signInManager;
             _userManager = userManager;
             _emailSender = emailSender;
-            _currentUserProvider = currentUserProvider;
             _unitOfWorkProvider = unitOfWorkProvider;
-            _apiKeyManager = apiKeyManager;
             _ruleFacade = ruleFacade;
             _accountFacade = accountFacade;
         }
@@ -170,35 +162,7 @@ namespace CVaS.Web.Controllers.Web
             }
         }
 
-        [HttpGet]
-        public async Task<ViewResult> Settings()
-        {
-            var message = (ManageMessageId?)(int?)TempData[nameof(ManageMessageId)];
-
-            var viewModel = new SettingsViewModel()
-            {
-                Title = "Settings",
-                ApiKey = await _apiKeyManager.GetApiKey(CurrentUserProvider.Id),
-                StatusMessage = message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
-                : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
-                : message == ManageMessageId.Error ? "An error has occurred."
-                : message == ManageMessageId.RevokeApiKey ? "Your api key has been resetted."
-                : ""
-            };
-
-            InitializeLayoutModel(viewModel);
-
-            return View(nameof(Settings), viewModel);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<RedirectToActionResult> RevokeApiKey()
-        {
-            await _apiKeyManager.RevokeAsync(CurrentUserProvider.Id);
-
-            return RedirectToSettingsPernament(ManageMessageId.RevokeApiKey);
-        }
+      
 
         [HttpGet]
         [AllowAnonymous]
@@ -313,35 +277,6 @@ namespace CVaS.Web.Controllers.Web
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(SettingsViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(nameof(Settings), model);
-            }
-
-            using (_unitOfWorkProvider.Create())
-            {
-                var user = await _userManager.GetUserAsync(_currentUserProvider.GetClaims());
-                if (user != null)
-                {
-                    var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-                    if (result.Succeeded)
-                    {
-                        await _signInManager.SignInAsync(user, false);
-                        _logger.LogInformation(3, "User changed their password successfully.");
-                        return RedirectToSettingsPernament(ManageMessageId.ChangePasswordSuccess);
-                    }
-                    AddErrors(result);
-                    return View(nameof(Settings), model);
-                }
-
-                return RedirectToSettingsPernament(ManageMessageId.Error);
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogOff()
         {
             await _signInManager.SignOutAsync();
@@ -352,20 +287,6 @@ namespace CVaS.Web.Controllers.Web
 
         #region Helpers
 
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-        }
-
-        private RedirectToActionResult RedirectToSettingsPernament(ManageMessageId? message = null)
-        {
-            TempData[nameof(ManageMessageId)] = message;
-            return RedirectToActionPermanent(nameof(Settings));
-        }
-
         private IActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
@@ -374,7 +295,7 @@ namespace CVaS.Web.Controllers.Web
             }
             else
             {
-                return RedirectToAction(nameof(Settings));
+                return this.RedirectToAction<ManageController>(c => c.Settings());
             }
         }
 

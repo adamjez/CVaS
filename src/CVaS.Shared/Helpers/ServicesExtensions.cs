@@ -66,7 +66,7 @@ namespace CVaS.Shared.Helpers
             }
         }
 
-        public static void AddJobsService(this IServiceCollection services, IConfigurationRoot configuration)
+        public static IServiceCollection AddJobsService(this IServiceCollection services, IConfigurationRoot configuration)
         {
             services.Configure<FilesCleaningOptions>(configuration.GetSection("FilesCleaning"));
             services.AddTransient<PeriodFilesCleaningRegistry>();

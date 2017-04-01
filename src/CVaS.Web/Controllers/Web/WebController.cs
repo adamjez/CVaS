@@ -2,6 +2,7 @@
 using CVaS.Web.Authentication;
 using CVaS.Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CVaS.Web.Controllers.Web
@@ -50,6 +51,14 @@ namespace CVaS.Web.Controllers.Web
             InitializeLayoutModel(viewModel);
 
             return View("Error", viewModel);
+        }
+
+        protected void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
         }
     }
 }
