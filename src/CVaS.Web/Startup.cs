@@ -14,7 +14,6 @@ using Swashbuckle.SwaggerGen.Application;
 using Microsoft.Extensions.PlatformAbstractions;
 using DryIoc;
 using DryIoc.Microsoft.DependencyInjection;
-using StackExchange.Profiling.Mvc;
 using StackExchange.Profiling;
 using StackExchange.Profiling.Storage;
 using Microsoft.Extensions.Caching.Memory;
@@ -27,14 +26,18 @@ namespace CVaS.Web
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ModeOptions _modeOptions = new ModeOptions();
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            var builder = new ConfigurationBuilder()
+            Configuration = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
+                .AddEnvironmentVariables()
+                .Build();
+
+            loggerFactory
+                .AddConsole(Configuration.GetSection("Logging"))
+                .AddDebug();
 
             _hostingEnvironment = env;
         }
@@ -42,7 +45,7 @@ namespace CVaS.Web
         public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public System.IServiceProvider ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddCustomOptions(Configuration);
             services.AddCustomizedIdentity();
@@ -50,6 +53,10 @@ namespace CVaS.Web
             services.AddStorageServices(Configuration);
             services.AddCustomizedMvc();
             services.AddMemoryCache(options => options.CompactOnMemoryPressure = true);
+            // Inject an implementation of ISwaggerProvider with defaulted settings applied
+            services.AddSwaggerGen(ConfigureSwagger);
+            services.AddMiniProfiler()
+                .AddEntityFramework();
 
             if (_modeOptions.IsLocal)
             {
@@ -59,10 +66,6 @@ namespace CVaS.Web
             {
                 services.AddMessageBroker(Configuration);
             }
-
-            // Inject an implementation of ISwaggerProvider with defaulted settings applied
-            services.AddSwaggerGen(ConfigureSwagger);
-            services.AddMiniProfiler();
 
             services.AddTransient<AppContextSeed>();
             services.AddSingleton(Configuration);
@@ -78,12 +81,8 @@ namespace CVaS.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, AppContextSeed contextSeed,
-            IMemoryCache cache, DryIoc.IContainer container)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IMemoryCache cache, IContainer container)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -103,7 +102,6 @@ namespace CVaS.Web
                 app.UseMiniProfiler(new MiniProfilerOptions
                 {
                     RouteBasePath = "~/profiler",
-                    ResultsListAuthorize = (r) => true,
                     SqlFormatter = new StackExchange.Profiling.SqlFormatters.InlineFormatter(),
                     Storage = new MemoryCacheStorage(cache, TimeSpan.FromMinutes(60))
                 });
@@ -118,12 +116,8 @@ namespace CVaS.Web
 
             // Enable middleware to serve generated Swagger as a JSON endpoint
             app.UseSwagger();
-
             // Enable middleware to serve swagger-ui assets (HTML, JS, CSS etc.)
             app.UseSwaggerUi();
-
-            contextSeed.SeedAsync()
-                .Wait();
 
             if (_modeOptions.IsLocal)
             {

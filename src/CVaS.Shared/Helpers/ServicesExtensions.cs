@@ -75,7 +75,7 @@ namespace CVaS.Shared.Helpers
 
         public static void InitializeJobs(IContainer container)
         {
-            var loggerFactory = container.Resolve< ILoggerFactory>();
+            var loggerFactory = container.Resolve<ILoggerFactory>();
 
             JobManager.JobFactory = new DryIoCJobFactory(container);
             JobManager.JobException += (info) => loggerFactory.CreateLogger(nameof(JobManager)).LogCritical("An error just happened with a scheduled job: " + info.Exception);
