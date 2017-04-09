@@ -63,7 +63,7 @@ namespace CVaS.Shared.Installers
             }
 
             registrator.Register<FileRepository, CachedFileRepository>();
-            registrator.Register<AlgorithmRepository>();
+            registrator.Register<AlgorithmRepository, CachedAlgorithmRepository>();
             registrator.Register<RunRepository>();
             registrator.Register<UserRepository>();
             registrator.Register<RuleRepository>();

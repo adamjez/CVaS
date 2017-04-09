@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
+using CVaS.Shared.Helpers;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace CVaS.Shared.Repositories
@@ -28,7 +29,7 @@ namespace CVaS.Shared.Repositories
             {
                 foreach (var id in ids)
                 {
-                    if (_memoryCache.TryGetValue(id, out File file))
+                    if (_memoryCache.TryGetValue(id, CacheType.FileRepository, out File file))
                     {
                         result.Add(file);
                         continue;;
@@ -46,7 +47,7 @@ namespace CVaS.Shared.Repositories
             foreach (var file in downloadedFiles)
             {
                 // ToDo save only file entity and not connected entities
-                _memoryCache.Set(file.Id, file);
+                _memoryCache.Set(file.Id, CacheType.FileRepository, file);
             }
 
             result.AddRange(downloadedFiles);

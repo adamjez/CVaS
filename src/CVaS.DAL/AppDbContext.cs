@@ -23,6 +23,17 @@ namespace CVaS.DAL
 
             modelBuilder.Entity<File>()
                 .HasAlternateKey(c => c.LocationId);
+
+            modelBuilder.Entity<Algorithm>()
+                .HasAlternateKey(c => c.CodeName);
+
+            modelBuilder.Entity<Algorithm>()
+                .Property(c => c.CodeName)
+                .IsRequired()
+                .HasMaxLength(64)
+                .IsUnicode(false);
+
         }
+
     }
 }

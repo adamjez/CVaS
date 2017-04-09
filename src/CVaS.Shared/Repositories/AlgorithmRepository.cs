@@ -11,7 +11,7 @@ namespace CVaS.Shared.Repositories
         {
         }
 
-        public async Task<Algorithm> GetByCodeNameWithArgs(string codeName)
+        public virtual async Task<Algorithm> GetByCodeNameWithArgs(string codeName)
         {
             return await Context.Algorithms
                 .FirstOrDefaultAsync(a => a.CodeName == codeName);

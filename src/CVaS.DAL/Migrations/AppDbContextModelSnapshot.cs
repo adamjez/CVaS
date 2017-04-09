@@ -24,7 +24,8 @@ namespace CVaS.DAL.Migrations
 
                     b.Property<string>("CodeName")
                         .IsRequired()
-                        .HasMaxLength(64);
+                        .HasMaxLength(64)
+                        .IsUnicode(false);
 
                     b.Property<string>("Description");
 
@@ -35,6 +36,8 @@ namespace CVaS.DAL.Migrations
                     b.Property<string>("Title");
 
                     b.HasKey("Id");
+
+                    b.HasAlternateKey("CodeName");
 
                     b.ToTable("Algorithms");
                 });

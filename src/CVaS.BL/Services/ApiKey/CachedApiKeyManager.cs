@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using CVaS.Shared.Core;
 using CVaS.Shared.Core.Provider;
+using CVaS.Shared.Helpers;
 using CVaS.Shared.Repositories;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -31,7 +32,7 @@ namespace CVaS.BL.Services.ApiKey
 
                 if (user != null)
                 {
-                    _memoryCache.Remove(user.ApiKey);
+                    _memoryCache.Remove(user.ApiKey, CacheType.ApiKey);
                 }
 
                 await _innerApiKeyManager.RevokeAsync(userId);
@@ -50,7 +51,7 @@ namespace CVaS.BL.Services.ApiKey
 
         public async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(byte[] apiKey)
         {
-            if (_memoryCache.TryGetValue(apiKey, out ClaimsPrincipal principals))
+            if (_memoryCache.TryGetValue(apiKey, CacheType.ApiKey, out ClaimsPrincipal principals))
             {
                 return principals;
             }
@@ -59,7 +60,7 @@ namespace CVaS.BL.Services.ApiKey
 
             if (principals != null)
             {
-                _memoryCache.Set(apiKey, principals);
+                _memoryCache.Set(apiKey, CacheType.ApiKey, principals);
             }
 
             return principals;
