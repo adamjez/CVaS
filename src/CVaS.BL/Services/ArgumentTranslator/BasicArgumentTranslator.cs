@@ -9,9 +9,6 @@ using CVaS.Shared.Services.Argument;
 
 namespace CVaS.BL.Services.ArgumentTranslator
 {
-    /// <summary>
-    /// TODO: Refactor!
-    /// </summary>
     public class BasicArgumentTranslator : IArgumentTranslator
     {
         private const string LocalFileScheme = "local://";
@@ -31,29 +28,27 @@ namespace CVaS.BL.Services.ArgumentTranslator
         {
             var typeInfo = arg.GetType().GetTypeInfo();
 
-            if (arg is string)
+            switch (arg)
             {
-                return new[] { ProccessString((string)arg)};
+                case string @string:
+                    return new[] { ProccessString(@string) };
+
+                case float @float:
+                    return new[] { new GenericArgument<float>(@float) };
+
+                case double @double:
+                    return new[] { new GenericArgument<double>(@double) };
+
+                case int @int:
+                    return new[] { new GenericArgument<int>(@int) };
+
+                case Dictionary<string, object> @dict:
+                    return ProcessDictionary(@dict);
             }
-            else if (arg is float)
-            {
-                return new[] { new GenericArgument<float>((float)arg)};
-            }
-            else if (arg is double)
-            {
-                return new[] { new GenericArgument<double>((double)arg)};
-            }
-            else if (arg is int)
-            {
-                return new[] { new GenericArgument<int>((int)arg) };
-            }
-            else if (typeInfo.IsPrimitive)
+
+            if (typeInfo.IsPrimitive)
             {
                 return new[] { new GenericArgument<string>(arg.ToString()) };
-            }
-            else if (arg is Dictionary<string, object>)
-            {
-                return ProcessDictionary(arg);
             }
             else
             {
