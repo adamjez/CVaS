@@ -49,6 +49,12 @@ namespace CVaS.Web
         {
             services.AddCustomOptions(Configuration);
             services.AddCustomizedIdentity();
+            services.AddApiAuthentication(option =>
+            {
+                option.AuthenticationScheme = AuthenticationScheme.ApiKey;
+                option.HeaderScheme = "Simple";
+            });
+
             services.AddDatabaseServices(Configuration);
             services.AddStorageServices(Configuration);
             services.AddCustomizedMvc();
@@ -90,11 +96,7 @@ namespace CVaS.Web
 
             app.UseStaticFiles();
 
-            app.UseApiAuthentication(new ApiAuthenticationOptions()
-            {
-                AuthenticationScheme = AuthenticationScheme.ApiKey,
-                HeaderScheme = "Simple"
-            });
+            app.UseApiAuthentication();
             app.UseIdentity();
 
             if (env.IsDevelopment())
