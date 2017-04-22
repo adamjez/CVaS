@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Swashbuckle.Swagger.Model;
-using Swashbuckle.SwaggerGen.Application;
 using Microsoft.Extensions.PlatformAbstractions;
 using DryIoc;
 using DryIoc.Microsoft.DependencyInjection;
@@ -18,6 +16,8 @@ using StackExchange.Profiling;
 using StackExchange.Profiling.Storage;
 using Microsoft.Extensions.Caching.Memory;
 using CVaS.Web.Helpers;
+using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace CVaS.Web
 {
@@ -119,7 +119,10 @@ namespace CVaS.Web
             // Enable middleware to serve generated Swagger as a JSON endpoint
             app.UseSwagger();
             // Enable middleware to serve swagger-ui assets (HTML, JS, CSS etc.)
-            app.UseSwaggerUi();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+            });
 
             if (_modeOptions.IsLocal)
             {
@@ -129,7 +132,7 @@ namespace CVaS.Web
 
         private static void ConfigureSwagger(SwaggerGenOptions options)
         {
-            options.SingleApiVersion(new Info
+            options.SwaggerDoc("v1", new Info
             {
                 Version = "v1",
                 Title = "Computer Vision as Service API",

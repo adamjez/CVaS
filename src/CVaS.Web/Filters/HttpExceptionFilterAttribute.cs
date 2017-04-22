@@ -16,26 +16,26 @@ namespace CVaS.Web.Filters
     {
         public override void OnException(ExceptionContext context)
         {
-            if (context.Exception is ApiException)
+            switch (context.Exception)
             {
-                var ex = (ApiException) context.Exception;
-                var apiError = new ApiError(ex.Message);
+                case ApiException apiException:
+                    var apiError = new ApiError(apiException.Message);
+                    context.ExceptionHandled = true;
+                    context.HttpContext.Response.StatusCode = apiException.StatusCode;
+                    context.Result = new ObjectResult(apiError);
+                    break;
 
-                context.ExceptionHandled = true;
+                case NotImplementedException _:
+                    context.HttpContext.Response.StatusCode = (int)HttpStatusCode.NotImplemented;
+                    context.ExceptionHandled = true;
+                    break;
 
-                context.HttpContext.Response.StatusCode = ex.StatusCode;
-                context.Result = new ObjectResult(apiError);
+                case UnauthorizedAccessException _:
+                    context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    context.ExceptionHandled = true;
+                    break;
             }
-            else if (context.Exception is NotImplementedException)
-            {
-                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.NotImplemented;
-                context.ExceptionHandled = true;
-            }
-            else if (context.Exception is UnauthorizedAccessException)
-            {
-                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                context.ExceptionHandled = true;
-            }
+
 
             base.OnException(context);
         }
