@@ -95,8 +95,6 @@ namespace CVaS.Web.Helpers
             services.Configure<DirectoryPathOptions>(configuration.GetSection("DirectoryPaths"));
             services.Configure<DatabaseOptions>(configuration.GetSection("Database"));
 
-            configuration.GetSection("Mode").Bind(configuration);
-
             return services;
         }
     }

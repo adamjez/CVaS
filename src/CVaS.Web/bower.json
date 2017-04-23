@@ -8,7 +8,7 @@
     "jquery-validation-unobtrusive": "3.2.6",
     "fine-uploader": "5.11.9",
     "clipboard": "1.6.1",
-    "zipjs": "*",
-    "featherlight": "1.7.1"
+    "featherlight": "1.7.1",
+    "zipjs": "*"
   }
 }

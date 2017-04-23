@@ -1,0 +1,58 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (web)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "",
+            "program": "${workspaceRoot}/src/CVaS.Web/bin/Debug/netcoreapp1.1/CVaS.Web.dll",
+            "args": [],
+            "cwd": "${workspaceRoot}/src/CVaS.Web",
+            "stopAtEntry": false,
+            "logging": {
+                "moduleLoad": false,
+                "engineLogging": false
+            },
+            "launchBrowser": {
+                "enabled": true,
+                "args": "${auto-detect-url}",
+                "windows": {
+                    "command": "cmd.exe",
+                    "args": "/C start ${auto-detect-url}"
+                },
+                "osx": {
+                    "command": "open"
+                },
+                "linux": {
+                    "command": "xdg-open"
+                }
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "LocalDevelopment"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceRoot}/Views"
+            }
+        },
+        {
+            "name": "AlgServer",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "",
+            "program": "${workspaceRoot}/src/CVaS.AlgServer/bin/Debug/netcoreapp1.1/CVaS.AlgServer.dll",
+            "args": [],
+            "cwd": "${workspaceRoot}/src/CVaS.AlgServer",
+            "stopAtEntry": false,
+            "env": {
+                "NETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        }
+    ]
+}

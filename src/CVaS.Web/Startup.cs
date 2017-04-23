@@ -48,6 +48,8 @@ namespace CVaS.Web
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddCustomOptions(Configuration);
+            Configuration.GetSection("Mode").Bind(_modeOptions);
+
             services.AddCustomizedIdentity();
             services.AddApiAuthentication(option =>
             {
