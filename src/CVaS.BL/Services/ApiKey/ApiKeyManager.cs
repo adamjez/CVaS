@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
+using CVaS.Shared.Exceptions;
 using CVaS.Shared.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ namespace CVaS.BL.Services.ApiKey
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
 
-        public ApiKeyManager(IUnitOfWorkProvider unitOfWorkProvider, UserRepository userRepository, 
+        public ApiKeyManager(IUnitOfWorkProvider unitOfWorkProvider, UserRepository userRepository,
             IApiKeyGenerator apiKeyGenerator, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager)
         {
             _unitOfWorkProvider = unitOfWorkProvider;
@@ -49,12 +50,19 @@ namespace CVaS.BL.Services.ApiKey
             }
         }
 
-        public Task<ClaimsPrincipal> GetClaimsPrincipalAsync(string apiKey)
+        public async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(string apiKey)
         {
-            return GetClaimsPrincipalAsync(Convert.FromBase64String(apiKey));
+            try
+            {
+                return await GetClaimsPrincipalAsync(Convert.FromBase64String(apiKey));
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
         }
 
-        public async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(byte[] apiKey)
+        private async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(byte[] apiKey)
         {
             using (_unitOfWorkProvider.Create())
             {

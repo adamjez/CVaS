@@ -22,7 +22,7 @@ namespace CVaS.BL.Installers
             var sharedComposition = new SharedComposition(registrator);
 
             registrator.Register<IApiKeyManager, ApiKeyManager>();
-            registrator.Register<IApiKeyManager, CachedApiKeyManager>(new CurrentScopeReuse(), setup: Setup.Decorator);
+            registrator.Register<IApiKeyManager, CachedApiKeyManager>(setup: Setup.Decorator);
 
 
             registrator.Register<AccountFacade>();

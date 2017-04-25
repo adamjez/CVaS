@@ -141,7 +141,7 @@ namespace CVaS.Web
                 Description = "A simple api to run computer vision algorithms.",
                 TermsOfService = "None"
             });
-            options.AddSecurityDefinition("Bearer", new ApiKeyScheme()
+            options.AddSecurityDefinition("Api Key", new ApiKeyScheme()
             {
                 In = "header",
                 Name = "Authorization",

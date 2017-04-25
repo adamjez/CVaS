@@ -8,6 +8,5 @@ namespace CVaS.BL.Services.ApiKey
         Task RevokeAsync(int userId);
         Task<string> GetApiKey(int userId);
         Task<ClaimsPrincipal> GetClaimsPrincipalAsync(string apiKey);
-        Task<ClaimsPrincipal> GetClaimsPrincipalAsync(byte[] apiKey);
     }
 }

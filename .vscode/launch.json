@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (web)",
+            "name": "Web",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "",
@@ -29,7 +29,7 @@
                 }
             },
             "env": {
-                "ASPNETCORE_ENVIRONMENT": "LocalDevelopment"
+                "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceRoot}/Views"
@@ -39,7 +39,7 @@
             "name": "AlgServer",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "",
+            "preLaunchTask": "Compile: algServer",
             "program": "${workspaceRoot}/src/CVaS.AlgServer/bin/Debug/netcoreapp1.1/CVaS.AlgServer.dll",
             "args": [],
             "cwd": "${workspaceRoot}/src/CVaS.AlgServer",

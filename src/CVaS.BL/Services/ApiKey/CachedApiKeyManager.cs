@@ -44,12 +44,7 @@ namespace CVaS.BL.Services.ApiKey
             return _innerApiKeyManager.GetApiKey(userId);
         }
 
-        public Task<ClaimsPrincipal> GetClaimsPrincipalAsync(string apiKey)
-        {
-            return _innerApiKeyManager.GetClaimsPrincipalAsync(apiKey);
-        }
-
-        public async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(byte[] apiKey)
+        public async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(string apiKey)
         {
             if (_memoryCache.TryGetValue(apiKey, CacheType.ApiKey, out ClaimsPrincipal principals))
             {

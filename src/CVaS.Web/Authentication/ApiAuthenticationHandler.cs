@@ -30,7 +30,7 @@ namespace CVaS.Web.Authentication
                                 new AuthenticationTicket(principals, new AuthenticationProperties(), Options.HeaderScheme));
                 }
 
-                return AuthenticateResult.Fail("bad username or password");
+                return AuthenticateResult.Fail("Bad username or password");
             }
 
             return AuthenticateResult.Skip();

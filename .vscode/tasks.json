@@ -4,14 +4,26 @@
     "version": "0.1.0",
     "command": "dotnet",
     "isShellCommand": true,
-    "args": [],
+    "suppressTaskName": true,
     "tasks": [
         {
-            "taskName": "build",
+            "taskName": "Compile: web",
             "isBuildCommand": true,
-            "args": [],
+            "args": ["build", "src/CVaS.Web"],
             "showOutput": "always",
             "problemMatcher": "$msCompile"
+        },
+        {
+            "taskName": "Compile: algServer",
+            "args": ["build", "src/CVaS.AlgServer"],
+            "showOutput": "always",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "taskName": "Test",
+            "isTestCommand": true,
+            "args": ["test", "test/CVaS.UnitTests/CVaS.UnitTests.csproj"],
+            "showOutput": "always"
         }
     ]
 }

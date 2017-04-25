@@ -12,6 +12,7 @@ using CVaS.Shared.Services.FilesCleaning;
 using FluentScheduler;
 using Microsoft.Extensions.Logging;
 using DryIoc;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace CVaS.Shared.Helpers
 {
@@ -31,16 +32,19 @@ namespace CVaS.Shared.Helpers
                 throw new ArgumentNullException(nameof(connectionString));
             }
 
-            if (msSqlConnectionString != null)
-            {
-                services.AddDbContext<AppDbContext>(options =>
-                    options.UseSqlServer(connectionString));
-            }
-            else
-            {
-                services.AddDbContext<AppDbContext>(options =>
-                      options.UseMySQL(connectionString));
-            }
+            services.AddDbContext<AppDbContext>(options =>
+                {
+                    if (msSqlConnectionString != null)
+                    {
+                        options.UseSqlServer(connectionString);
+                    }
+                    else
+                    {
+                        options.UseMySQL(connectionString);
+                    }
+
+                    options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));
+                });
         }
 
         public static void AddStorageServices(this IServiceCollection services, IConfigurationRoot configuration)
