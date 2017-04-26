@@ -4,6 +4,7 @@ using CVaS.BL.Facades;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using CVaS.BL.Providers;
+using CVaS.Web.Models;
 
 namespace CVaS.Web.Controllers.Api
 {
@@ -23,9 +24,13 @@ namespace CVaS.Web.Controllers.Api
         /// Retrieve basic informace about Run.
         /// </summary>
         /// <param name="runId">Identifier of run created by current user</param>
-        /// <returns></returns>
+        /// <response code="200">Run retrieved</response>
+        /// <response code="400">Run Id is missing/invalid</response>
+        /// <response code="404">Run with given Id doesn't exist</response>
         [HttpGet("{runId}")]
-        [Produces(typeof(RunDTO))]
+        [ProducesResponseType(typeof(RunDTO), 200)]
+        [ProducesResponseType(typeof(ApiError), 400)]
+        [ProducesResponseType(typeof(ApiError), 404)]
         public async Task<IActionResult> Get(Guid runId)
         {
             if (!ModelState.IsValid)

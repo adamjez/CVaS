@@ -20,6 +20,5 @@ namespace CVaS.Web.Models
             Message = message;
             IsError = true;
         }
-
     }
 }

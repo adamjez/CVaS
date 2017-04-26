@@ -124,6 +124,7 @@ namespace CVaS.Web
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+                c.InjectStylesheet("/lib/swagger-ui-themes/themes/2.x/theme-flatoop.css");
             });
 
             if (_modeOptions.IsLocal)
@@ -139,7 +140,12 @@ namespace CVaS.Web
                 Version = "v1",
                 Title = "Computer Vision as Service API",
                 Description = "A simple api to run computer vision algorithms.",
-                TermsOfService = "None"
+                TermsOfService = "None",
+                Contact = new Contact
+                {
+                    Name = "Adam Jež",
+                    Email = "adamjez@outlook.cz"
+                }
             });
             options.AddSecurityDefinition("Api Key", new ApiKeyScheme()
             {
@@ -148,6 +154,9 @@ namespace CVaS.Web
                 Description = "Api Key Authentication",
                 Type = "apiKey"
             });
+
+            options.DocumentFilter<LowercaseDocumentFilter>();
+            options.OperationFilter<AuthResponsesOperationFilter>();
 
             var basePath = PlatformServices.Default.Application.ApplicationBasePath;
             var pathToDoc = System.IO.Path.Combine(basePath, "CVaS.Web.xml");

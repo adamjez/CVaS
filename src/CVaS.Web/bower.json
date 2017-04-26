@@ -1,6 +1,5 @@
 {
   "name": "asp.net",
-  "private": true,
   "dependencies": {
     "bootswatch-dist": "3.3.6-flatly",
     "jquery": "2.2.0",
@@ -9,6 +8,15 @@
     "fine-uploader": "5.11.9",
     "clipboard": "1.6.1",
     "featherlight": "1.7.1",
-    "zipjs": "*"
-  }
+    "zipjs": "*",
+    "swagger-ui-themes": "latest"
+  },
+  "homepage": "https://github.com/adamjez/CVaS",
+  "authors": [
+    "Adam Jez <adamjez@outlook.cz>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT"
 }
