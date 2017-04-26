@@ -124,7 +124,7 @@ namespace CVaS.Web
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
-                c.InjectStylesheet("/lib/swagger-ui-themes/themes/2.x/theme-flatoop.css");
+                c.InjectStylesheet("/lib/swagger-ui-themes/themes/2.x/theme-flattop.css");
             });
 
             if (_modeOptions.IsLocal)
