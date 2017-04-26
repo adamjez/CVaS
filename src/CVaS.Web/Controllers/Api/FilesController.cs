@@ -18,6 +18,8 @@ using System;
 using CVaS.BL.DTO;
 using CVaS.Shared.Services.File.User;
 using Microsoft.AspNetCore.Http.Extensions;
+using CVaS.Web.Swagger;
+using Microsoft.AspNetCore.Http.Internal;
 
 namespace CVaS.Web.Controllers.Api
 {
@@ -50,6 +52,7 @@ namespace CVaS.Web.Controllers.Api
         /// </summary>
         /// <returns>Returns files identifier</returns>
         [HttpPost("")]
+        [FileParams("file", description: "File to upload.")]
         public async Task<IActionResult> UploadMultipleFiles()
         {
             if (!HttpContext.Request.IsMultipartContentType())

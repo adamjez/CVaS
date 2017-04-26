@@ -18,6 +18,8 @@ using Microsoft.Extensions.Caching.Memory;
 using CVaS.Web.Helpers;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using CVaS.Web.Swagger;
+using System.Collections.Generic;
 
 namespace CVaS.Web
 {
@@ -147,7 +149,7 @@ namespace CVaS.Web
                     Email = "adamjez@outlook.cz"
                 }
             });
-            options.AddSecurityDefinition("Api Key", new ApiKeyScheme()
+            options.AddSecurityDefinition("ApiKey", new ApiKeyScheme()
             {
                 In = "header",
                 Name = "Authorization",
@@ -157,6 +159,8 @@ namespace CVaS.Web
 
             options.DocumentFilter<LowercaseDocumentFilter>();
             options.OperationFilter<AuthResponsesOperationFilter>();
+            options.OperationFilter<AddFileParamsFilter>();
+
 
             var basePath = PlatformServices.Default.Application.ApplicationBasePath;
             var pathToDoc = System.IO.Path.Combine(basePath, "CVaS.Web.xml");

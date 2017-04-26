@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace CVaS.Web.Helpers
+namespace CVaS.Web.Swagger
 {
     public class LowercaseDocumentFilter : IDocumentFilter
     {
