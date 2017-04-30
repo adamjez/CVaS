@@ -3,9 +3,16 @@ using System.Collections.Generic;
 
 namespace CVaS.Web.Models.FileViewModels
 {
-    public class UploadFilesResult
+    public struct UploadFileResult
     {
-        public IEnumerable<Guid> Ids { get; set; }
-        public bool Success { get; set; } = true;
+        public Guid Id { get; set; }
+
+        public string FileName { get; set; }
+
+        public UploadFileResult(Guid id, string fileName)
+        {
+            Id = id;
+            FileName = fileName;
+        }
     }
 }

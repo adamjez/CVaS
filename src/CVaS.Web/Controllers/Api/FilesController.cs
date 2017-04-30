@@ -68,7 +68,7 @@ namespace CVaS.Web.Controllers.Api
 
             var reader = new MultipartReader(boundary, HttpContext.Request.Body);
 
-            var fileIds = new List<Guid>();
+            var files = new List<UploadFileResult>();
             MultipartSection section;
             while ((section = await reader.ReadNextSectionAsync()) != null)
             {
@@ -78,10 +78,10 @@ namespace CVaS.Web.Controllers.Api
 
                 var id = await _fileFacade.AddFileAsync(section.Body, fileName, GetContentType(fileName));
 
-                fileIds.Add(id);
+                files.Add(new UploadFileResult(id, fileName));
             }
 
-            return Ok(new UploadFilesResult { Ids = fileIds });
+            return Ok(files);
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace CVaS.Web.Controllers.Api
         /// </summary>
         /// <param name="fileId">Identifier of file</param>
         [HttpGet, Route("{fileId}", Name = nameof(GetFile))]
-        public async Task<FileStreamResult> GetFile(Guid fileId)
+        public async Task<IActionResult> GetFile(Guid fileId)
         {
             if (!ModelState.IsValid)
             {
@@ -112,7 +112,6 @@ namespace CVaS.Web.Controllers.Api
                 else
                 {
                     await HttpContext.Response.SendFileAsync(fileInfo);
-
                 }
             }
             else
@@ -122,7 +121,7 @@ namespace CVaS.Web.Controllers.Api
                 return new FileStreamResult(result.Content, result.ContentType);
             }
 
-            return null;
+            return new EmptyResult();
         }
 
         /// <summary>

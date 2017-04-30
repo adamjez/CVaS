@@ -1,7 +1,6 @@
 ﻿"use strict";
 function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) {
-    if (options === undefined)
-    {
+    if (options === undefined) {
         options = {
             messageHideDelay: 5000,
             slideUpDuration: 500,
@@ -37,7 +36,7 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
         else
             label = 'danger';
 
-        return '<span class="label label-' + label +'">' + status + '</span>'
+        return '<span class="label label-' + label + '">' + status + '</span>'
     }
 
     var checkForRun = function (runId, divElement, divElementImgOut) {
@@ -186,6 +185,15 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
         });
     };
 
+    // Hack - wait fot v6 of fine uploader
+    qq.deprecatedParseJson = qq.parseJson;
+    qq.parseJson = function (json) {
+        return {
+            success: true,
+            data: qq.deprecatedParseJson(json)
+        };
+    };
+
     $('#fine-uploader-gallery')
         .fineUploader({
             template: 'qq-template-gallery',
@@ -207,9 +215,11 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
             },
             callbacks: {
                 onComplete: function (qqId, name, responseJson) {
-                    responseJson.ids.forEach(function (id) {
-                        runAlgorithm(name, id, qqId);
-                    });
+                    if (responseJson.success) {
+                        responseJson.data.forEach(function (file) {
+                            runAlgorithm(name, file.id, qqId);
+                        });
+                    }
                 }
             }
         });

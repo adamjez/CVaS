@@ -70,25 +70,12 @@ namespace CVaS.Shared.Services.Process
                 process.Dispose();
             };
 
-            using (cancellationToken.Register(() =>
-            {
-                tcs.TrySetCanceled();
-
-                try
-                {
-                    if (!process.HasExited)
-
-                    {
-                        process.Kill();
-                    }
-                }
-                catch (InvalidOperationException) { }
-            }))
+            using (cancellationToken.Register(CanceledAction(tcs, process)))
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 result.StartedAt = _currentTimeProvider.Now();
-                _logger.LogInformation("Launching process: " + process.StartInfo.FileName + " workind directory: " + process.StartInfo.WorkingDirectory);
+                _logger.LogInformation($"Launching process: {process.StartInfo.FileName} working directory: {process.StartInfo.WorkingDirectory}");
                 if (process.Start() == false)
                 {
                     tcs.TrySetException(new InvalidOperationException("Failed to start process"));
@@ -99,7 +86,23 @@ namespace CVaS.Shared.Services.Process
 
                 return await tcs.Task;
             }
+        }
 
+        private static Action CanceledAction(TaskCompletionSource<ProcessResult> tcs, System.Diagnostics.Process process)
+        {
+            return () =>
+            {
+                tcs.TrySetCanceled();
+
+                try
+                {
+                    if (!process.HasExited)
+                    {
+                        process.Kill();
+                    }
+                }
+                catch (InvalidOperationException) { }
+            };
         }
     }
 }

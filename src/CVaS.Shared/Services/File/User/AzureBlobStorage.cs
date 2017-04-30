@@ -6,7 +6,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace CVaS.Shared.Services.File.User
 {
-    public class AzureBlobStorage : FileStorage
+    public class AzureBlobStorage : FileStorageBase
     {
         private readonly CloudBlobClient _blobClient;
 

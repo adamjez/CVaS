@@ -15,9 +15,9 @@ namespace CVaS.BL.Services.Broker
             _bus = bus;
         }
 
-        public async Task<RunResultMessage> SendAsync(CreateAlgorithmMessage message)
+        public Task<RunResultMessage> SendAsync(CreateAlgorithmMessage message)
         {
-            return await _bus.RequestAsync<CreateAlgorithmMessage, RunResultMessage>(message);
+            return _bus.RequestAsync<CreateAlgorithmMessage, RunResultMessage>(message);
         }
 
         public async Task<RunResultMessage> SendAsync(CreateAlgorithmMessage message, TimeSpan timeout)
