@@ -1,0 +1,8 @@
+version: '{build} ({branch})'
+skip_tags: true
+init:
+- cmd: git config --global core.autocrlf true
+build_script:
+- dotnet build
+test_script:
+- dotnet test "test/CVaS.UnitTests/CVaS.UnitTests.csproj"
