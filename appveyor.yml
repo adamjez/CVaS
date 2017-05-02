@@ -4,5 +4,7 @@ init:
 - cmd: git config --global core.autocrlf true
 build_script:
 - dotnet build
+before_build:
+- appveyor-retry dotnet restore -v Minimal
 test_script:
 - dotnet test "test/CVaS.UnitTests/CVaS.UnitTests.csproj"
