@@ -27,25 +27,20 @@ namespace CVaS.Shared.Services.Process
             _fileSystemWrapper = fileSystemWrapper;
         }
 
-        public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments, string workingDirectory, CancellationToken cancellationToken)
+        public async Task<ProcessResult> RunAsync(ProcessOptions options, CancellationToken cancellationToken)
         {
-            return await RunAsync(filePath, arguments, cancellationToken);
-        }
-
-        public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments, CancellationToken cancellationToken)
-        {
-            var fileExt = Path.GetExtension(filePath);
-            var workingDirectory = _fileSystemWrapper.GetDirectoryFromFile(filePath);
-
+            options.WorkingDirectory = _fileSystemWrapper.GetDirectoryFromFile(options.FilePath);
+            
+            var fileExt = Path.GetExtension(options.FilePath);
             var interpreter = _interpreterResolver.Resolve(fileExt);
 
             if (!string.IsNullOrEmpty(interpreter))
             {
-                arguments.Insert(0, filePath);
-                filePath = interpreter;
+                options.Arguments.Insert(0, options.FilePath);
+                options.FilePath = interpreter;
             }
 
-            return await _processService.RunAsync(filePath, arguments, workingDirectory, cancellationToken);
+            return await _processService.RunAsync(options, cancellationToken);
         }
     }
 }

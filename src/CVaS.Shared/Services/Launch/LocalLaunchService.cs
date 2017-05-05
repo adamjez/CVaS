@@ -70,11 +70,10 @@ namespace CVaS.Shared.Services.Launch
                 var stringArguments = settings.Arguments.Select(arg => arg.ToString()).ToList();
 
                 var runFolder = _temporaryFileProvider.CreateTemporaryFolder();
-                stringArguments.Insert(0, runFolder);
 
                 var tokenSource = new CancellationTokenSource(_options.Value.HardTimeoutInSeconds * 1000);
 
-                var task = _processService.RunAsync(filePath, stringArguments, tokenSource.Token);
+                var task = _processService.RunAsync(new ProcessOptions(filePath, stringArguments, runFolder), tokenSource.Token);
 
                 var lightTimeout = !settings.Timeout.HasValue || settings.Timeout < 0
                     ? _options.Value.LightTimeoutInSeconds

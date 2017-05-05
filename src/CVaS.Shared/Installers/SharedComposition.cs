@@ -26,12 +26,12 @@ namespace CVaS.Shared.Installers
             {
                 registrator.Register<IInterpreterResolver, ConfigInterpreterResolver>();
 
-                registrator.Register<IProcessService, BaseProcessService>();
+                registrator.Register<IProcessService, ProcessService>();
                 registrator.Register<IProcessService, WindowsDecoratorProcessService>(setup: Setup.Decorator);
             }
             else
             {
-                registrator.Register<IProcessService, BaseProcessService>();
+                registrator.Register<IProcessService, ProcessService>();
             }
 
             registrator.Register<BrokerFactory>(Reuse.Singleton);

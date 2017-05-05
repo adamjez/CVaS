@@ -14,40 +14,27 @@ namespace CVaS.Shared.Services.Process
     /// Processing of process outputs is asynchronous and
     /// can be canceled
     /// </summary>
-    public class BaseProcessService : IProcessService
+    public class ProcessService : IProcessService
     {
+        private const string DestinationDirectoryKey = "DESTINATION_DIRECTORY";
         private readonly FileSystemWrapper _fileSystemWrapper;
         private readonly ICurrentTimeProvider _currentTimeProvider;
-        private readonly ILogger<BaseProcessService> _logger;
+        private readonly ILogger<ProcessService> _logger;
 
-        public BaseProcessService(FileSystemWrapper fileSystemWrapper, ICurrentTimeProvider currentTimeProvider, ILogger<BaseProcessService> logger)
+        public ProcessService(FileSystemWrapper fileSystemWrapper, ICurrentTimeProvider currentTimeProvider, ILogger<ProcessService> logger)
         {
             _fileSystemWrapper = fileSystemWrapper;
             _currentTimeProvider = currentTimeProvider;
             _logger = logger;
         }
 
-        public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments,  CancellationToken cancellationToken)
-        {
-            return await RunAsync(filePath, arguments, _fileSystemWrapper.GetDirectoryFromFile(filePath), cancellationToken);
-        }
-
-        public async Task<ProcessResult> RunAsync(string filePath, IList<string> arguments, string workingDirectory, CancellationToken cancellationToken)
+        public async Task<ProcessResult> RunAsync(ProcessOptions options, CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<ProcessResult>();
 
             System.Diagnostics.Process process = new System.Diagnostics.Process()
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = filePath,
-                    Arguments = String.Join(" ", arguments),
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                    WorkingDirectory = workingDirectory
-                },
+                StartInfo = CreateProcessStartInfo(options),
                 EnableRaisingEvents = true
             };
             var result = new ProcessResult { StdError = "", StdOut = "" };
@@ -88,6 +75,23 @@ namespace CVaS.Shared.Services.Process
 
                 return await tcs.Task;
             }
+        }
+
+        private ProcessStartInfo CreateProcessStartInfo(ProcessOptions options)
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = options.FilePath,
+                Arguments = String.Join(" ", options.Arguments),
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                WorkingDirectory = options.WorkingDirectory 
+                    ?? _fileSystemWrapper.GetDirectoryFromFile(options.FilePath)
+            };
+            startInfo.Environment.Add(DestinationDirectoryKey, options.DestinationDirectory);
+            return startInfo;
         }
 
         private static Action CanceledAction(TaskCompletionSource<ProcessResult> tcs, System.Diagnostics.Process process)
