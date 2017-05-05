@@ -24,7 +24,7 @@ namespace CVaS.BL.Facades
 
         public async Task<StatsDTO> CreateStats()
         {
-            var now = _currentTimeProvider.Now();
+            var now = _currentTimeProvider.Now;
             using (var uow = UnitOfWorkProvider.Create())
             {
                 var result = new StatsDTO

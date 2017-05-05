@@ -38,7 +38,7 @@ namespace CVaS.BL.Facades
 
         public async Task<List<AlgorithmStatsListDTO>> GetAllWithStats()
         {
-            var now = _currentTimeProvider.Now();
+            var now = _currentTimeProvider.Now;
 
             // Todo: Issue https://github.com/aspnet/EntityFramework/issues/7714
             return (await GetAll(entity => new

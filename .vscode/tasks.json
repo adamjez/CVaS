@@ -36,6 +36,12 @@
             "isTestCommand": true,
             "args": ["test", "test/CVaS.UnitTests/CVaS.UnitTests.csproj"],
             "showOutput": "always"
+        },
+        {
+            "taskName": "Compile: Solution",
+            "args": ["build"],
+            "showOutput": "always",
+            "problemMatcher": "$msCompile"
         }
     ]
 }

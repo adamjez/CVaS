@@ -4,6 +4,6 @@ namespace CVaS.Shared.Services.Time
 {
     public class UtcNowTimeProvider : ICurrentTimeProvider
     {
-        public DateTime Now() => DateTime.UtcNow;
+        public DateTime Now { get => DateTime.UtcNow; }
     }
 }
