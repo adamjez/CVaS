@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
@@ -18,6 +19,7 @@ using CVaS.Shared.Services.File.User;
 using CVaS.Shared.Services.Process;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MimeTypes;
 
 namespace CVaS.Shared.Services.Launch
 {
@@ -35,7 +37,7 @@ namespace CVaS.Shared.Services.Launch
         private readonly FileSystemWrapper _fileSystemWrapper;
 
         public LocalLaunchService(IOptions<AlgorithmOptions> options, IProcessService processService, IUnitOfWorkProvider unitOfWorkProvider,
-            RunRepository runRepository, ITemporaryFileProvider temporaryFileProvider, IFileStorage fileStorage, IAlgorithmFileProvider algorithmFileProvider, 
+            RunRepository runRepository, ITemporaryFileProvider temporaryFileProvider, IFileStorage fileStorage, IAlgorithmFileProvider algorithmFileProvider,
             ILogger<LocalLaunchService> logger, FileSystemWrapper fileSystemWrapper)
         {
             _options = options;
@@ -74,8 +76,8 @@ namespace CVaS.Shared.Services.Launch
 
                 var task = _processService.RunAsync(filePath, stringArguments, tokenSource.Token);
 
-                var lightTimeout = !settings.Timeout.HasValue || settings.Timeout < 0 
-                    ? _options.Value.LightTimeoutInSeconds 
+                var lightTimeout = !settings.Timeout.HasValue || settings.Timeout < 0
+                    ? _options.Value.LightTimeoutInSeconds
                     : settings.Timeout.Value;
 
                 var result = await task.WithTimeout(TimeSpan.FromSeconds(lightTimeout));
@@ -90,7 +92,8 @@ namespace CVaS.Shared.Services.Launch
                     return new RunResult()
                     {
                         RunId = run.Id,
-                        Result = run.Result
+                        Result = run.Result,
+                        CreatedAt = run.CreatedAt
                     };
                 }
 
@@ -134,12 +137,18 @@ namespace CVaS.Shared.Services.Launch
         {
             using (var uow = _unitOfWorkProvider.Create())
             {
-                if (!_fileSystemWrapper.IsEmpty(runFolder))
+                var filesCount = _fileSystemWrapper.FilesCountInFolder(runFolder);
+                if (filesCount == 1)
+                {
+                    run.File = await CreateSingleFile(runFolder, run.UserId);
+                }
+                else if (filesCount > 1)
                 {
                     run.File = await CreateZipPackage(runFolder, run.UserId);
                 }
 
                 run.FinishedAt = result.FinishedAt;
+                run.StartedAt = result.StartedAt;
                 run.StdOut = result.StdOut;
                 run.StdErr = result.StdError;
                 run.Result = result.ExitCode == 0 ? RunResultType.Success : RunResultType.Fail;
@@ -165,6 +174,25 @@ namespace CVaS.Shared.Services.Launch
                 FileSize = _fileSystemWrapper.FileSize(zipFile.FullPath),
                 ContentType = ZipHelpers.ContentType,
                 Extension = ZipHelpers.Extension,
+                Type = FileType.Result,
+                UserId = userId,
+            };
+        }
+
+        private async Task<DAL.Model.File> CreateSingleFile(string runFolder, int userId)
+        {
+            _logger.LogInformation("Uploading single file from result folder");
+
+            var filePath = Directory.EnumerateFiles(runFolder).First();
+            var fileInfo = new System.IO.FileInfo(filePath);
+            var contetType = MimeTypeMap.GetMimeType(fileInfo.Extension);
+
+            return new DAL.Model.File()
+            {
+                LocationId = await _fileStorage.SaveAsync(filePath, contetType),
+                FileSize = _fileSystemWrapper.FileSize(filePath),
+                ContentType = contetType,
+                Extension = fileInfo.Extension,
                 Type = FileType.Result,
                 UserId = userId,
             };

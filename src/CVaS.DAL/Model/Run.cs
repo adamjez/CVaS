@@ -15,7 +15,9 @@ namespace CVaS.DAL.Model
 
         public virtual AppUser User { get; set; }
 
-        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public DateTime? StartedAt { get; set; }
 
         public DateTime? FinishedAt { get; set; }
 

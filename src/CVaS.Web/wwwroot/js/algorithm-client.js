@@ -49,7 +49,7 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
             },
             success: function (data) {
                 showResult(data.id, data.status, data.duration, data.stdOut,
-                    data.stdErr, data.zip, divElement, divElementImgOut);
+                    data.stdErr, data.file, divElement, divElementImgOut);
             }
         });
     }
@@ -83,6 +83,22 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
         element.append(button);
     }
 
+    var showImage = function (element, imageUrl) {
+        var imgElementInput = element.find('div.qq-upload-input-image');
+        imgElementInput.removeClass('qq-image-full-width');
+
+        var imgElementOutput = element.find('div.qq-upload-output-image');
+        imgElementOutput.addClass('qq-output-image-added');
+
+        var imgElement = element.find('div.resultImg');
+        imgElement.prepend('<a class="result-preview" href="#"><img class="result-preview" src="' + imageUrl + '"/></a>');
+        imgElement.find("a.result-preview").click(function (ev) {
+            $.featherlight('<img src="' + imageUrl + '"/>');
+            ev.preventDefault();
+            return false;
+        });
+    }
+
     var showImageFromZip = function (element, zipFileUrl) {
         zip.createReader(new zip.HttpReader(zipFileUrl), function (zipReader) {
             zipReader.getEntries(function (entries) {
@@ -92,26 +108,14 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
                         // close the reader and calls callback function with uncompressed data as parameter
                         zipReader.close();
 
-                        var imgElementInput = element.find('div.qq-upload-input-image');
-                        imgElementInput.removeClass('qq-image-full-width');
-
-                        var imgElementOutput = element.find('div.qq-upload-output-image');
-                        imgElementOutput.addClass('qq-output-image-added');
-
-                        var imgElement = element.find('div.resultImg');
-                        imgElement.prepend('<a class="result-preview" href="#"><img class="result-preview" src="' + URL.createObjectURL(data) + '"/></a>');
-                        imgElement.find("a.result-preview").click(function (ev) {
-                            $.featherlight('<img src="' + URL.createObjectURL(data) + '"/>');
-                            ev.preventDefault();
-                            return false;
-                        });
+                        showImage(element, URL.createObjectURL(data));
                     });
                 })
             });
         }, onerror);
     }
 
-    var showResult = function (runId, status, duration, stdOut, stdErr, zipFile, element, elementImgOut) {
+    var showResult = function (runId, status, duration, stdOut, stdErr, file, element, elementImgOut) {
         // Clear inner html
         element.html("");
 
@@ -136,9 +140,24 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
             element.append('<p>StdErr: ' + stdErr + '</p>');
         }
 
-        if (zipFile !== undefined) {
-            element.append('<p>Zip: <a href= "' + zipFile + '">download</a></p>');
-            showImageFromZip(elementImgOut, zipFile);
+        if (file !== undefined) {
+            element.append('<p>File: <a href= "' + file + '">download</a></p>');
+            $.ajax({
+                type: 'HEAD',
+                url: file,
+                success: function (message, text, jqXHR) {
+                    var contentType = jqXHR.getResponseHeader('Content-Type');
+                    if (contentType === 'application/zip') {
+                        showImageFromZip(elementImgOut, file);
+                    }
+                    else {
+                        showImage(elementImgOut, file);
+                    }
+                },
+                error: function () {
+                    console.error("HTTP HEAD on " + file + " failed.")
+                }
+            });
         }
     };
 
@@ -174,7 +193,7 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
             success: function (data) {
                 loader.hide();
                 showResult(data.id, data.status, data.duration, data.stdOut,
-                    data.stdErr, data.zip, resultDiv, resultImgDiv);
+                    data.stdErr, data.file, resultDiv, resultImgDiv);
             },
             complete: function () {
                 loader.hide();

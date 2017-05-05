@@ -23,9 +23,13 @@ namespace CVaS.BL.Services.Launch
 
         public async Task<RunResult> LaunchAsync(Algorithm algorithm, Run run, RunSettings settings)
         {
+            // Todo: Change this to some mapping probably, dont include Runs which contains current run
+            // Probably create some model to transfer all data needed..
+            algorithm.Runs.Clear();
             var message = new CreateAlgorithmMessage()
             {
-                RunId = run.Id,
+                Run = run,
+                Algorithm = algorithm,
                 Arguments = settings.Arguments,
                 Timeout = settings.Timeout
             };

@@ -44,9 +44,9 @@ namespace CVaS.Shared.Services.File
             return Directory.Exists(path);
         }
 
-        public bool IsEmpty(string directory)
+        public int FilesCountInFolder(string path)
         {
-            return !Directory.EnumerateFiles(directory).Any();
+            return Directory.GetFiles(path, "*", SearchOption.TopDirectoryOnly).Length;
         }
 
         public string GetDirectoryFromFile(string filePath)

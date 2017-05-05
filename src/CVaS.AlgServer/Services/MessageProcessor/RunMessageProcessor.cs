@@ -53,15 +53,15 @@ namespace CVaS.AlgServer.Services.MessageProcessor
 
         private async Task<RunResultMessage> ProcessInternalAsync(CreateAlgorithmMessage request)
         {
-            _logger.LogInformation("Processing message - Run Id: " + request.RunId);
+            _logger.LogInformation("Processing message - Run Id: " + request.Run.Id);
 
             using (_container.OpenScope())
             {
                 using (_unitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
                 {
-                    var run = await _runRepository.GetByIdSafely(request.RunId, (r) => r.Algorithm);
+                    //var run = await _runRepository.GetByIdSafely(request.RunId, (r) => r.Algorithm);
 
-                    var result = await _launchService.LaunchAsync(run.Algorithm, run, 
+                    var result = await _launchService.LaunchAsync(request.Algorithm, request.Run, 
                         new RunSettings { Arguments = request.Arguments, Timeout = request.Timeout });
 
                     return new RunResultMessage()

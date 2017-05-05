@@ -65,7 +65,8 @@ namespace CVaS.Shared.Services.Process
             process.Exited += (sender, args) =>
             {
                 result.ExitCode = process.ExitCode;
-                result.FinishedAt = _currentTimeProvider.Now();
+                result.FinishedAt = process.ExitTime;
+                // result.FinishedAt = _currentTimeProvider.Now();
                 tcs.TrySetResult(result);
                 process.Dispose();
             };
@@ -74,12 +75,13 @@ namespace CVaS.Shared.Services.Process
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                result.StartedAt = _currentTimeProvider.Now();
                 _logger.LogInformation($"Launching process: {process.StartInfo.FileName} working directory: {process.StartInfo.WorkingDirectory}");
                 if (process.Start() == false)
                 {
                     tcs.TrySetException(new InvalidOperationException("Failed to start process"));
                 }
+
+                result.StartedAt = process.StartTime;
 
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();

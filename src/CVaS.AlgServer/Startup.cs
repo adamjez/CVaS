@@ -41,7 +41,6 @@ namespace CVaS.AlgServer
 
             ConfigureAlgorithmServices(services);
             ConfigureBrokerServices(services);
-
             services.AddDatabaseServices(Configuration);
             services.AddStorageServices(Configuration);
             services.AddJobsService(Configuration);
@@ -78,10 +77,9 @@ namespace CVaS.AlgServer
 
         public void Configure(DryIoc.IContainer container)
         {
-            var loggerFactory = container.Resolve<ILoggerFactory>();
-
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            container.Resolve<ILoggerFactory>()
+                .AddConsole(Configuration.GetSection("Logging"))
+                .AddDebug();
 
             ServicesExtensions.InitializeJobs(container);
         }

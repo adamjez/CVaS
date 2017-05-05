@@ -23,6 +23,6 @@ namespace CVaS.BL.DTO
 
         public double? Duration => FinishedAt.HasValue ? (double?)(FinishedAt.Value - CreatedAt).TotalMilliseconds : null;
 
-        public string Zip { get; set; }
+        public string File { get; set; }
     }
 }

@@ -14,8 +14,20 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "taskName": "Publish: web",
+            "args": ["publish", "-c", "Release", "src/CVaS.Web"],
+            "showOutput": "always",
+            "problemMatcher": "$msCompile"
+        },
+        {
             "taskName": "Compile: algServer",
             "args": ["build", "src/CVaS.AlgServer"],
+            "showOutput": "always",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "taskName": "Publish: algServer",
+            "args": ["publish", "-c", "Release", "src/CVaS.AlgServer"],
             "showOutput": "always",
             "problemMatcher": "$msCompile"
         },
