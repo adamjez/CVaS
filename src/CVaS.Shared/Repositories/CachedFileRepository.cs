@@ -47,7 +47,8 @@ namespace CVaS.Shared.Repositories
             foreach (var file in downloadedFiles)
             {
                 // ToDo save only file entity and not connected entities
-                _memoryCache.Set(file.Id, CacheType.FileRepository, file);
+                _memoryCache.Set(file.Id, CacheType.FileRepository, file, new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMilliseconds(1)));
             }
 
             result.AddRange(downloadedFiles);

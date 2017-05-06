@@ -69,9 +69,11 @@ namespace CVaS.Shared.Services.Process
                 {
                     tcs.TrySetException(new InvalidOperationException("Failed to start process"));
                 }
-
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
+                else
+                {
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+                }
 
                 return await tcs.Task;
             }

@@ -1,12 +1,16 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using System;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace CVaS.Shared.Helpers
 {
     public static class MemoryCacheExtensions
     {
-        public static TItem Set<TItem>(this IMemoryCache cache, object key, CacheType type, TItem value)
+        public static TItem Set<TItem>(this IMemoryCache cache, object key, CacheType type, TItem value, MemoryCacheEntryOptions options = null)
         {
-            return cache.Set(new CacheKey(key, type), value);
+            if(options != null)
+                return cache.Set(new CacheKey(key, type), value, options);
+            else
+                return cache.Set(new CacheKey(key, type), value);
         }
 
         public static bool TryGetValue<TItem>(this IMemoryCache cache, object key, CacheType type, out TItem value)

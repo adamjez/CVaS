@@ -86,8 +86,8 @@ namespace CVaS.Shared.Services.File.Algorithm
 
             // future Local File Path - sometimes Hash doesn't exist - only when zip result is used
             var localPath = dbFile.Hash != null 
-                ? _userLocalFileProvider.CreatePath(userId, dbFile.Hash, dbFile.Extension)
-                : _userLocalFileProvider.CreatePath(userId, dbFile.LocationId, dbFile.Extension);
+                ? _userLocalFileProvider.CreatePath(userId, System.IO.Path.GetRandomFileName(), dbFile.Extension)
+                : _userLocalFileProvider.CreatePath(userId, System.IO.Path.GetRandomFileName(), dbFile.Extension);
 
             // Check if file exists locally
             if (_fileSystem.ExistsFile(localPath))

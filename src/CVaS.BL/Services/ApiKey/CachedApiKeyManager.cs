@@ -1,3 +1,4 @@
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CVaS.Shared.Core;
@@ -55,7 +56,8 @@ namespace CVaS.BL.Services.ApiKey
 
             if (principals != null)
             {
-                _memoryCache.Set(apiKey, CacheType.ApiKey, principals);
+                _memoryCache.Set(apiKey, CacheType.ApiKey, principals, new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMilliseconds(1)));
             }
 
             return principals;
