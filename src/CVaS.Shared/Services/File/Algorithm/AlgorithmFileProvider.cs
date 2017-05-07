@@ -49,7 +49,11 @@ namespace CVaS.Shared.Services.File.Algorithm
         {
             using (_unitOfWorkProvider.Create())
             {
-                var files = arguments.OfType<FileArgument>().ToList();
+                var files = arguments
+                    .Select(arg => arg is KeyValueArgument ? ((KeyValueArgument)arg).Content : arg)
+                    .OfType<FileArgument>()
+                    .ToList();
+
                 if (!files.Any())
                     return;
 

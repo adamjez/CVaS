@@ -4,6 +4,7 @@
     {
         String,
         File,
-        Raw
+        Raw,
+        KeyValue
     }
 }

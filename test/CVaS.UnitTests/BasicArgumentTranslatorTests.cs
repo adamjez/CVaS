@@ -102,6 +102,28 @@ namespace CVaS.UnitTests
         }
 
         [Fact]
+        public void ArgumentTranslator_DictionaryParse_KeyValueArgumentExpected()
+        {
+            var id = Guid.NewGuid();
+            var filePath = "local://" + id;
+
+            var text = "file";
+
+            var input = new Dictionary<string, object>()
+            {
+                { text, filePath }
+            };
+
+            var expected = new List<Argument>()
+            {
+                new KeyValueArgument(text, new FileArgument(id))                
+            };
+
+            var result = _translator.Process(new object[] { input });
+            Assert.Equal(expected, result, new ArgumentCompare());
+        }
+
+        [Fact]
         public void ArgumentTranslator_UnknownTypeParse_ExceptionExpected()
         {
             Assert.Throws<ArgumentException>(() => _translator.Process(new object[] { new object() }));

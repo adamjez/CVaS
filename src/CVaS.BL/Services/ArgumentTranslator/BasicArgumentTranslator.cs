@@ -61,14 +61,12 @@ namespace CVaS.BL.Services.ArgumentTranslator
             var arguments = new List<Argument>();
             foreach (var dictValue in (Dictionary<string, object>)arg)
             {
-                var builder = new StringBuilder();
-
-                builder.Append('-', dictValue.Key.Length == 1 ? 1 : 2);
-                builder.Append(dictValue.Key);
-                builder.Append(dictValue.Key.Length == 1 ? ' ' : '=');
-                builder.Append(ProcessSimpleType(dictValue.Value).FirstOrDefault());
-
-                arguments.Add(new GenericArgument<string>(builder.ToString()));
+                arguments.Add(
+                    new KeyValueArgument(
+                        dictValue.Key, 
+                        ProcessSimpleType(dictValue.Value).FirstOrDefault()
+                        )
+                    );
             }
 
             return arguments;
