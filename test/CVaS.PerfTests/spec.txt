@@ -1,0 +1,120 @@
+cvas@LoadServer:~$ lscpu
+Architecture:          x86_64
+CPU op-mode(s):        32-bit, 64-bit
+Byte Order:            Little Endian
+CPU(s):                2
+On-line CPU(s) list:   0,1
+Thread(s) per core:    1
+Core(s) per socket:    2
+Socket(s):             1
+NUMA node(s):          1
+Vendor ID:             GenuineIntel
+CPU family:            6
+Model:                 45
+Model name:            Intel(R) Xeon(R) CPU E5-2660 0 @ 2.20GHz
+Stepping:              7
+CPU MHz:               2194.717
+BogoMIPS:              4389.43
+Hypervisor vendor:     Microsoft
+Virtualization type:   full
+L1d cache:             32K
+L1i cache:             32K
+L2 cache:              256K
+L3 cache:              20480K
+NUMA node0 CPU(s):     0,1
+Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx lm constant_tsc rep_g
+ood nopl eagerfpu pni pclmulqdq ssse3 cx16 sse4_1 sse4_2 popcnt aes xsave avx hypervisor lahf_lm xsaveopt
+
+cvas@LoadServer:~$ cat /proc/meminfo
+MemTotal:        7134416 kB
+MemFree:         6666432 kB
+MemAvailable:    6668936 kB
+Buffers:           56448 kB
+Cached:           232572 kB
+SwapCached:            0 kB
+Active:           208760 kB
+Inactive:         132948 kB
+Active(anon):      55532 kB
+Inactive(anon):    65728 kB
+Active(file):     153228 kB
+Inactive(file):    67220 kB
+Unevictable:        3656 kB
+Mlocked:            3656 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Dirty:                52 kB
+Writeback:             0 kB
+AnonPages:         56344 kB
+Mapped:            41356 kB
+Shmem:             66160 kB
+Slab:              42876 kB
+SReclaimable:      19408 kB
+SUnreclaim:        23468 kB
+KernelStack:        3264 kB
+PageTables:         3044 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     3567208 kB
+Committed_AS:     302232 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:           0 kB
+VmallocChunk:          0 kB
+HardwareCorrupted:     0 kB
+AnonHugePages:     12288 kB
+CmaTotal:              0 kB
+CmaFree:               0 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+DirectMap4k:       71616 kB
+DirectMap2M:     7268352 kB
+
+cvas@LoadServer:~$ hwinfo --short
+cpu:
+                       Intel(R) Xeon(R) CPU E5-2660 0 @ 2.20GHz, 2194 MHz
+                       Intel(R) Xeon(R) CPU E5-2660 0 @ 2.20GHz, 2194 MHz
+keyboard:
+  /dev/input/event1    AT Translated Set 2 keyboard
+  /dev/input/event4    AT Translated Set 2 keyboard
+  /dev/ttyS0           serial console
+mouse:
+  /dev/input/mice      Microsoft Vmbus HID-compliant Mouse
+  /dev/input/mice      TPPS/2 IBM TrackPoint
+graphics card:
+                       Microsoft Hyper-V virtual VGA
+storage:
+                       Floppy disk controller
+                       Intel 82371AB/EB/MB PIIX4 IDE
+                       Virtual Storage 0
+                       Virtual Storage 1
+                       Virtual Storage 2
+                       Virtual Storage 3
+network:
+  eth0                 Virtual Ethernet Card 0
+network interface:
+  eth0                 Ethernet network interface
+  lo                   Loopback network interface
+disk:
+  /dev/fd0             Disk
+  /dev/sda             Msft Virtual Disk
+  /dev/sdb             Msft Virtual Disk
+partition:
+  /dev/sda1            Partition
+  /dev/sdb1            Partition
+bios:
+                       BIOS
+bridge:
+                       Intel 440BX/ZX/DX - 82443BX/ZX/DX Host bridge (AGP disabled)
+                       Intel 82371AB/EB/MB PIIX4 ISA
+                       Intel 82371AB/EB/MB PIIX4 ACPI
+memory:
+                       Main Memory
+unknown:
+                       FPU
+                       DMA controller
+                       PIC
+                       Keyboard controller
+                       Serial controller

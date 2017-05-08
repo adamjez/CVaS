@@ -103,13 +103,13 @@ namespace CVaS.Web
             app.UseApiAuthentication();
             app.UseIdentity();
 
-            if (env.IsDevelopment())
+            //if (env.IsDevelopment())
             {
                 app.UseMiniProfiler(new MiniProfilerOptions
                 {
                     RouteBasePath = "~/profiler",
                     SqlFormatter = new StackExchange.Profiling.SqlFormatters.InlineFormatter(),
-                    Storage = new MemoryCacheStorage(cache, TimeSpan.FromMinutes(60))
+                    Storage = new MemoryCacheStorage(cache, TimeSpan.FromMinutes(20))
                 });
             }
 
