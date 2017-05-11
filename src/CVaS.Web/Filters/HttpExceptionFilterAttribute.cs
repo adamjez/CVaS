@@ -31,7 +31,7 @@ namespace CVaS.Web.Filters
                     break;
 
                 case UnauthorizedAccessException _:
-                    context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                     context.ExceptionHandled = true;
                     break;
             }
