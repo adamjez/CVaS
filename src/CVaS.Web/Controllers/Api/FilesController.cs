@@ -141,6 +141,16 @@ namespace CVaS.Web.Controllers.Api
         }
 
         /// <summary>
+        /// Deletes all user files.
+        /// </summary>
+        [HttpDelete, Route("")]
+        public async Task<IActionResult> DeleteUserFiles()
+        {
+            await _fileFacade.DeleteAllAsync();
+            return Ok();
+        }
+
+        /// <summary>
         /// Retrieve meta information about file with given file Id.
         /// Currently returns only Content-Type of file
         /// </summary>

@@ -10,6 +10,7 @@ using CVaS.Shared.Repositories;
 using File = CVaS.DAL.Model.File;
 using CVaS.BL.Providers;
 using CVaS.Shared.Services.File.User;
+using CVaS.Shared.Core;
 
 namespace CVaS.BL.Facades
 {
@@ -23,24 +24,6 @@ namespace CVaS.BL.Facades
         {
             _fileRepository = fileRepository;
             _fileStorage = fileStorage;
-        }
-
-        public async Task DeleteAsync(Guid fileId)
-        {
-            using (var uow = UnitOfWorkProvider.Create())
-            {
-                var file = await _fileRepository.GetByIdSafely(fileId);
-
-                if (file.UserId != CurrentUserProvider.Id)
-                {
-                    throw new UnauthorizedAccessException();
-                }
-
-                await _fileStorage.DeleteAsync(file.LocationId);
-
-                _fileRepository.Delete(file);
-                await uow.CommitAsync();
-            }
         }
 
         public async Task<Guid> AddFileAsync(Stream fileStream, string fileName, string contentType)
@@ -92,9 +75,9 @@ namespace CVaS.BL.Facades
         {
             using (UnitOfWorkProvider.Create())
             {
-                var file = await _fileRepository.GetByUser(CurrentUserProvider.Id);
+                var files = await _fileRepository.GetByUser(CurrentUserProvider.Id);
 
-                return file.Select(FileDTO.FromEntity);
+                return files.Select(FileDTO.FromEntity);
             }
         }
 
@@ -110,6 +93,39 @@ namespace CVaS.BL.Facades
                 }
 
                 return file;
+            }
+        }
+
+        public async Task DeleteAsync(Guid fileId)
+        {
+            using (var uow = UnitOfWorkProvider.Create())
+            {
+                var file = await _fileRepository.GetByIdSafely(fileId);
+
+                if (file.UserId != CurrentUserProvider.Id)
+                {
+                    throw new UnauthorizedAccessException();
+                }
+
+                await _fileStorage.DeleteAsync(file.LocationId);
+
+                _fileRepository.Delete(file);
+                await uow.CommitAsync();
+            }
+        }
+
+        public async Task DeleteAllAsync()
+        {
+            using (var uow = UnitOfWorkProvider.Create(DbContextOptions.ReuseParentContext))
+            {
+                var files = await _fileRepository.GetByUser(CurrentUserProvider.Id);
+
+                foreach (var file in files)
+                {
+                    await DeleteAsync(file.Id);
+                }
+
+                await uow.CommitAsync();
             }
         }
     }
