@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DryIoc.dll" Version="2.10.7" />
-    <PackageReference Include="DryIoc.Microsoft.DependencyInjection" Version="1.2.2" />
+    <PackageReference Include="DryIoc.dll" Version="2.10.4" />
+    <PackageReference Include="DryIoc.Microsoft.DependencyInjection" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="1.1.2" />

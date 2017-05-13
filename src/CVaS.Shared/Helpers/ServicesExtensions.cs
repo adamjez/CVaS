@@ -3,7 +3,6 @@ using CVaS.Shared.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using MySQL.Data.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using Microsoft.WindowsAzure.Storage;
@@ -22,7 +21,7 @@ namespace CVaS.Shared.Helpers
         {
             // We choose what database provider we will use
             var msSqlConnectionString = configuration.GetConnectionString("MsSql");
-            var connectionString = msSqlConnectionString ?? configuration.GetConnectionString("MySql");
+            var connectionString = msSqlConnectionString ?? configuration.GetConnectionString("PostgreSql");
 
             if (connectionString == null)
             {
@@ -40,7 +39,7 @@ namespace CVaS.Shared.Helpers
                     }
                     else
                     {
-                        options.UseMySQL(connectionString);
+                        options.UseNpgsql(connectionString);
                     }
 
                     options.ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning));

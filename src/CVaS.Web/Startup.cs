@@ -103,7 +103,7 @@ namespace CVaS.Web
             app.UseApiAuthentication();
             app.UseIdentity();
 
-            //if (env.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 app.UseMiniProfiler(new MiniProfilerOptions
                 {
