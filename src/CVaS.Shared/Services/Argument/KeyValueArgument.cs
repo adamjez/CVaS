@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CVaS.Shared.Services.Argument
 {
@@ -17,10 +18,12 @@ namespace CVaS.Shared.Services.Argument
         {
             var builder = new StringBuilder();
 
-            builder.Append('-', Key.Length == 1 ? 1 : 2);
-            builder.Append(Key);
-            builder.Append(Key.Length == 1 ? ' ' : '=');
-            builder.Append(Content.ToString());
+            var normalizedKey = Regex.Replace(Key.Trim(), @"\s+", "-");
+
+            builder.Append('-', normalizedKey.Length == 1 ? 1 : 2);
+            builder.Append(normalizedKey);
+            builder.Append(normalizedKey.Length == 1 ? ' ' : '=');
+            builder.Append(Content);
 
             return builder.ToString();
         }

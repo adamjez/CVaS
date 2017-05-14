@@ -171,5 +171,16 @@ namespace CVaS.UnitTests
 
             Assert.Equal($"\"{text}\"", result.ToString());
         }
+
+        [Fact]
+        public void ArgumentTranslator_ObjectWithComplexKeyParse_NormalizedKeyValueStringExpected()
+        {
+            var text = "key test ";
+            var num = 5;
+
+            var argument = new KeyValueArgument(text, new GenericArgument<int>(num));
+
+            Assert.Equal("--key-test=5", argument.ToString());
+        }
     }
 }
