@@ -6,5 +6,5 @@ dal="$dir/../src/CVaS.DAL"
 
 # We have to change directory for dotnet ef to be available
 cd $web
-echo "dotnet ef --project $dal database drop
+echo "dotnet ef --project $dal database drop"
 dotnet ef --project $dal database drop
