@@ -23,6 +23,16 @@ namespace CVaS.Web.Controllers.Web
             return View(InitializeLayoutModel(layout));
         }
 
+        public IActionResult Docs()
+        {
+            var layout = new LayoutViewModel
+            {
+                Title = "Docs"
+            };
+
+            return View(InitializeLayoutModel(layout));
+        }
+
         public IActionResult About()
         {
             var layout = new LayoutViewModel
