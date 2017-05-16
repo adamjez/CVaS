@@ -20,9 +20,11 @@ namespace CVaS.Web.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
+            var algServerCount = await _brokerStatus.GetConnectedAlgServersCount();
+
             var status = new WebServiceStatusViewModel()
             {
-                IsAnyAlgServerOnline = (await _brokerStatus.GetConnectedAlgServersCount()) > 0,
+                IsAnyAlgServerOnline = algServerCount.HasValue && algServerCount.Value > 0,
                 IsLocalMode = _modeOptions.Value.IsLocal
             };
 

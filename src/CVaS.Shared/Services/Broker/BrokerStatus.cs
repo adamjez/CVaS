@@ -24,19 +24,22 @@ namespace CVaS.Shared.Services.Broker
 
         public Task<int?> GetConnectedAlgServersCount()
         {
+            return Task.FromResult(GetConnectedAlgServersCountSync());
+        }
+
+        public int? GetConnectedAlgServersCountSync()
+        {
             if (!_bus.IsConnected)
             {
                 return null;
             }
-
             var client = new ManagementClient(_brokerOptions.Value.Hostname, _brokerOptions.Value.Username, _brokerOptions.Value.Password);
 
             try
             {
-                return Task.FromResult<int?>(
-                    client
+                return client
                         .GetConnections()
-                        .Count(c => c.ClientProperties.Application == "CVaS.AlgServer.dll"));
+                        .Count(c => c.ClientProperties.Application == "CVaS.AlgServer.dll");
 
             }
             catch (Exception exc)
