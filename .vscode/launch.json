@@ -39,7 +39,7 @@
             "name": "AlgServer",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "Compile: algServer",
+            "preLaunchTask": "",
             "program": "${workspaceRoot}/src/CVaS.AlgServer/bin/Debug/netcoreapp1.1/CVaS.AlgServer.dll",
             "args": [],
             "cwd": "${workspaceRoot}/src/CVaS.AlgServer",

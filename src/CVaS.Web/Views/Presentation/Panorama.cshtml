@@ -1,0 +1,36 @@
+﻿@model CVaS.Web.Models.LayoutViewModel
+@{
+    Layout = "_AlgorithmLayout";
+}
+
+<h3>Description</h3>
+<p>Algorithm for panorama of two images with <a target="_blank" href="http://opencv.org/">opencv</a> (SIFT, RANSAC) implemented in python.</p>
+
+<h3>API</h3>
+<div class="well well-lg">
+    <h4>Input</h4>
+    <span>Two images in array</span><br />
+    <span>Example: [&quot;local://6762da80-d1e5-46a2-3818-08d472d3e445&quot; ,&quot;local://e87057a2-a3b3-4417-3819-08d472d3e445&quot;]</span>
+    
+    <h4>Return</h4>
+    <span>Panorama</span>
+</div>
+
+@section Scripts {
+    <script>
+        var uploadedFiles = []
+        var callback = function (fileId) {
+            uploadedFiles.push("local://" + fileId)
+
+            if (uploadedFiles.length == 2) { 
+                array = uploadedFiles;
+                uploadedFiles = [];
+                return array;
+            }
+
+            return null;
+        }
+
+        var client = new AlgorithmClient('/algorithms/panorama', callback);
+    </script>
+}
