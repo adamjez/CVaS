@@ -30,10 +30,10 @@ namespace CVaS.BL.Facades
                 var result = new StatsDTO
                 {
                     RunCountLastHour = 
-                        await uow.Context.Run.CountAsync(r => r.CreatedAt > now.AddHours(-1)),
+                        await uow.Context.Runs.CountAsync(r => r.CreatedAt > now.AddHours(-1)),
 
                     RunCountLastDay = 
-                        await uow.Context.Run.CountAsync(r => r.CreatedAt > now.AddDays(-1)),
+                        await uow.Context.Runs.CountAsync(r => r.CreatedAt > now.AddDays(-1)),
 
                     UploadedFilesCountThisWeek = 
                         await uow.Context.Files.CountAsync(f => f.CreatedAt > now.AddDays(-7)),

@@ -59,7 +59,7 @@ namespace CVaS.AlgServer.Services.MessageProcessor
             {
                 using (var uow = _unitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
                 {
-                    uow.Context.Run.Attach(request.Run);
+                    uow.Context.Runs.Attach(request.Run);
 
                     var result = await _launchService.LaunchAsync(request.Algorithm, request.Run, 
                         new RunSettings { Arguments = request.Arguments, Timeout = request.Timeout });
