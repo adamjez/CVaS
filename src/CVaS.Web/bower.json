@@ -5,7 +5,7 @@
     "jquery": "2.2.0",
     "jquery-validation": "1.14.0",
     "jquery-validation-unobtrusive": "3.2.6",
-    "fine-uploader": "5.14.2",
+    "fine-uploader": "5.13.0",
     "clipboard": "1.6.1",
     "featherlight": "1.7.1",
     "zipjs": "*",

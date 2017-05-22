@@ -1,17 +1,46 @@
 version: '2'
 
+volumes:
+  mongodata:
+    external: true
+
 services:
   cvas.web:
-    image: user/cvas.web${TAG}
+    image: adamjez1/cvas:latest
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "80"
+      - 5000:80
     depends_on:
       - rabbitmq
+      - mongodb
+    environment:
+      - 'ASPNETCORE_ENVIRONMENT=Production'
+      - 'ConnectionStrings:MsSql=Server=tcp:{host},1433;Initial Catalog={database};User ID={username};Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+      - 'ConnectionStrings:RabbitMq=host=rmq;username=guest;password=guest'
+      - 'ConnectionStrings:MongoDb=mongodb://mongostorage:27017'
   rabbitmq:
-    image: rabbitmq
+    image: library/rabbitmq
     hostname: rmq
     ports:
-      - "15672:15672"
+      - 15672:15672
+      - 5672:5672
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+  mongodb:
+    image: 'library/mongo'
+    hostname: mongostorage
+    volumes:
+      - mongodata:/data/db
+    ports:
+      - 27017:27017
+  # mssql:
+  #   image: 'microsoft/mssql-server-linux'
+  #   hostname: mssql
+  #   ports:
+  #     - 1433:1433
+  #   environment:
+  #     - ACCEPT_EULA=Y
+  #     - SA_PASSWORD=Samplepassword25

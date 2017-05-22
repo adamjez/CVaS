@@ -57,9 +57,9 @@ namespace CVaS.AlgServer.Services.MessageProcessor
 
             using (_container.OpenScope())
             {
-                using (_unitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
+                using (var uow = _unitOfWorkProvider.Create(DbContextOptions.DisableTransactionMode))
                 {
-                    //var run = await _runRepository.GetByIdSafely(request.RunId, (r) => r.Algorithm);
+                    uow.Context.Run.Attach(request.Run);
 
                     var result = await _launchService.LaunchAsync(request.Algorithm, request.Run, 
                         new RunSettings { Arguments = request.Arguments, Timeout = request.Timeout });

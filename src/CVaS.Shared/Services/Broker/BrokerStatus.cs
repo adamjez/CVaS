@@ -44,7 +44,7 @@ namespace CVaS.Shared.Services.Broker
             }
             catch (Exception exc)
             {
-                _logger.LogError("Exception when getting connected Alg Servers Count", exc);
+                _logger.LogWarning("Exception when getting connected Alg Servers Count", exc);
             }
 
             return null;

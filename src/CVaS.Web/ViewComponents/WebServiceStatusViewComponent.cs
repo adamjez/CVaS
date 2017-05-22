@@ -24,7 +24,7 @@ namespace CVaS.Web.ViewComponents
 
             var status = new WebServiceStatusViewModel()
             {
-                IsAnyAlgServerOnline = algServerCount.HasValue && algServerCount.Value > 0,
+                IsAnyAlgServerOnline = !algServerCount.HasValue || algServerCount.Value > 0,
                 IsLocalMode = _modeOptions.Value.IsLocal
             };
 

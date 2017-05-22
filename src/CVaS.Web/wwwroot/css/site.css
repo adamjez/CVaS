@@ -110,7 +110,7 @@ img.clippy {
 
 
 /* Algorithms Section */
-#message {
+.message {
     position: fixed;
     top: 70px;
     left: 10px;
@@ -119,6 +119,10 @@ img.clippy {
 }
 
 #request-message {
+    display: inline-block;
+}
+
+#admin-message {
     display: inline-block;
 }
 
