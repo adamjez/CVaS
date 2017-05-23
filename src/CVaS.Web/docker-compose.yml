@@ -18,11 +18,11 @@ services:
     environment:
       - 'ASPNETCORE_ENVIRONMENT=Production'
       - 'ConnectionStrings:MsSql=Server=tcp:{host},1433;Initial Catalog={database};User ID={username};Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-      - 'ConnectionStrings:RabbitMq=host=rmq;username=guest;password=guest'
-      - 'ConnectionStrings:MongoDb=mongodb://mongostorage:27017'
+      - 'ConnectionStrings:RabbitMq=host=rabbitmq;username=guest;password=guest'
+      - 'ConnectionStrings:MongoDb=mongodb://mongodb:27017'
   rabbitmq:
     image: library/rabbitmq
-    hostname: rmq
+    hostname: rabbitmq
     ports:
       - 15672:15672
       - 5672:5672
@@ -31,7 +31,7 @@ services:
       - RABBITMQ_DEFAULT_PASS=guest
   mongodb:
     image: 'library/mongo'
-    hostname: mongostorage
+    hostname: mongodb
     volumes:
       - mongodata:/data/db
     ports:
