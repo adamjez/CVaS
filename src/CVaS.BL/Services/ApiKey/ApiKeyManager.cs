@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
-using CVaS.Shared.Exceptions;
 using CVaS.Shared.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,17 +14,17 @@ namespace CVaS.BL.Services.ApiKey
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly UserRepository _userRepository;
         private readonly IApiKeyGenerator _apiKeyGenerator;
-        private readonly Func<SignInManager<AppUser>> _signInManagerFactory;
-        private readonly Func<UserManager<AppUser>> _userManagerFactory;
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly UserManager<AppUser> _userManager;
 
         public ApiKeyManager(IUnitOfWorkProvider unitOfWorkProvider, UserRepository userRepository,
-            IApiKeyGenerator apiKeyGenerator, Func<SignInManager<AppUser>> signInManagerFactory, Func<UserManager<AppUser>> userManagerFactory)
+            IApiKeyGenerator apiKeyGenerator, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager)
         {
             _unitOfWorkProvider = unitOfWorkProvider;
             _userRepository = userRepository;
             _apiKeyGenerator = apiKeyGenerator;
-            _signInManagerFactory = signInManagerFactory;
-            _userManagerFactory = userManagerFactory;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         public async Task RevokeAsync(int userId)
@@ -66,13 +65,13 @@ namespace CVaS.BL.Services.ApiKey
         {
             using (_unitOfWorkProvider.Create())
             {
-                var user = await _userManagerFactory().Users.FirstOrDefaultAsync(us => us.ApiKey == apiKey);
+                var user = await _userManager.Users.FirstOrDefaultAsync(us => us.ApiKey == apiKey);
                 if (user == null)
                 {
                     return null;
                 }
 
-                return await _signInManagerFactory().CreateUserPrincipalAsync(user);
+                return await _signInManager.CreateUserPrincipalAsync(user);
             }
         }
     }

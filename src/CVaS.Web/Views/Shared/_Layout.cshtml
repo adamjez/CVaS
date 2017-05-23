@@ -1,5 +1,4 @@
-﻿@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
-@model CVaS.Web.Models.LayoutViewModel
+﻿@model CVaS.Web.Models.LayoutViewModel
 
 <!DOCTYPE html>
 <html>
@@ -24,8 +23,6 @@
     <environment names="Staging,Production">
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
-
-    @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
 <body>
 

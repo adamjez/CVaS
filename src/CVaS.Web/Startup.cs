@@ -83,10 +83,12 @@ namespace CVaS.Web
             // It's null when using ef migrations tools so we need to check first to not to throw exc
             if (physicalProvider != null) services.AddSingleton(physicalProvider);
 
-            return new Container()
+            return new Container(Rules.Default
+                    .WithCaptureContainerDisposeStackTrace()
+                    .WithoutThrowIfDependencyHasShorterReuseLifespan()
+                    .WithImplicitRootOpenScope())
                 .WithDependencyInjectionAdapter(services,
-                    throwIfUnresolved: type => type.Name.EndsWith("Controller"))
-                .With(rules => rules.WithCaptureContainerDisposeStackTrace())
+                    throwIfUnresolved: type => type.Name.EndsWith("Controller"))  
                 .ConfigureServiceProvider<WebApiCompositionRoot>();
         }
 
