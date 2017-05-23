@@ -1,5 +1,4 @@
-﻿using CVaS.BL.Common;
-using CVaS.BL.Facades;
+﻿using CVaS.BL.Facades;
 using CVaS.BL.Services.ApiKey;
 using CVaS.BL.Services.ArgumentTranslator;
 using CVaS.BL.Services.Email;
@@ -24,7 +23,6 @@ namespace CVaS.BL.Installers
             registrator.Register<IApiKeyManager, ApiKeyManager>();
             registrator.Register<IApiKeyManager, CachedApiKeyManager>(setup: Setup.Decorator);
 
-
             registrator.Register<AccountFacade>();
             registrator.Register<AlgorithmFacade>();
             registrator.Register<FileFacade>();
@@ -35,7 +33,6 @@ namespace CVaS.BL.Installers
             registrator.Register<IApiKeyGenerator, RndApiKeyGenerator>();
             registrator.Register<IArgumentTranslator, BasicArgumentTranslator>();
             registrator.Register<IEmailSender, MockMessageSender>();
-
 
             if (ModeOptions.IsLocal)
             {

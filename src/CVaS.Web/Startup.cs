@@ -19,7 +19,6 @@ using CVaS.Web.Helpers;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using CVaS.Web.Swagger;
-using System.Collections.Generic;
 
 namespace CVaS.Web
 {
@@ -87,6 +86,7 @@ namespace CVaS.Web
             return new Container()
                 .WithDependencyInjectionAdapter(services,
                     throwIfUnresolved: type => type.Name.EndsWith("Controller"))
+                .With(rules => rules.WithCaptureContainerDisposeStackTrace())
                 .ConfigureServiceProvider<WebApiCompositionRoot>();
         }
 

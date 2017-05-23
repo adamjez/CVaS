@@ -42,7 +42,8 @@ namespace CVaS.Shared.Installers
                     setup: Setup.With(condition: (request) => request.ParentOrWrapper.FactoryType != FactoryType.Wrapper));
 
                 // Registration for custom Unit Of Work Pattern => resolving using Func<AppDbContext>
-                registrator.Register<AppDbContext>(Reuse.Transient, ifAlreadyRegistered: IfAlreadyRegistered.AppendNotKeyed,
+                registrator.Register<AppDbContext>(Reuse.Transient,
+                    ifAlreadyRegistered: IfAlreadyRegistered.AppendNotKeyed,
                     setup: Setup.With(condition: (request) => request.ParentOrWrapper.FactoryType == FactoryType.Wrapper));
             }
             else
@@ -50,7 +51,7 @@ namespace CVaS.Shared.Installers
                 registrator.Register<AppDbContext>(Reuse.Transient, ifAlreadyRegistered: IfAlreadyRegistered.Replace);
             }
 
-            registrator.Register<IUnitOfWorkProvider, EntityFrameworkUnitOfWorkProvider>(Reuse.InCurrentScope);
+            registrator.Register<IUnitOfWorkProvider, EntityFrameworkUnitOfWorkProvider>(Reuse.Transient);
 
             if (IsWebApplication)
             {

@@ -34,8 +34,8 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Mvc.TypedRouting" Version="1.3.0" />
     <PackageReference Include="BuildBundlerMinifier" Version="2.4.337" />
-    <PackageReference Include="DryIoc.dll" Version="2.10.4" />
-    <PackageReference Include="DryIoc.Microsoft.DependencyInjection" Version="1.1.1" />
+    <PackageReference Include="DryIoc.dll" Version="2.10.7" />
+    <PackageReference Include="DryIoc.Microsoft.DependencyInjection" Version="1.2.2" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Routing" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Server.IISIntegration" Version="1.1.2" />
