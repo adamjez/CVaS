@@ -7,6 +7,7 @@
     <environment names="Development">
         <link href="~/lib/fine-uploader/dist/fine-uploader-new.css" rel="stylesheet">
         <link href="~/lib/featherlight/release/featherlight.min.css" rel="stylesheet">
+        <link href="~/css/algorithm-client.css" rel="stylesheet">
     </environment>
     <environment names="Staging,Production">
         <link href="~/lib/fine-uploader/dist/fine-uploader-new.min.css" rel="stylesheet">
@@ -74,7 +75,7 @@
                                 </div>
                             </div>
                         </div>
-                     </div>
+                    </div>
                 </li>
             </ul>
 
@@ -105,13 +106,8 @@
     </script>
 }
 
-<div class="message">
-    <div id="request-message" class="alert alert-info alert-dismissible" style="display:none;" role="alert">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <div id="body-request-message">
-        </div>
+<div id="messages-container" class="message">
 
-    </div>
 </div>
 
 <div class="page-header">

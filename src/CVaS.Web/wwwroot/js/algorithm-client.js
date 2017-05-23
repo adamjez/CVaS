@@ -18,12 +18,25 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
     zip.workerScriptsPath = "/lib/zipjs/WebContent/";
 
     var showMessage = function (method, location, body) {
-        $("#body-request-message").html("<p>" + method + " " + location + "</p><p>BODY: " + body + "</p>");
-        $("#request-message").show();
-        $("#request-message").alert();
-        $("#request-message")
+        var message = $(
+            `<div>
+                <div class="alert alert-info alert-dismissible request-message" role="alert" >
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <div class="body-request-message">
+                    </div>
+                </div >
+            </div>`);
+
+        message.find(".body-request-message").html("<p>" + method + " " + location + "</p><p>BODY: " + body + "</p>");
+        $("#messages-container").append(message);
+
+        var requestMessage = message.find(".request-message");
+        requestMessage.alert();
+        requestMessage
             .delay(_this.options.messageHideDelay)
-            .slideUp(_this.options.slideUpDuration, 0);
+            .slideUp(_this.options.slideUpDuration, function () {
+                message.remove();
+            });
     };
 
     var createLabelForStatus = function (status) {

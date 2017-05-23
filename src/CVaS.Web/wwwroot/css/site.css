@@ -107,9 +107,6 @@ img.clippy {
     margin-top: -2px;
 }
 
-
-
-/* Algorithms Section */
 .message {
     position: fixed;
     top: 70px;
@@ -118,116 +115,8 @@ img.clippy {
     z-index: 4;
 }
 
-#request-message {
-    display: inline-block;
-}
-
 #admin-message {
     display: inline-block;
-}
-
-#body-request-message {
-    display: inline-block;
-}
-
-.featherlight .featherlight-content {
-    max-width: 90%;
-    max-height: 90%;
-}
-
-.loader {
-    margin: auto;
-    border: 8px solid #ceecff; /* Light blue */
-    border-top: 8px solid #3498db; /* Blue */
-    border-radius: 50%;
-    width: 80px;
-    height: 80px;
-    animation: spin 1s ease infinite;
-}
-
-.qq-upload-file {
-    width: 150px !important;
-}
-
-.qq-uploader {
-    min-height: 400px;
-    max-height: 1200px;
-}
-
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-.fine-upload-gallery {
-    position: relative;
-}
-
-.qq-upload-list li {
-    overflow: hidden;
-    width: 48%;
-    display: inline-block;
-    vertical-align: top;
-    margin: 0 15px 10px 0;
-}
-
-.qq-upload-input-image .qq-file-name {
-    display: none;
-}
-
-img.result-preview,
-.qq-upload-input-image .qq-thumbnail-selector {
-    display: block;
-    margin: auto;
-    max-width: 100%;
-    max-height: 100%;
-    height: 100%;
-}
-
-.qq-upload-input-image .qq-file-info {
-    display: block;
-    text-align: center;
-}
-
-.qq-upload-output-image .resultImg {
-    position: relative;
-    height: 90%;
-}
-
-.qq-upload-images {
-    height: 160px;
-    max-height: 160px;
-}
-
-.qq-upload-input-image,
-.qq-output-image-added {
-    /*width: 50%;*/
-    height: 100%;
-    max-height: 100%;
-}
-
-.qq-thumbnail-wrapper {
-    height: 90%;
-}
-
-.qq-upload-results {
-    display: block;
-    float: initial;
-    width: initial;
-    margin: 10px 0 20px 0;
-    padding: 0;
-}
-
-.qq-image-full-width {
-    display: block;
-    width: 100%;
-    margin: auto;
 }
 
 .arrow-top,
@@ -266,24 +155,4 @@ footer {
 
 footer p {
     margin: 0;
-}
-
-@media screen and (max-width: 768px) {
-    .qq-upload-list li.qq-upload-success {
-        width: 100%;
-    }
-
-    .qq-upload-list li {
-        margin: 0 0px 10px 0;
-    }
-
-    .qq-upload-input-image, .qq-output-image-added {
-        max-height: 100%;
-        height: 160px;
-    }
-
-    .qq-upload-images {
-        height: auto;
-        max-height: inherit;
-    }
 }
