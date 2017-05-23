@@ -52,7 +52,8 @@ namespace CVaS.AlgServer
             var container = new Container(rules => rules
                                                     .WithImplicitRootOpenScope()
                                                     .WithoutThrowOnRegisteringDisposableTransient()
-                                                    .WithDefaultIfAlreadyRegistered(IfAlreadyRegistered.Throw))
+                                                    .WithDefaultIfAlreadyRegistered(IfAlreadyRegistered.Throw)
+                                                    .WithImplicitRootOpenScope())
                                 .WithDependencyInjectionAdapter(services);
 
             SharedComposition.IsWebApplication = false;

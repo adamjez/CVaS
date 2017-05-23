@@ -11,7 +11,7 @@ namespace CVaS.AlgServer
             var env = EnviromentOptions.GetEnviromentOptions();
             var startup = new Startup(env);
 
-            using (var container = startup.ConfigureServices()) 
+            using (var container = startup.ConfigureServices())
             {
                 startup.Configure(container);
 

@@ -108,6 +108,7 @@ namespace CVaS.Shared.Services.Process
                     }
                 }
                 catch (InvalidOperationException) { }
+                catch (System.ComponentModel.Win32Exception) { }
             };
         }
     }

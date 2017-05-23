@@ -51,15 +51,16 @@ namespace CVaS.Shared.Installers
                 registrator.Register<AppDbContext>(Reuse.Transient, ifAlreadyRegistered: IfAlreadyRegistered.Replace);
             }
 
-            registrator.Register<IUnitOfWorkProvider, EntityFrameworkUnitOfWorkProvider>(Reuse.Transient);
 
             if (IsWebApplication)
             {
+                registrator.Register<IUnitOfWorkProvider, EntityFrameworkUnitOfWorkProvider>(Reuse.Transient);
                 registrator.Register<UnitOfWorkRegistryBase, AsyncLocalUnitOfWorkRegistry>();
                 registrator.Register<IUnitOfWorkRegistry, HttpContextUnitOfWorkRegistry>();
             }
             else
             {
+                registrator.Register<IUnitOfWorkProvider, EntityFrameworkUnitOfWorkProvider>(Reuse.InCurrentScope);
                 registrator.Register<IUnitOfWorkRegistry, AsyncLocalUnitOfWorkRegistry>();
             }
 
