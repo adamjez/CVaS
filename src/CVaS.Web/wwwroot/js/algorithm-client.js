@@ -1,17 +1,21 @@
 ﻿"use strict";
 function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) {
-    if (options === undefined) {
-        options = {
-            messageHideDelay: 5000,
-            slideUpDuration: 500,
-            checkForRunInterval: 10,
-            runsEndpoint: '/runs',
-            filesEndpoint: '/files'
-        };
+    var currentOptions = {
+        messageHideDelay: 5000,
+        slideUpDuration: 500,
+        checkForRunInterval: 10,
+        runsEndpoint: '/runs',
+        filesEndpoint: '/files',
+        allowedExtensions: ['jpeg', 'jpg', 'gif', 'png', 'bmp']
+    };
+
+    if (options !== undefined) {
+        // Assign all properties even if user specificated only few of them
+        Object.assign(currentOptions, options);
     }
 
     var _this = this;
-    this.options = options;
+    this.options = currentOptions;
     this.algorithmEndpoint = algorithmEndpoint;
     this.createRequestBodyCallback = createRequestBodyCallback;
 
@@ -243,7 +247,7 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
                 }
             },
             validation: {
-                allowedExtensions: ['jpeg', 'jpg', 'gif', 'png', 'bmp']
+                allowedExtensions: _this.options.allowedExtensions
             },
             callbacks: {
                 onComplete: function (qqId, name, responseJson) {

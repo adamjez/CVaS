@@ -1,0 +1,31 @@
+﻿@model CVaS.Web.Models.LayoutViewModel
+@{
+    Layout = "_AlgorithmLayout";
+}
+
+<h3>Description</h3>
+<p>Algorithm for video stabilization is provided created with <a target="_blank" href="https://ffmpeg.org/">FFmpeg</a> filters.</p>
+
+<img src="https://trac.ffmpeg.org/ffmpeg-logo.png" alt="ffmpeg logo" style="float:right;margin-top:-100px;" />
+
+<h3>API</h3>
+<div class="well well-lg">
+    <h4>Input</h4>
+    <span>Video file</span><br />
+    <span>Example: &quot;local://6762da80-d1e5-46a2-3818-08d472d3e445&quot;</span>
+    
+    <h4>Return</h4>
+    <span>Stabilized video file</span>
+    <ul>
+</div>
+
+@section Scripts {
+    <script>
+        var callback = function (fileId) {
+            var form = $('#algorithm-run');
+            return "local://" + fileId;
+        }
+
+        var client = new AlgorithmClient('/algorithms/video-stabilization', callback, {allowedExtensions: ['avi', 'mp4']});
+    </script>
+}
