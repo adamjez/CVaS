@@ -19,8 +19,8 @@
 
 @section Scripts {
     <script>
-        var callback = function (fileId) {
-            return "local://" + fileId;
+        var callback = function (file) {
+            return file;
         }
 
         var client = new AlgorithmClient('/algorithms/gender-detection', callback);

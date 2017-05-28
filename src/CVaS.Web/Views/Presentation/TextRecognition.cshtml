@@ -90,10 +90,10 @@
 
 @section Scripts {
     <script>
-        var callback = function (fileId) {
+        var callback = function (file) {
             var form = $('#algorithm-run');
             return [
-                "local://" + fileId,
+                file,
                 "stdout",
                 {
                     l: form.find('input[type=checkbox]:checked').map(function () { return $(this).val(); }).get().join('+'),

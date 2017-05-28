@@ -44,9 +44,9 @@
 
 @section Scripts {
     <script>
-        var callback = function (fileId) {
+        var callback = function (file) {
             var form = $('#algorithm-run');
-            return ["local://" + fileId, form.find('#inputScaleFactor').val(), form.find('input[type=radio]:checked').val()];
+            return [file, form.find('#inputScaleFactor').val(), form.find('input[type=radio]:checked').val()];
         }
 
         var client = new AlgorithmClient('/algorithms/face-detection', callback);

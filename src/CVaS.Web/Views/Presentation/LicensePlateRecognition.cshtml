@@ -35,11 +35,11 @@
 
 @section Scripts {
     <script>
-        var callback = function (fileId) {
+        var callback = function (file) {
             var form = $('#algorithm-run');
             return [
                 { c: form.find('input[type=radio]:checked').val(), n: form.find('#inputPlatesCount').val() },
-                "local://" + fileId
+                file
             ];
         }
 

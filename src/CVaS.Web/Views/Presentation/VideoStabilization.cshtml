@@ -21,9 +21,9 @@
 
 @section Scripts {
     <script>
-        var callback = function (fileId) {
+        var callback = function (file) {
             var form = $('#algorithm-run');
-            return "local://" + fileId;
+            return file;
         }
 
         var client = new AlgorithmClient('/algorithms/video-stabilization', callback, {allowedExtensions: ['avi', 'mp4']});

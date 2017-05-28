@@ -158,7 +158,7 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
         }
 
         if (file !== undefined) {
-            element.append('<p>File: <a href= "' + file + '">download</a></p>');
+            element.append('<p>File: <a href= "' + file + '" target="_blank">download</a></p>');
             $.ajax({
                 type: 'HEAD',
                 url: file,
@@ -167,7 +167,7 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
                     if (contentType === 'application/zip') {
                         showImageFromZip(elementImgOut, file);
                     }
-                    else {
+                    else if (contentType.startsWith("image/")){
                         showImage(elementImgOut, file);
                     }
                 },
@@ -184,7 +184,7 @@ function AlgorithmClient(algorithmEndpoint, createRequestBodyCallback, options) 
         var resultDiv = result.find('div.result');
         var resultImgDiv = result.find('div.qq-upload-images');
 
-        var requestBody = _this.createRequestBodyCallback(id);
+        var requestBody = _this.createRequestBodyCallback('local://' + id);
         // if callback returns null, we dont run algorithm
         // Most common use is that client want more images uploaded
         if (requestBody === null) {

@@ -23,8 +23,8 @@
 @section Scripts {
     <script>
         var uploadedFiles = []
-        var callback = function (fileId) {
-            uploadedFiles.push("local://" + fileId)
+        var callback = function (file) {
+            uploadedFiles.push(file)
 
             if (uploadedFiles.length == 2) { 
                 array = uploadedFiles;
