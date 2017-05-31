@@ -15,19 +15,19 @@
                 <label class="control-label">Output type</label>
                 <div class="form-check">
                     <label class="form-check-label">
-                        <input type="radio" class="form-check-input" name="optionsRadios" value="2" checked>
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="text" checked>
                         Text
                     </label>
                 </div>
                 <div class="form-check">
                     <label class="form-check-label">
-                        <input type="radio" class="form-check-input" name="optionsRadios" value="3">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="image">
                         Image
                     </label>
                 </div>
                 <div class="form-check">
                     <label class="form-check-label">
-                        <input type="radio" class="form-check-input" name="optionsRadios" value="1">
+                        <input type="radio" class="form-check-input" name="optionsRadios" value="both">
                         Both
                     </label>
                 </div>
@@ -46,7 +46,7 @@
     <script>
         var callback = function (file) {
             var form = $('#algorithm-run');
-            return [file, form.find('#inputScaleFactor').val(), form.find('input[type=radio]:checked').val()];
+            return {"input": file, "scale": form.find('#inputScaleFactor').val(), "outputType": form.find('input[type=radio]:checked').val()};
         }
 
         var client = new AlgorithmClient('/algorithms/face-detection', callback);

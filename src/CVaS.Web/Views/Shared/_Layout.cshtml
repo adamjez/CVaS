@@ -27,9 +27,7 @@
 <body>
 
     <authorize roles="Admin">
-        <cache expires-after="@TimeSpan.FromMinutes(1)">
-            <vc:web-service-status />
-        </cache>
+        <vc:web-service-status />
     </authorize>
 
     <nav class="navbar navbar-default navbar-fixed-top">
