@@ -21,7 +21,7 @@ services:
       - 'ConnectionStrings:RabbitMq=host=rabbitmq;username=guest;password=guest;timeout=120'
       - 'ConnectionStrings:MongoDb=mongodb://mongodb:27017'
   rabbitmq:
-    image: library/rabbitmq
+    image: library/rabbitmq-management
     hostname: rabbitmq
     ports:
       - 15672:15672
