@@ -47,7 +47,7 @@ namespace CVaS.AlgServer
 
             services.AddSingleton(Configuration);
 
-            services.AddMemoryCache(options => options.CompactOnMemoryPressure = true);
+            services.AddMemoryCache();
 
             var container = new Container(rules => rules
                                                     .WithImplicitRootOpenScope()

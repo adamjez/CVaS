@@ -10,12 +10,9 @@
     <PackageId>CVaS.Web</PackageId>
     <OutputType>Exe</OutputType>
     <UserSecretsId>aspnet-CVaS.Web-20161227062634</UserSecretsId>
+    <LangVersion>7.1</LangVersion>
     <ApplicationInsightsResourceId>/subscriptions/53e0a8d2-2132-436b-b208-013b247740e4/resourcegroups/Default-ApplicationInsights-EastUS/providers/microsoft.insights/components/CVaS.Web</ApplicationInsightsResourceId>
     <ApplicationInsightsAnnotationResourceId>/subscriptions/53e0a8d2-2132-436b-b208-013b247740e4/resourcegroups/Default-ApplicationInsights-EastUS/providers/microsoft.insights/components/CVaS.Web</ApplicationInsightsAnnotationResourceId>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
