@@ -1,5 +1,6 @@
 version: '{build} ({branch})'
 skip_tags: true
+image: Visual Studio 2017
 init:
 - cmd: git config --global core.autocrlf true
 build_script:
