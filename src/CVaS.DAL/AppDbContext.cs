@@ -14,7 +14,7 @@ namespace CVaS.DAL
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
-            
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,8 +32,6 @@ namespace CVaS.DAL
                 .IsRequired()
                 .HasMaxLength(64)
                 .IsUnicode(false);
-
         }
-
     }
 }

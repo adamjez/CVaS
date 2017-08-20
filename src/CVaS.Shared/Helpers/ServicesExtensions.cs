@@ -12,6 +12,7 @@ using FluentScheduler;
 using Microsoft.Extensions.Logging;
 using DryIoc;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace CVaS.Shared.Helpers
 {

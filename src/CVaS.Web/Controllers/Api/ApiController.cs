@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CVaS.Web.Controllers.Api
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = AuthenticationSchemes.Both)]
     public abstract class ApiController : Controller
     {
     }

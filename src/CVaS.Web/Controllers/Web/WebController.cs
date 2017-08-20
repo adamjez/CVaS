@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CVaS.Web.Controllers.Web
 {
-    [Authorize(ActiveAuthenticationSchemes = AuthenticationScheme.WebCookie)]
+    [Authorize(AuthenticationSchemes = AuthenticationSchemes.WebCookie)]
     public abstract class WebController : Controller
     {
         protected readonly ICurrentUserProvider CurrentUserProvider;

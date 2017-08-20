@@ -4,11 +4,11 @@ using CVaS.BL.Common;
 using CVaS.DAL;
 using CVaS.DAL.Model;
 using CVaS.Shared.Options;
-using CVaS.Web.Authentication;
 using CVaS.Web.Filters;
 using EasyNetQ;
 using EasyNetQ.ConnectionString;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -41,32 +41,33 @@ namespace CVaS.Web.Helpers
 
         public static IServiceCollection AddCustomizedIdentity(this IServiceCollection services)
         {
+            services.ConfigureApplicationCookie(o =>
+            {
+                o.LoginPath = "/Account/Login";
+                o.LogoutPath = "/Account/LogOff";
+                o.ExpireTimeSpan = TimeSpan.FromDays(150);
+            });
+
             // Set ASP.NET Identity and cookie authentication
-            services.AddIdentity<AppUser, AppRole>(options =>
+            services.AddIdentity<AppUser, AppRole>(o =>
             {
                 // Password settings
-                options.Password.RequireDigit = false;
-                options.Password.RequiredLength = 8;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireLowercase = false;
+                o.Password.RequireDigit = false;
+                o.Password.RequiredLength = 8;
+                o.Password.RequireNonAlphanumeric = false;
+                o.Password.RequireUppercase = false;
+                o.Password.RequireLowercase = false;
 
                 // User settings
-                options.User.RequireUniqueEmail = true;
-
-                options.Cookies.ApplicationCookie.ExpireTimeSpan = TimeSpan.FromDays(150);
-                options.Cookies.ApplicationCookie.LoginPath = "/Account/Login/";
-                options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOff";
-                options.Cookies.ApplicationCookie.AuthenticationScheme = AuthenticationScheme.WebCookie;
-                options.Cookies.ApplicationCookie.AutomaticAuthenticate = true;
-                options.Cookies.ApplicationCookie.AutomaticChallenge = false;
+                o.User.RequireUniqueEmail = true;
             })
-                .AddEntityFrameworkStores<AppDbContext, int>()
+                .AddEntityFrameworkStores<AppDbContext>()
                 .AddUserStore<AppUserStore>()
                 .AddDefaultTokenProviders();
 
-            return services;;
+            return services;
         }
+
 
         public static IServiceCollection AddMessageBroker(this IServiceCollection services, IConfiguration configuration)
         {

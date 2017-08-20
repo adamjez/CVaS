@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
 using DryIoc;
 using DryIoc.Microsoft.DependencyInjection;
-using StackExchange.Profiling;
 using StackExchange.Profiling.Storage;
 using Microsoft.Extensions.Caching.Memory;
 using CVaS.Web.Helpers;
@@ -54,18 +53,18 @@ namespace CVaS.Web
             services.AddCustomizedIdentity();
             services.AddApiAuthentication(option =>
             {
-                option.AuthenticationScheme = AuthenticationScheme.ApiKey;
+                option.AuthenticationScheme = AuthenticationSchemes.ApiKey;
                 option.HeaderScheme = "Simple";
             });
 
             services.AddDatabaseServices(Configuration);
             services.AddStorageServices(Configuration);
             services.AddCustomizedMvc();
-            services.AddMemoryCache(options => options.CompactOnMemoryPressure = true);
+            services.AddMemoryCache();
             // Inject an implementation of ISwaggerProvider with defaulted settings applied
             services.AddSwaggerGen(ConfigureSwagger);
-            services.AddMiniProfiler()
-                .AddEntityFramework();
+            services.AddMiniProfiler();
+                //.AddEntityFramework();
 
             if (_modeOptions.IsLocal)
             {
@@ -93,7 +92,7 @@ namespace CVaS.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IMemoryCache cache, IContainer container)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IMemoryCache cache, IContainer container)   
         {
             if (env.IsDevelopment())
             {
@@ -102,18 +101,17 @@ namespace CVaS.Web
 
             app.UseStaticFiles();
 
-            app.UseApiAuthentication();
-            app.UseIdentity();
-
             if (env.IsDevelopment())
             {
-                app.UseMiniProfiler(new MiniProfilerOptions
+                app.UseMiniProfiler(o =>
                 {
-                    RouteBasePath = "~/profiler",
-                    SqlFormatter = new StackExchange.Profiling.SqlFormatters.InlineFormatter(),
-                    Storage = new MemoryCacheStorage(cache, TimeSpan.FromMinutes(20))
+                    o.RouteBasePath = "~/profiler";
+                    o.SqlFormatter = new StackExchange.Profiling.SqlFormatters.InlineFormatter();
+                    o.Storage = new MemoryCacheStorage(cache, TimeSpan.FromMinutes(20));
                 });
             }
+
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {

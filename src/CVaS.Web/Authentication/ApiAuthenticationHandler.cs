@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 using CVaS.BL.Services.ApiKey;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CVaS.Web.Authentication
 {
@@ -9,7 +11,9 @@ namespace CVaS.Web.Authentication
     {
         private readonly IApiKeyManager _apiKeyManager;
 
-        public ApiAuthenticationHandler(IApiKeyManager apiKeyManager)
+        public ApiAuthenticationHandler(IOptionsMonitor<ApiAuthenticationOptions> options, ILoggerFactory logger, 
+            UrlEncoder encoder, ISystemClock clock, IApiKeyManager apiKeyManager) 
+            : base(options, logger, encoder, clock)
         {
             _apiKeyManager = apiKeyManager;
         }
@@ -19,7 +23,7 @@ namespace CVaS.Web.Authentication
             string authHeader = Context.Request.Headers["Authorization"];
             if (authHeader != null && authHeader.StartsWith(Options.HeaderScheme))
             {
-                //Extract credentials
+                // Extract api key
                 string apiKey = authHeader.Substring(Options.HeaderScheme.Length).Trim();
 
                 var principals = await _apiKeyManager.GetClaimsPrincipalAsync(apiKey);
@@ -27,13 +31,13 @@ namespace CVaS.Web.Authentication
                 if (principals != null)
                 {
                     return AuthenticateResult.Success(
-                                new AuthenticationTicket(principals, new AuthenticationProperties(), Options.HeaderScheme));
+                                new AuthenticationTicket(principals, Options.HeaderScheme));
                 }
 
                 return AuthenticateResult.Fail("Bad username or password");
             }
 
-            return AuthenticateResult.Skip();
+            return AuthenticateResult.NoResult();
         }
     }
 }

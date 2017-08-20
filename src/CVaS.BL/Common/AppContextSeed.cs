@@ -64,6 +64,9 @@ namespace CVaS.BL.Common
                     await _userManager.CreateAsync(user, _databaseOptions.Value.DefaultPassword);
 
                     await _userManager.AddToRoleAsync(user, Roles.Admin);
+                    await _userManager.AddToRoleAsync(user, Roles.Developer);
+
+                    uow.Context.SaveChanges();
                 }
 
                 if (!uow.Context.Algorithms.Any())

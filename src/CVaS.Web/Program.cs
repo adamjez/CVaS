@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using CVaS.BL.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +8,7 @@ namespace CVaS.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var host = new WebHostBuilder()
                 .UseKestrel()
@@ -16,19 +17,19 @@ namespace CVaS.Web
                 .UseStartup<Startup>()
                 .Build();
 
-            PrepareDatabase(host);
+            await PrepareDatabase(host);
 
             host.Run();
         }
 
-        private static void PrepareDatabase(IWebHost host)
+        private static async Task PrepareDatabase(IWebHost host)
         {
-            var services = (IServiceScopeFactory) host.Services.GetService(typeof(IServiceScopeFactory));
+            var services = host.Services.GetService<IServiceScopeFactory>();
 
             using (var scope = services.CreateScope())
             {
-                var contextSeed = (AppContextSeed) scope.ServiceProvider.GetService(typeof(AppContextSeed));
-                contextSeed.SeedAsync().Wait();
+                var contextSeed = scope.ServiceProvider.GetService<AppContextSeed>();
+                await contextSeed.SeedAsync();
             }
         }
     }

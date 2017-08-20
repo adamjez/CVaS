@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CVaS.BL.DTO;
 using CVaS.BL.Facades;
 using CVaS.DAL.Model;
@@ -12,7 +11,7 @@ using CVaS.BL.Providers;
 
 namespace CVaS.Web.Controllers.Web
 {
-    [Authorize(Roles = Roles.Admin, ActiveAuthenticationSchemes = AuthenticationScheme.WebCookie)]
+    [Authorize(Roles = Roles.Admin, AuthenticationSchemes = AuthenticationSchemes.WebCookie)]
     public class AdminController : WebController
     {
         private readonly AlgorithmFacade _algoFacade;

@@ -7,7 +7,12 @@ namespace CVaS.Web.Authentication
     {
         public static void AddApiAuthentication(this IServiceCollection services, Action<ApiAuthenticationOptions> setupAction)
         {
-            services.Configure(setupAction);
+            var apiOptions = new ApiAuthenticationOptions();
+            setupAction(apiOptions);
+
+            services.AddAuthentication()
+                .AddScheme<ApiAuthenticationOptions, ApiAuthenticationHandler>(
+                    apiOptions.AuthenticationScheme, null, setupAction);
         }
     }
 }

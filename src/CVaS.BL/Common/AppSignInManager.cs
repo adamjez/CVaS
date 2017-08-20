@@ -1,5 +1,5 @@
 ﻿using CVaS.DAL.Model;
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -11,8 +11,8 @@ namespace CVaS.BL.Common
     {
         public AppSignInManager(UserManager<AppUser> userManager, IHttpContextAccessor contextAccessor, 
             IUserClaimsPrincipalFactory<AppUser> claimsFactory, IOptions<IdentityOptions> optionsAccessor, 
-            ILogger<AppSignInManager> logger)
-            : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger)
+            ILogger<AppSignInManager> logger, IAuthenticationSchemeProvider authenticationSchemeProvider)
+            : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, authenticationSchemeProvider)
         {
         }
     }

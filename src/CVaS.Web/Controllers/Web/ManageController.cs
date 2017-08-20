@@ -4,14 +4,12 @@ using CVaS.BL.Services.ApiKey;
 using CVaS.DAL.Model;
 using CVaS.Shared.Core.Provider;
 using CVaS.Web.Models.ManageViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace CVaS.Web.Controllers.Web
 {
-    [Authorize(ActiveAuthenticationSchemes = "WebCookieScheme")]
     public class ManageController : WebController
     {
         private readonly ILogger<AccountController> _logger;

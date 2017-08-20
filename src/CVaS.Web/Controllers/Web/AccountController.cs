@@ -9,10 +9,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using CVaS.BL.Providers;
+using CVaS.Web.Authentication;
 
 namespace CVaS.Web.Controllers.Web
 {
-    [Authorize(ActiveAuthenticationSchemes = "WebCookieScheme")]
     public class AccountController : WebController
     {
         private readonly ILogger<AccountController> _logger;
